@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Korean Center Global Network - Digital Business Card",
+  "description": "Interactive digital business card and print-ready PDF generator for PARK, GIHONG (President Director, Korean Center Global Network).",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

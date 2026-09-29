@@ -1,0 +1,20 @@
+# Cloudflare Pages / Workers Configuration for card.goguma.app
+name = "card-goguma-app"
+pages_build_output_dir = "dist"
+compatibility_date = "2024-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+BASE_DOMAIN = "card.goguma.app"
+
+# 1. Cloudflare D1 (Global Edge SQLite DB)
+[[d1_databases]]
+binding = "DB"
+database_name = "card_goguma_db"
+database_id = "card-goguma-d1-prod"
+
+# 2. Cloudflare R2 (Static HTML & Media Assets Bucket)
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "card-goguma-assets"
+preview_bucket_name = "card-goguma-assets-dev"
