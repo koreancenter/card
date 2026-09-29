@@ -1,7 +1,7 @@
 export interface Env {
-  DB: D1Database;
-  R2: R2Bucket;
-  ASSETS: Fetcher;
+  DB: any;
+  R2?: any;
+  ASSETS: { fetch: (request: Request) => Promise<Response> };
 }
 
 export default {

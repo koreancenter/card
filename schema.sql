@@ -36,3 +36,12 @@ CREATE TABLE IF NOT EXISTS card_views (
 );
 
 CREATE INDEX IF NOT EXISTS idx_card_views_card_id ON card_views(card_id);
+
+-- Wallets Table (Anonymous Cross-Device Sync)
+CREATE TABLE IF NOT EXISTS wallets (
+    sync_id TEXT PRIMARY KEY,
+    cards_json TEXT NOT NULL,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_wallets_sync_id ON wallets(sync_id);

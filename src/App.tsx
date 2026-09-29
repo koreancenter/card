@@ -15,13 +15,16 @@ import { ExportModal } from './components/ExportModal';
 import { ScanCardModal } from './components/ScanCardModal';
 import { CardEditorModal } from './components/CardEditorModal';
 import { VaultView } from './components/VaultView';
+import { DeviceSyncModal } from './components/DeviceSyncModal';
 import { APP_BASE_DOMAIN, resolveCardFromLocation, getCardShareUrl } from './utils/domain';
+import { pullWalletFromEdge, pushWalletToEdge } from './utils/syncWallet';
 import { 
   Check, 
   Camera, 
   CreditCard, 
   FolderArchive, 
-  ArrowLeft
+  ArrowLeft,
+  Smartphone
 } from 'lucide-react';
 
 export default function App() {
@@ -42,6 +45,7 @@ export default function App() {
   const [isScanOpen, setIsScanOpen] = useState<boolean>(false);
   const [isEditorOpen, setIsEditorOpen] = useState<boolean>(false);
   const [isCreatingCard, setIsCreatingCard] = useState<boolean>(false);
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
   const [editingCard, setEditingCard] = useState<StoredCard | null>(null);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -49,6 +53,36 @@ export default function App() {
   // Sync cards with local storage
   useEffect(() => {
     saveStoredCards(cards);
+  }, [cards]);
+
+  // 1. URL Sync Detection & Initialization (Cross-device anonymous wallet)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const searchParams = new URLSearchParams(window.location.search);
+    const syncId = searchParams.get('sync');
+    if (syncId) {
+      pullWalletFromEdge(syncId).then((remoteCards) => {
+        if (remoteCards && Array.isArray(remoteCards) && remoteCards.length > 0) {
+          setCards(remoteCards);
+          saveStoredCards(remoteCards);
+          setActiveTab('vault');
+          showToast('기기 보관함이 성공적으로 동기화되었습니다.');
+        }
+        // Clean up URL query parameter using replaceState without page refresh
+        const url = new URL(window.location.href);
+        url.searchParams.delete('sync');
+        window.history.replaceState({}, document.title, url.pathname + (url.search || ''));
+      });
+    }
+  }, []);
+
+  // 2. Automatic background sync of wallet to Cloudflare edge
+  useEffect(() => {
+    if (!cards || cards.length === 0) return;
+    const timer = setTimeout(() => {
+      pushWalletToEdge(cards);
+    }, 800);
+    return () => clearTimeout(timer);
   }, [cards]);
 
   // URL query parameter (?card=...), Pathname (/mrpark), & Custom Domain smart routing
@@ -311,17 +345,27 @@ export default function App() {
             </button>
           </nav>
 
-          {/* Right Header: Scan Card (Vault only) */}
+          {/* Right Header: Actions (Vault only) */}
           <div className="flex items-center gap-1.5 sm:gap-2 min-h-[32px]">
             {activeTab === 'vault' && (
-              <button
-                onClick={() => setIsScanOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition-all cursor-pointer active:scale-95 shadow-sm"
-                title="카메라로 종이 명함 촬영 및 자동 등록"
-              >
-                <Camera className="w-3.5 h-3.5" />
-                <span>명함 스캔</span>
-              </button>
+              <>
+                <button
+                  onClick={() => setIsSyncModalOpen(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white text-xs font-semibold transition-all cursor-pointer active:scale-95 shadow-sm"
+                  title="스마트폰과 보관함 동기화"
+                >
+                  <Smartphone className="w-3.5 h-3.5 text-[#C5A880]" />
+                  <span className="hidden sm:inline">기기 연결</span>
+                </button>
+                <button
+                  onClick={() => setIsScanOpen(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition-all cursor-pointer active:scale-95 shadow-sm"
+                  title="카메라로 종이 명함 촬영 및 자동 등록"
+                >
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>명함 스캔</span>
+                </button>
+              </>
             )}
           </div>
         </header>
@@ -399,6 +443,7 @@ export default function App() {
                 setIsExportOpen(true);
               }}
               onOpenScan={() => setIsScanOpen(true)}
+              onOpenSync={() => setIsSyncModalOpen(true)}
               onOpenEditor={() => {
                 setEditingCard(activeCard);
                 setIsCreatingCard(false);
@@ -450,6 +495,11 @@ export default function App() {
           isOpen={isScanOpen}
           onClose={() => setIsScanOpen(false)}
           onSaveCard={handleSaveCard}
+        />
+
+        <DeviceSyncModal
+          isOpen={isSyncModalOpen}
+          onClose={() => setIsSyncModalOpen(false)}
         />
 
         {editingCard && (

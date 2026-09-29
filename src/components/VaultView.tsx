@@ -14,7 +14,8 @@ import {
   List, 
   Eye, 
   Sparkles,
-  QrCode
+  QrCode,
+  Smartphone
 } from 'lucide-react';
 import { BusinessCardFront } from './BusinessCardFront';
 import { downloadVCard } from '../utils/vcard';
@@ -27,6 +28,7 @@ interface VaultViewProps {
   onExportCard: (card: StoredCard) => void;
   onOpenScan: () => void;
   onOpenEditor: () => void;
+  onOpenSync?: () => void;
 }
 
 export const VaultView: React.FC<VaultViewProps> = ({
@@ -36,7 +38,8 @@ export const VaultView: React.FC<VaultViewProps> = ({
   onDeleteCard,
   onExportCard,
   onOpenScan,
-  onOpenEditor
+  onOpenEditor,
+  onOpenSync
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -115,6 +118,19 @@ export const VaultView: React.FC<VaultViewProps> = ({
               <span className="hidden sm:inline">리스트 뷰</span>
             </button>
           </div>
+
+          {/* Device Sync Button */}
+          {onOpenSync && (
+            <button
+              onClick={onOpenSync}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-800 hover:border-neutral-700 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95 shrink-0"
+              title="스마트폰 카메라로 스캔하여 보관함 즉시 동기화"
+            >
+              <Smartphone className="w-3.5 h-3.5 text-[#C5A880]" />
+              <span className="hidden sm:inline">기기 연결</span>
+              <span className="sm:hidden">동기화</span>
+            </button>
+          )}
 
           {/* Quick Add Button */}
           <button

@@ -177,6 +177,7 @@ export function saveStoredCards(cards: StoredCard[]): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+    localStorage.setItem('saved_cards', JSON.stringify(cards));
   } catch (e) {
     console.error('Failed to save cards to storage', e);
   }
