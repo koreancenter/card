@@ -7,6 +7,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { CardTheme, PrintConfig, StoredCard } from './types/card';
 import { loadStoredCards, saveStoredCards } from './utils/initialCards';
 import { CardContainer } from './components/CardContainer';
+import { MyCardsCarousel } from './components/MyCardsCarousel';
 import { MyCardSwitcher } from './components/MyCardSwitcher';
 import { ShareModal } from './components/ShareModal';
 import { QrModal } from './components/QrModal';
@@ -476,53 +477,61 @@ export default function App() {
         <main className="flex-1 flex flex-col items-center justify-center px-4 py-5 sm:py-7 max-w-6xl mx-auto w-full">
           
           {activeTab === 'my-card' ? (
-            /* ================= VIEW 1: 3D CARD SHOWCASE ================= */
-            <div className="w-full flex flex-col items-center space-y-3 sm:space-y-3.5">
-              
-              {/* Context Bar if viewing someone else's card from the vault */}
+            /* ================= VIEW 1: LUXURY CARD SHOWCASE & CAROUSEL ================= */
+            <div className="w-full flex flex-col items-center">
+              {/* Context Bar only if viewing someone else's card from the vault */}
               {!activeCard.isMyCard ? (
-                <div className="flex items-center justify-between w-full max-w-[360px] sm:max-w-[400px] text-xs">
-                  <button
-                    onClick={() => setActiveTab('vault')}
-                    className="flex items-center gap-1 text-neutral-400 hover:text-white transition-colors cursor-pointer"
-                  >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    <span>보관함 목록으로</span>
-                  </button>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-neutral-900 border border-neutral-800 text-neutral-400">
-                    보관 명함 열람 중 ({activeCard.category})
-                  </span>
+                <div className="w-full flex flex-col items-center space-y-4">
+                  <div className="flex items-center justify-between w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px] text-xs">
+                    <button
+                      onClick={() => setActiveTab('vault')}
+                      className="flex items-center gap-1.5 text-neutral-400 hover:text-white transition-colors cursor-pointer py-1"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>보관함 목록으로</span>
+                    </button>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-[#121318] border border-white/5 text-neutral-400 font-mono">
+                      보관 명함 ({activeCard.category})
+                    </span>
+                  </div>
+
+                  <div className="w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px]">
+                    <CardContainer 
+                      data={activeCard.data} 
+                      theme={activeCard.theme} 
+                      isFlipped={isFlipped}
+                      onFlip={() => setIsFlipped(prev => !prev)}
+                      onOpenShare={() => setIsShareModalOpen(true)}
+                      onOpenEdit={() => {
+                        requireUnlock(() => {
+                          setEditingCard(activeCard);
+                          setIsCreatingCard(false);
+                          setIsEditorOpen(true);
+                        });
+                      }}
+                    />
+                  </div>
                 </div>
               ) : (
-                /* Multi-Profile Switcher & Creator (Requirement #1 & #2) */
-                <MyCardSwitcher
-                  myCards={myCards}
+                /* Apple Wallet-Style Luxury Horizontal Card Carousel Deck with Ghost Add Card Slot */
+                <MyCardsCarousel
+                  cards={myCards}
                   activeCardId={activeCard.id}
                   onSelectCard={handleSelectMyCard}
                   onCreateNewCard={handleOpenCreateModal}
-                  onDuplicateCard={handleDuplicateMyCard}
-                  onSetDefaultCard={handleSetDefaultCard}
-                  onDeleteCard={handleDeleteMyCard}
-                />
-              )}
-
-              {/* 3D Tactile Business Card */}
-              <div className="w-full">
-                <CardContainer 
-                  data={activeCard.data} 
-                  theme={activeCard.theme} 
-                  isFlipped={isFlipped}
-                  onFlip={() => setIsFlipped(prev => !prev)}
-                  onOpenShare={() => setIsShareModalOpen(true)}
-                  onOpenEdit={() => {
+                  onOpenEdit={(cardToEdit) => {
                     requireUnlock(() => {
-                      setEditingCard(activeCard);
+                      setEditingCard(cardToEdit);
                       setIsCreatingCard(false);
                       setIsEditorOpen(true);
                     });
                   }}
+                  onOpenShare={(cardToShare) => {
+                    setActiveCardId(cardToShare.id);
+                    setIsShareModalOpen(true);
+                  }}
                 />
-              </div>
+              )}
             </div>
           ) : (
             /* ================= VIEW 2: THE VAULT (CARD / LIST) ================= */
