@@ -1,5 +1,5 @@
 # Cloudflare Pages / Workers Configuration for card.goguma.app
-name = "card"
+name = "card_goguma_db"
 pages_build_output_dir = "dist"
 compatibility_date = "2024-09-01"
 compatibility_flags = ["nodejs_compat"]
