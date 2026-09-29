@@ -1,12 +1,12 @@
 import React from 'react';
 import { CardData } from '../types/card';
 import { 
-  Phone, 
-  Mail, 
-  Globe, 
-  MessageSquare, 
-  Edit3, 
-  Share2 
+  Share2,
+  Edit3,
+  Globe,
+  Mail,
+  MessageSquare,
+  Phone
 } from 'lucide-react';
 
 interface ActionButtonsProps {
@@ -20,88 +20,89 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   onOpenEdit,
   onOpenShare,
 }) => {
+  // Uniform minimal button style with original translucent hover effect
+  const buttonClass = "w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-white hover:bg-white/10 active:scale-95 transition-all duration-200 cursor-pointer";
+
   return (
-    <div className="flex items-center justify-center py-1.5 px-3 rounded-full bg-[#121318]/90 border border-white/10 backdrop-blur-xl shadow-xl">
-      {/* Group A: Contact Channels (Primary Communication) */}
-      <div className="flex items-center gap-1 sm:gap-1.5" role="group" aria-label="연락 수단">
-        {/* 1. Phone Call */}
-        {data.phone && (
-          <a
-            href={`tel:${data.phoneRaw || data.phone}`}
-            className="p-2 rounded-full text-neutral-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
-            title={`전화 통화 (${data.phone})`}
-            aria-label="전화 통화"
-          >
-            <Phone className="w-3.5 h-3.5" />
-          </a>
-        )}
+    <div 
+      className="inline-flex items-center gap-1 sm:gap-1.5"
+      role="toolbar" 
+      aria-label="명함 빠른 작업"
+    >
+      {/* 1. 공유 (Share) - Uniform icon-only button with original hover effect */}
+      <button
+        onClick={onOpenShare}
+        className={buttonClass}
+        title="명함 공유 (QR, 링크, 연락처)"
+        aria-label="명함 공유"
+      >
+        <Share2 className="w-3.5 h-3.5" />
+      </button>
 
-        {/* 2. Message (WhatsApp or SMS) */}
-        <a
-          href={data.whatsappUrl || `sms:${data.phoneRaw || data.phone}`}
-          target={data.whatsappUrl ? '_blank' : undefined}
-          rel={data.whatsappUrl ? 'noopener noreferrer' : undefined}
-          className="p-2 rounded-full text-neutral-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
-          title="문자 / 메시지 보내기"
-          aria-label="문자 보내기"
-        >
-          <MessageSquare className="w-3.5 h-3.5" />
-        </a>
-
-        {/* 3. Email */}
-        {data.email && (
-          <a
-            href={`mailto:${data.email}`}
-            className="p-2 rounded-full text-neutral-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
-            title={`이메일 작성 (${data.email})`}
-            aria-label="이메일 작성"
-          >
-            <Mail className="w-3.5 h-3.5" />
-          </a>
-        )}
-
-        {/* 4. Website / Digital Location */}
-        {data.website && (
-          <a
-            href={data.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-2 rounded-full text-neutral-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
-            title={`웹사이트 방문 (${data.websiteDisplay || data.website})`}
-            aria-label="웹사이트 방문"
-          >
-            <Globe className="w-3.5 h-3.5" />
-          </a>
-        )}
-      </div>
-
-      {/* Subtle 1px Divider */}
-      <span className="border-r border-white/10 mx-2.5 sm:mx-3 h-4 self-center" />
-
-      {/* Group B: Studio Actions (Secondary Refined Buttons) */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* Edit Button */}
-        {onOpenEdit && (
-          <button
-            onClick={onOpenEdit}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-neutral-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer active:scale-95"
-            title="명함 정보 및 테마 편집"
-          >
-            <Edit3 className="w-3.5 h-3.5 text-[#C5A880]" />
-            <span>편집</span>
-          </button>
-        )}
-
-        {/* Share Button */}
+      {/* 2. 편집 (Edit) */}
+      {onOpenEdit && (
         <button
-          onClick={onOpenShare}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-neutral-950 bg-[#C5A880] hover:bg-[#d4b78f] transition-all cursor-pointer shadow-sm active:scale-95"
-          title="QR 코드, 링크 복사, 연락처 저장, 인쇄"
+          onClick={onOpenEdit}
+          className={buttonClass}
+          title="명함 편집"
+          aria-label="명함 편집"
         >
-          <Share2 className="w-3.5 h-3.5 text-neutral-950" />
-          <span>공유</span>
+          <Edit3 className="w-3.5 h-3.5" />
         </button>
-      </div>
+      )}
+
+      {/* Subtle Hairline Divider */}
+      <span className="w-px h-3.5 bg-white/10 mx-0.5 self-center" />
+
+      {/* 3. 온라인 명함 보기 (Website) */}
+      {data.website && (
+        <a
+          href={data.website}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={buttonClass}
+          title="온라인 명함 보기"
+          aria-label="온라인 명함 보기"
+        >
+          <Globe className="w-3.5 h-3.5" />
+        </a>
+      )}
+
+      {/* 4. 이메일 (Email) */}
+      {data.email && (
+        <a
+          href={`mailto:${data.email}`}
+          className={buttonClass}
+          title={`이메일 작성 (${data.email})`}
+          aria-label="이메일 작성"
+        >
+          <Mail className="w-3.5 h-3.5" />
+        </a>
+      )}
+
+      {/* 5. 문자 (Message / WhatsApp) */}
+      <a
+        href={data.whatsappUrl || `sms:${data.phoneRaw || data.phone}`}
+        target={data.whatsappUrl ? '_blank' : undefined}
+        rel={data.whatsappUrl ? 'noopener noreferrer' : undefined}
+        className={buttonClass}
+        title="문자 / 메시지 보내기"
+        aria-label="문자 보내기"
+      >
+        <MessageSquare className="w-3.5 h-3.5" />
+      </a>
+
+      {/* 6. 전화 (Phone) */}
+      {data.phone && (
+        <a
+          href={`tel:${data.phoneRaw || data.phone}`}
+          className={buttonClass}
+          title={`전화 통화 (${data.phone})`}
+          aria-label="전화 통화"
+        >
+          <Phone className="w-3.5 h-3.5" />
+        </a>
+      )}
     </div>
   );
 };

@@ -7,8 +7,7 @@ import {
   Plus, 
   ChevronLeft, 
   ChevronRight, 
-  RefreshCw, 
-  Sparkles 
+  RefreshCw 
 } from 'lucide-react';
 
 interface MyCardsCarouselProps {
@@ -310,66 +309,20 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                 <p className="text-xs text-neutral-400 mt-1 max-w-[240px] leading-relaxed">
                   새로운 직함이나 소속 단체 명함을 추가합니다
                 </p>
-                <span className="mt-3.5 inline-flex items-center gap-1 text-[11px] font-semibold text-[#C5A880] bg-[#C5A880]/10 px-3 py-1 rounded-full border border-[#C5A880]/20 group-hover:border-[#C5A880]/40 transition-colors">
-                  <Sparkles className="w-3 h-3" />
-                  <span>+ 새 명함 등록하기</span>
-                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Discreet Bottom Pagination Indicator */}
-      <div className="flex items-center justify-center gap-1.5 mt-4 sm:mt-5 mb-3" role="tablist" aria-label="명함 선택 슬라이더">
-        {cards.map((card, idx) => {
-          const isSelected = idx === currentIndex;
-          return (
-            <button
-              key={card.id}
-              onClick={() => goToSlide(idx)}
-              className={`transition-all duration-300 cursor-pointer ${
-                isSelected
-                  ? 'w-6 h-1.5 rounded-full bg-[#C5A880] shadow-sm shadow-[#C5A880]/30'
-                  : 'w-1.5 h-1.5 rounded-full bg-white/20 hover:bg-white/40'
-              }`}
-              title={`${card.data.organizationKr || card.data.organization} 명함으로 이동`}
-              aria-label={`${card.data.name} 명함`}
-            />
-          );
-        })}
-
-        {/* Ghost Card Slot Indicator (+) */}
-        <button
-          onClick={() => goToSlide(ghostIndex)}
-          className={`flex items-center justify-center transition-all duration-300 cursor-pointer ${
-            currentIndex === ghostIndex
-              ? 'w-6 h-1.5 rounded-full bg-[#C5A880] shadow-sm shadow-[#C5A880]/30'
-              : 'w-3.5 h-3.5 rounded-full border border-dashed border-[#C5A880]/40 text-[#C5A880] text-[9px] font-bold hover:border-[#C5A880] hover:scale-110'
-          }`}
-          title="새 명함 추가 슬라이드로 이동"
-          aria-label="새 명함 추가"
-        >
-          {currentIndex !== ghostIndex && '+'}
-        </button>
-      </div>
-
-      {/* 3. Bottom Actions Bar (Directly Reflects Centered Card) */}
-      <div className="w-full flex justify-center px-4 mt-2">
-        {activeCard ? (
+      {/* 2. Bottom Actions Bar (Centered beneath Card) */}
+      <div className="w-full flex justify-center px-4 mt-3 sm:mt-4 min-h-[38px]">
+        {activeCard && (
           <ActionButtons
             data={activeCard.data}
             onOpenEdit={() => onOpenEdit && onOpenEdit(activeCard)}
             onOpenShare={() => onOpenShare(activeCard)}
           />
-        ) : (
-          <button
-            onClick={onCreateNewCard}
-            className="flex items-center gap-2 py-2 px-5 rounded-full bg-[#C5A880] hover:bg-[#d6b991] active:bg-[#b59870] text-neutral-950 text-xs font-bold transition-all shadow-lg active:scale-95 cursor-pointer"
-          >
-            <Plus className="w-4 h-4 text-neutral-950" />
-            <span>새 명함 작성 시작하기</span>
-          </button>
         )}
       </div>
     </div>

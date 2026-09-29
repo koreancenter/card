@@ -143,8 +143,8 @@ export const CardContainer: React.FC<CardContainerProps> = ({
         </div>
       </div>
 
-      {/* Bottom Actions: Two clearly defined groups (Group A: Contacts, Group B: Studio Actions) */}
-      <div className="w-full mt-5 px-1 flex justify-center">
+      {/* Bottom Actions: Centered beneath Card */}
+      <div className="w-full mt-4 px-1 flex justify-center">
         <ActionButtons
           data={data}
           onOpenEdit={onOpenEdit}
