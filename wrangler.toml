@@ -6,7 +6,6 @@ compatibility_flags = ["nodejs_compat"]
 # 정적 파일(Vite 빌드 결과물) 서빙 설정 추가
 [assets]
 directory = "./dist"
-binding = "ASSETS"
 
 [vars]
 BASE_DOMAIN = "card.goguma.app"
