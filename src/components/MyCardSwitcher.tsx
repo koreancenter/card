@@ -8,8 +8,7 @@ import {
   Check, 
   Copy, 
   Trash2, 
-  Globe,
-  ExternalLink
+  Globe 
 } from 'lucide-react';
 
 interface MyCardSwitcherProps {
@@ -65,20 +64,20 @@ export const MyCardSwitcher: React.FC<MyCardSwitcherProps> = ({
   };
 
   return (
-    <div className="relative inline-flex items-center gap-1.5 z-30" ref={dropdownRef}>
-      {/* Active Profile Pill Selector */}
+    <div className="relative inline-flex items-center justify-center z-30" ref={dropdownRef}>
+      {/* Single Unified Pill Selector */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-900/90 hover:bg-neutral-800/90 border border-neutral-800 hover:border-neutral-700 text-neutral-200 text-xs font-medium transition-all shadow-md active:scale-98 cursor-pointer group"
-        title="내 다른 명함으로 전환하거나 새 명함 추가"
+        className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121318]/90 hover:bg-[#181922] border border-white/10 hover:border-[#C5A880]/40 text-neutral-200 text-xs font-medium transition-all shadow-md active:scale-98 cursor-pointer group"
+        title="소속 단체 및 명함 프로필 전환"
         aria-expanded={isOpen}
       >
         <span 
-          className="w-2.5 h-2.5 rounded-full ring-1 ring-white/20 shrink-0"
+          className="w-2 h-2 rounded-full shrink-0 ring-1 ring-white/20"
           style={{ backgroundColor: themeColors[activeCard.theme] || '#f8f6f0' }}
         />
-        <div className="flex items-center gap-1.5 max-w-[200px] sm:max-w-[260px] truncate">
-          <span className="font-semibold text-white truncate">
+        <div className="flex items-center gap-1.5 max-w-[200px] sm:max-w-[280px] truncate">
+          <span className="font-semibold text-white tracking-tight truncate">
             {activeCard.data.organizationKr || activeCard.data.organization}
           </span>
           <span className="text-neutral-400 text-[11px] truncate hidden xs:inline">
@@ -86,30 +85,20 @@ export const MyCardSwitcher: React.FC<MyCardSwitcherProps> = ({
           </span>
         </div>
         {activeCard.isDefault && (
-          <span title="기본 대표 명함" className="text-amber-400">
-            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+          <span title="기본 대표 명함" className="text-[#C5A880]">
+            <Star className="w-3 h-3 fill-[#C5A880] text-[#C5A880]" />
           </span>
         )}
-        <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 group-hover:text-white transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-
-      {/* Quick "+ New Card" shortcut button */}
-      <button
-        onClick={onCreateNewCard}
-        className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-neutral-900/80 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white text-xs transition-all cursor-pointer shadow-md active:scale-95"
-        title="새로운 직함 / 단체 명함 만들기"
-      >
-        <Plus className="w-3.5 h-3.5 text-emerald-400" />
-        <span className="hidden sm:inline text-[11px] font-medium">새 명함</span>
+        <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 group-hover:text-[#C5A880] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {/* Floating Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-[310px] sm:w-[360px] rounded-2xl bg-neutral-900/95 border border-neutral-800 shadow-2xl backdrop-blur-xl p-2 animate-in fade-in zoom-in-95 duration-150 z-50 text-neutral-200">
-          <div className="px-3 py-2 border-b border-neutral-800/80 flex items-center justify-between">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[310px] sm:w-[350px] rounded-2xl bg-[#121318] border border-white/10 shadow-2xl backdrop-blur-2xl p-2 animate-in fade-in zoom-in-95 duration-150 z-50 text-neutral-200">
+          <div className="px-3 py-2 border-b border-white/5 flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <Briefcase className="w-3.5 h-3.5 text-neutral-400" />
-              <span className="text-xs font-semibold text-white">내 프로필 명함 목록</span>
+              <Briefcase className="w-3.5 h-3.5 text-[#C5A880]" />
+              <span className="text-xs font-semibold text-white">소속 및 프로필 명함</span>
             </div>
             <span className="text-[10px] font-mono text-neutral-400">
               {myCards.length}개 보유
@@ -117,7 +106,7 @@ export const MyCardSwitcher: React.FC<MyCardSwitcherProps> = ({
           </div>
 
           {/* Cards List */}
-          <div className="py-1 max-h-[260px] overflow-y-auto space-y-1">
+          <div className="py-1 max-h-[240px] overflow-y-auto space-y-1">
             {myCards.map((card) => {
               const isSelected = card.id === activeCard.id;
               const displayDomain = card.data.websiteDisplay || card.data.website?.replace(/^https?:\/\//, '') || '도메인 미설정';
@@ -131,8 +120,8 @@ export const MyCardSwitcher: React.FC<MyCardSwitcherProps> = ({
                   }}
                   className={`group relative flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-all ${
                     isSelected
-                      ? 'bg-neutral-800/90 text-white border border-neutral-700/60 shadow-sm'
-                      : 'hover:bg-neutral-800/50 text-neutral-300 border border-transparent'
+                      ? 'bg-white/10 text-white border border-white/15 shadow-sm'
+                      : 'hover:bg-white/5 text-neutral-300 border border-transparent'
                   }`}
                 >
                   <div className="flex items-start gap-2.5 min-w-0 pr-2">
@@ -146,13 +135,8 @@ export const MyCardSwitcher: React.FC<MyCardSwitcherProps> = ({
                           {card.data.organizationKr || card.data.organization}
                         </p>
                         {card.isDefault && (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] bg-amber-500/10 text-amber-300 border border-amber-500/20 font-medium">
+                          <span className="px-1.5 py-0.2 rounded text-[9px] bg-[#C5A880]/15 text-[#C5A880] border border-[#C5A880]/30 font-medium">
                             대표
-                          </span>
-                        )}
-                        {card.customDomain && (
-                          <span className="px-1.5 py-0.2 rounded text-[8px] bg-blue-500/10 text-blue-300 border border-blue-500/20 font-mono" title="개인 도메인 연결됨">
-                            도메인
                           </span>
                         )}
                       </div>
@@ -173,12 +157,12 @@ export const MyCardSwitcher: React.FC<MyCardSwitcherProps> = ({
                       onClick={() => onSetDefaultCard(card.id)}
                       className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                         card.isDefault 
-                          ? 'text-amber-400' 
-                          : 'text-neutral-600 hover:text-amber-300 hover:bg-neutral-700/50 opacity-0 group-hover:opacity-100'
+                          ? 'text-[#C5A880]' 
+                          : 'text-neutral-600 hover:text-[#C5A880] hover:bg-white/5 opacity-0 group-hover:opacity-100'
                       }`}
                       title={card.isDefault ? '대표 명함' : '이 명함을 기본 대표 명함으로 지정'}
                     >
-                      <Star className={`w-3.5 h-3.5 ${card.isDefault ? 'fill-amber-400' : ''}`} />
+                      <Star className={`w-3.5 h-3.5 ${card.isDefault ? 'fill-[#C5A880]' : ''}`} />
                     </button>
 
                     {/* Delete secondary card if more than 1 */}
@@ -189,7 +173,7 @@ export const MyCardSwitcher: React.FC<MyCardSwitcherProps> = ({
                             onDeleteCard(card.id);
                           }
                         }}
-                        className="p-1.5 rounded-lg text-neutral-600 hover:text-red-400 hover:bg-neutral-700/50 opacity-0 group-hover:opacity-100 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-neutral-600 hover:text-rose-400 hover:bg-white/5 opacity-0 group-hover:opacity-100 transition-colors cursor-pointer"
                         title="이 명함 삭제"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -198,7 +182,7 @@ export const MyCardSwitcher: React.FC<MyCardSwitcherProps> = ({
 
                     {/* Selected check */}
                     {isSelected && (
-                      <span className="p-1 text-emerald-400 ml-1">
+                      <span className="p-1 text-[#C5A880] ml-1">
                         <Check className="w-4 h-4" />
                       </span>
                     )}
@@ -208,17 +192,17 @@ export const MyCardSwitcher: React.FC<MyCardSwitcherProps> = ({
             })}
           </div>
 
-          {/* Bottom Creation Options */}
-          <div className="pt-2 mt-1 border-t border-neutral-800/80 flex flex-col gap-1">
+          {/* Bottom Creation Options (Exclusively Inside Dropdown) */}
+          <div className="pt-2 mt-1 border-t border-white/5 flex flex-col gap-1">
             <button
               onClick={() => {
                 setIsOpen(false);
                 onCreateNewCard();
               }}
-              className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-semibold transition-colors cursor-pointer"
+              className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-colors cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5 text-emerald-400" />
-              <span>새 내 명함 만들기</span>
+              <Plus className="w-3.5 h-3.5 text-[#C5A880]" />
+              <span>+ 새 명함 추가</span>
             </button>
 
             <button
@@ -226,10 +210,10 @@ export const MyCardSwitcher: React.FC<MyCardSwitcherProps> = ({
                 setIsOpen(false);
                 onDuplicateCard(activeCard);
               }}
-              className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl hover:bg-neutral-800/60 text-neutral-400 hover:text-neutral-200 text-[11px] transition-colors cursor-pointer"
+              className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl hover:bg-white/5 text-neutral-400 hover:text-neutral-200 text-[11px] transition-colors cursor-pointer"
             >
-              <Copy className="w-3 h-3" />
-              <span>현재 명함 정보 복제하여 새로 만들기 (추천)</span>
+              <Copy className="w-3 h-3 text-neutral-400" />
+              <span>현재 명함 정보 복제하여 새로 만들기</span>
             </button>
           </div>
         </div>

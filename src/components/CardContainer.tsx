@@ -3,48 +3,26 @@ import { CardData, CardTheme, CardOrientation } from '../types/card';
 import { BusinessCardFront } from './BusinessCardFront';
 import { BusinessCardBack } from './BusinessCardBack';
 import { ActionButtons } from './ActionButtons';
-import { Smartphone, Monitor, CreditCard, QrCode } from 'lucide-react';
+import { RefreshCw, Smartphone, Monitor } from 'lucide-react';
 
 interface CardContainerProps {
   data: CardData;
   theme: CardTheme;
   isFlipped: boolean;
   onFlip: () => void;
-  onOpenQr: () => void;
-  onOpenPrint: () => void;
-  onShare: () => void;
-  onSelectTheme: (theme: CardTheme) => void;
   onOpenEdit?: () => void;
-  onOpenExport?: () => void;
+  onOpenShare: () => void;
 }
-
-const SWATCHES: { id: CardTheme; label: string; color: string; border?: string }[] = [
-  { id: 'sand', label: '소프트 아이보리 (Soft Ivory)', color: '#f8f6f0', border: 'border border-amber-900/30 shadow-sm' },
-  { id: 'cotton', label: '코튼 화이트 (Cotton White)', color: '#fcfcfb', border: 'border border-neutral-300' },
-  { id: 'obsidian', label: '옵시디언 블랙 (Obsidian Black)', color: '#0c0c0d', border: 'border border-neutral-700' },
-  { id: 'navy', label: '미드나잇 네이비 (Midnight Navy)', color: '#080e1a', border: 'border border-blue-900/60' },
-  { id: 'emerald', label: '포레스트 그린 (Forest Emerald)', color: '#08140e', border: 'border border-emerald-800/60' },
-  { id: 'burgundy', label: '임페리얼 버건디 (Imperial Burgundy)', color: '#15070b', border: 'border border-rose-900/60' },
-];
 
 export const CardContainer: React.FC<CardContainerProps> = ({
   data,
   theme,
   isFlipped,
   onFlip,
-  onOpenQr,
-  onOpenPrint,
-  onShare,
-  onSelectTheme,
   onOpenEdit,
-  onOpenExport
+  onOpenShare,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [rotateX, setRotateX] = useState(0);
-  const [rotateY, setRotateY] = useState(0);
-  const [glarePos, setGlarePos] = useState({ x: 50, y: 50, opacity: 0 });
-
-  // Orientation: Portrait (스마트폰 세로형) or Landscape (정통 가로형)
   const [orientation, setOrientation] = useState<CardOrientation>('landscape');
 
   // Automatically default to portrait on mobile screens
@@ -70,97 +48,41 @@ export const CardContainer: React.FC<CardContainerProps> = ({
     touchStartX.current = null;
   };
 
-  // Subtle interactive 3D perspective tilt
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const normX = (x / rect.width) - 0.5;
-    const normY = (y / rect.height) - 0.5;
-    
-    setRotateX(-normY * 8);
-    setRotateY(normX * 8);
-    setGlarePos({
-      x: (x / rect.width) * 100,
-      y: (y / rect.height) * 100,
-      opacity: 0.14
-    });
-  };
-
-  const handleMouseLeave = () => {
-    setRotateX(0);
-    setRotateY(0);
-    setGlarePos(prev => ({ ...prev, opacity: 0 }));
-  };
-
   const isPortrait = orientation === 'portrait';
 
   return (
     <div className={`w-full ${isPortrait ? 'max-w-[340px] sm:max-w-[360px]' : 'max-w-[560px]'} mx-auto select-none flex flex-col items-center transition-all duration-300`}>
-      {/* Top Controls: Left Swatches & Right Viewport Controls */}
-      <div className="flex items-center justify-between w-full px-1 mb-2.5">
-        {/* Left: Tactile Material Swatches */}
-        <div className="flex items-center gap-2" role="group" aria-label="명함 재질 선택">
-          {SWATCHES.map((swatch) => {
-            const isSelected = theme === swatch.id;
-            return (
-              <button
-                key={swatch.id}
-                onClick={() => onSelectTheme(swatch.id)}
-                className={`relative w-3.5 h-3.5 rounded-full transition-all duration-200 cursor-pointer ${
-                  isSelected 
-                    ? 'ring-2 ring-white ring-offset-2 ring-offset-[#0a0a0c] scale-110 opacity-100 z-10' 
-                    : 'opacity-45 hover:opacity-100 hover:scale-110'
-                } ${swatch.border || 'border border-white/20'}`}
-                style={{ backgroundColor: swatch.color }}
-                title={`${swatch.label} 재질 적용`}
-                aria-label={swatch.label}
-              />
-            );
-          })}
-        </div>
-
-        {/* Right: Viewport Controls (2 Toggle Buttons) */}
-        <div className="inline-flex items-center gap-1 text-neutral-400">
-          {/* Toggle 1: Front / Back Flip */}
-          <button
-            onClick={onFlip}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer active:scale-95"
-            title={isFlipped ? '명함 앞면으로 회전 (Front)' : '명함 뒷면으로 회전 (Back)'}
-            aria-label={isFlipped ? '명함 앞면으로 회전' : '명함 뒷면으로 회전'}
-          >
-            {isFlipped ? (
-              <CreditCard className="w-4 h-4" />
-            ) : (
-              <QrCode className="w-4 h-4" />
-            )}
-          </button>
-
-          {/* Micro Hairline Divider */}
-          <span className="w-px h-3.5 bg-neutral-800" />
-
-          {/* Toggle 2: Orientation (Portrait / Landscape) */}
+      {/* Discreet Utility Bar Above Card: Orientation Toggle & Flip */}
+      <div className="flex items-center justify-end w-full px-1 mb-2.5">
+        <div className="inline-flex items-center gap-1 p-0.5 rounded-full bg-[#121318]/70 border border-white/5 text-neutral-400 text-xs">
+          {/* Orientation Toggle (Landscape / Portrait) */}
           <button
             onClick={() => setOrientation(prev => prev === 'portrait' ? 'landscape' : 'portrait')}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer active:scale-95"
-            title={isPortrait ? '가로형 명함 보기 (Landscape)' : '세로형 명함 보기 (Portrait)'}
-            aria-label={isPortrait ? '가로형 명함 보기' : '세로형 명함 보기'}
+            className="p-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+            title={isPortrait ? '가로형 명함 보기' : '세로형 명함 보기'}
+            aria-label="명함 방향 전환"
           >
-            {isPortrait ? (
-              <Monitor className="w-4 h-4" />
-            ) : (
-              <Smartphone className="w-4 h-4" />
-            )}
+            {isPortrait ? <Monitor className="w-3.5 h-3.5" /> : <Smartphone className="w-3.5 h-3.5" />}
+          </button>
+
+          <span className="w-px h-3 bg-white/10" />
+
+          {/* Discreet Flip Trigger */}
+          <button
+            onClick={onFlip}
+            className="flex items-center gap-1 px-2 py-1 rounded-full hover:text-white hover:bg-white/5 transition-all cursor-pointer text-[11px]"
+            title="앞·뒷면 뒤집기 (스페이스바)"
+            aria-label="앞·뒷면 뒤집기"
+          >
+            <RefreshCw className="w-3 h-3 text-[#C5A880]" />
+            <span className="text-[10px] text-neutral-400">{isFlipped ? '앞면' : '뒷면'}</span>
           </button>
         </div>
       </div>
 
-      {/* 3D Tactile Card Canvas */}
+      {/* 3D Tactile Card Canvas (Clean Matte, No Mouse Glare Follower) */}
       <div 
         className="w-full [perspective:1400px] relative"
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -168,14 +90,21 @@ export const CardContainer: React.FC<CardContainerProps> = ({
           ref={cardRef}
           onClick={onFlip}
           style={{
-            transform: `rotateX(${rotateX}deg) rotateY(${rotateY + (isFlipped ? 180 : 0)}deg)`,
+            transform: `rotateY(${isFlipped ? 180 : 0}deg)`,
             transformStyle: 'preserve-3d',
             WebkitTransformStyle: 'preserve-3d',
             transition: 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
-          className="relative w-full cursor-pointer group shadow-[0_24px_64px_rgba(0,0,0,0.55)] rounded-2xl transition-shadow duration-300 hover:shadow-[0_32px_80px_rgba(0,0,0,0.7)]"
-          title="카드를 클릭하여 앞·뒷면 뒤집기"
+          className="relative w-full cursor-pointer group shadow-[0_24px_64px_rgba(0,0,0,0.6)] rounded-2xl transition-shadow duration-300 hover:shadow-[0_32px_80px_rgba(0,0,0,0.75)]"
         >
+          {/* Discreet Flip Indicator Badge on Top-Right Corner */}
+          <div 
+            className="absolute top-3 right-3 z-30 opacity-40 group-hover:opacity-100 transition-opacity p-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white/80 pointer-events-none"
+            title="클릭하여 뒤집기"
+          >
+            <RefreshCw className="w-3 h-3 text-[#C5A880]" />
+          </div>
+
           {/* Front Face */}
           <div 
             style={{ 
@@ -211,30 +140,15 @@ export const CardContainer: React.FC<CardContainerProps> = ({
               orientation={orientation}
             />
           </div>
-
-          {/* Dynamic Tactile Light Glare Sheen Overlay */}
-          <div 
-            className="absolute inset-0 pointer-events-none transition-opacity duration-300 rounded-2xl"
-            style={{
-              background: `radial-gradient(circle at ${glarePos.x}% ${glarePos.y}%, rgba(255,255,255,${glarePos.opacity}) 0%, transparent 60%)`,
-              zIndex: 30,
-              transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-              backfaceVisibility: 'hidden',
-              WebkitBackfaceVisibility: 'hidden',
-            }}
-          />
         </div>
       </div>
 
-      {/* Bottom Actions: Borderless, Floating Pure Icons at the Card's Bottom Center (Balanced Dock) */}
-      <div className="w-full mt-3 px-1 flex justify-center">
+      {/* Bottom Actions: Two clearly defined groups (Group A: Contacts, Group B: Studio Actions) */}
+      <div className="w-full mt-5 px-1 flex justify-center">
         <ActionButtons
           data={data}
-          onOpenQr={onOpenQr}
-          onOpenPrint={onOpenPrint}
-          onShare={onShare}
           onOpenEdit={onOpenEdit}
-          onOpenExport={onOpenExport}
+          onOpenShare={onOpenShare}
         />
       </div>
     </div>

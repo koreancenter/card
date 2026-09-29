@@ -15,7 +15,9 @@ import {
   Eye, 
   Sparkles,
   QrCode,
-  Smartphone
+  Smartphone,
+  Lock,
+  KeyRound
 } from 'lucide-react';
 import { BusinessCardFront } from './BusinessCardFront';
 import { downloadVCard } from '../utils/vcard';
@@ -29,6 +31,8 @@ interface VaultViewProps {
   onOpenScan: () => void;
   onOpenEditor: () => void;
   onOpenSync?: () => void;
+  isLocked?: boolean;
+  onUnlockRequest?: () => void;
 }
 
 export const VaultView: React.FC<VaultViewProps> = ({
@@ -39,7 +43,9 @@ export const VaultView: React.FC<VaultViewProps> = ({
   onExportCard,
   onOpenScan,
   onOpenEditor,
-  onOpenSync
+  onOpenSync,
+  isLocked = false,
+  onUnlockRequest
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -71,103 +77,109 @@ export const VaultView: React.FC<VaultViewProps> = ({
     return matchesCategory && matchesSearch;
   });
 
+  if (isLocked) {
+    return (
+      <div className="w-full max-w-lg mx-auto py-16 px-6 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-200">
+        <div className="w-16 h-16 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center text-[#C5A880] mb-5 shadow-2xl">
+          <Lock className="w-8 h-8" />
+        </div>
+        <h3 className="text-xl font-bold text-white mb-2 tracking-tight">명함 보관함이 잠겨 있습니다</h3>
+        <p className="text-xs text-white/60 max-w-sm mb-6 leading-relaxed">
+          공용 기기 및 타인의 무단 열람을 방지하기 위해 보관함이 4자리 보안 PIN으로 보호되고 있습니다.
+        </p>
+        <button
+          onClick={onUnlockRequest}
+          className="px-6 py-3 rounded-2xl bg-white hover:bg-neutral-200 text-black font-bold text-xs transition-all cursor-pointer shadow-lg active:scale-95 flex items-center gap-2"
+        >
+          <KeyRound className="w-4 h-4 text-neutral-800" />
+          <span>보안 PIN 입력하여 잠금 해제</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6 animate-in fade-in duration-300">
-      
-      {/* Vault Control Header */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-4 rounded-2xl bg-neutral-900/60 border border-neutral-800/80 backdrop-blur-md">
-        
-        {/* Search Input */}
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="이름, 회사, 직함, 메모 검색..."
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-neutral-950 border border-neutral-800 text-xs text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:border-neutral-600 transition-colors"
-          />
+    <div className="w-full max-w-6xl mx-auto space-y-5 animate-in fade-in duration-300">
+      {/* 1. Quiet Luxury Search Bar */}
+      <div className="relative w-full max-w-md">
+        <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="이름, 회사, 직함, 메모 검색..."
+          className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#121318] border border-white/10 text-xs text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:border-[#C5A880]/50 transition-colors"
+        />
+      </div>
+
+      {/* 2. Wallet Toolbar (Categories on Left, View Mode & Primary Accent Button on Right) */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-1 border-b border-white/5">
+        {/* Left: Category Filter Chips */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+          {categories.map((cat) => {
+            const isSelected = selectedCategory === cat;
+            const count = cat === '전체' 
+              ? cards.length 
+              : cards.filter(c => c.category === cat).length;
+
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1.5 rounded-full whitespace-nowrap text-xs transition-all cursor-pointer font-medium ${
+                  isSelected
+                    ? 'bg-[#C5A880] text-neutral-950 font-semibold shadow-sm'
+                    : 'bg-[#121318] text-neutral-400 hover:text-white border border-white/5 hover:border-white/10'
+                }`}
+              >
+                <span>{cat}</span>
+                <span className={`ml-1.5 text-[10px] ${isSelected ? 'text-neutral-900/80 font-bold' : 'text-neutral-500'}`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* View Mode & Actions */}
-        <div className="flex items-center justify-between sm:justify-end gap-2.5">
+        {/* Right: View Mode Toggles + Single Primary Accent Button */}
+        <div className="flex items-center gap-2.5 shrink-0 self-end lg:self-auto">
           {/* View Mode Toggle */}
-          <div className="flex items-center p-1 bg-neutral-950 rounded-xl border border-neutral-800 text-xs">
+          <div className="flex items-center p-1 bg-[#121318] rounded-xl border border-white/10 text-xs">
             <button
               onClick={() => setViewMode('cards')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors cursor-pointer ${
                 viewMode === 'cards'
-                  ? 'bg-neutral-800 text-white font-semibold shadow-sm'
+                  ? 'bg-white/10 text-white font-semibold shadow-sm'
                   : 'text-neutral-400 hover:text-neutral-200'
               }`}
               title="카드 갤러리 뷰"
             >
               <Layers className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">카드 뷰</span>
+              <span className="hidden sm:inline">카드</span>
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors cursor-pointer ${
                 viewMode === 'list'
-                  ? 'bg-neutral-800 text-white font-semibold shadow-sm'
+                  ? 'bg-white/10 text-white font-semibold shadow-sm'
                   : 'text-neutral-400 hover:text-neutral-200'
               }`}
               title="에디토리얼 리스트 뷰"
             >
               <List className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">리스트 뷰</span>
+              <span className="hidden sm:inline">리스트</span>
             </button>
           </div>
 
-          {/* Device Sync Button */}
-          {onOpenSync && (
-            <button
-              onClick={onOpenSync}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-800 hover:border-neutral-700 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95 shrink-0"
-              title="스마트폰 카메라로 스캔하여 보관함 즉시 동기화"
-            >
-              <Smartphone className="w-3.5 h-3.5 text-[#C5A880]" />
-              <span className="hidden sm:inline">기기 연결</span>
-              <span className="sm:hidden">동기화</span>
-            </button>
-          )}
-
-          {/* Quick Add Button */}
+          {/* Single Primary Accent Button */}
           <button
             onClick={onOpenScan}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-neutral-200 text-black text-xs font-bold transition-all shadow-md cursor-pointer active:scale-95 shrink-0"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#C5A880] hover:bg-[#d6b991] active:bg-[#b59870] text-neutral-950 text-xs font-bold transition-all shadow-md cursor-pointer active:scale-95 shrink-0"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>사진 스캔 등록</span>
+            <span>+ 사진 스캔 등록</span>
           </button>
         </div>
-      </div>
-
-      {/* Category Pills Bar */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
-        {categories.map((cat) => {
-          const isSelected = selectedCategory === cat;
-          const count = cat === '전체' 
-            ? cards.length 
-            : cards.filter(c => c.category === cat).length;
-
-          return (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer font-medium ${
-                isSelected
-                  ? 'bg-white text-black shadow-sm'
-                  : 'bg-neutral-900/80 text-neutral-400 hover:text-white border border-neutral-800/80 hover:border-neutral-700'
-              }`}
-            >
-              <span>{cat}</span>
-              <span className={`ml-1.5 text-[10px] ${isSelected ? 'text-neutral-600' : 'text-neutral-500'}`}>
-                {count}
-              </span>
-            </button>
-          );
-        })}
       </div>
 
       {/* Content Rendering: Cards Grid or List Table */}

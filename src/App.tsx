@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CardTheme, PrintConfig, StoredCard } from './types/card';
 import { loadStoredCards, saveStoredCards } from './utils/initialCards';
 import { CardContainer } from './components/CardContainer';
 import { MyCardSwitcher } from './components/MyCardSwitcher';
+import { ShareModal } from './components/ShareModal';
 import { QrModal } from './components/QrModal';
 import { PrintModal } from './components/PrintModal';
 import { PrintSheet } from './components/PrintSheet';
@@ -18,13 +19,20 @@ import { VaultView } from './components/VaultView';
 import { DeviceSyncModal } from './components/DeviceSyncModal';
 import { APP_BASE_DOMAIN, resolveCardFromLocation, getCardShareUrl } from './utils/domain';
 import { pullWalletFromEdge, pushWalletToEdge } from './utils/syncWallet';
+import { PinLockModal, PinModalMode } from './components/PinLockModal';
+import { BiometricsSettingModal } from './components/BiometricsSettingModal';
+import { useAutoLock } from './hooks/useAutoLock';
+import { verifyBiometric } from './utils/biometrics';
 import { 
   Check, 
-  Camera, 
   CreditCard, 
   FolderArchive, 
   ArrowLeft,
-  Smartphone
+  Smartphone,
+  Lock,
+  ShieldCheck,
+  Fingerprint,
+  Settings
 } from 'lucide-react';
 
 export default function App() {
@@ -39,6 +47,7 @@ export default function App() {
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
   
   // Modals state
+  const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
   const [isQrOpen, setIsQrOpen] = useState<boolean>(false);
   const [isPrintOpen, setIsPrintOpen] = useState<boolean>(false);
   const [isExportOpen, setIsExportOpen] = useState<boolean>(false);
@@ -46,7 +55,49 @@ export default function App() {
   const [isEditorOpen, setIsEditorOpen] = useState<boolean>(false);
   const [isCreatingCard, setIsCreatingCard] = useState<boolean>(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
+  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState<boolean>(false);
+  const settingsMenuRef = useRef<HTMLDivElement>(null);
   const [editingCard, setEditingCard] = useState<StoredCard | null>(null);
+
+  // Close settings popover on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (settingsMenuRef.current && !settingsMenuRef.current.contains(e.target as Node)) {
+        setIsSettingsMenuOpen(false);
+      }
+    };
+    if (isSettingsMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSettingsMenuOpen]);
+
+  // Local-First 4-Digit PIN App Lock with Auto-Lock (Manual, Visibility, Idle 5m)
+  const { isLocked, setIsLocked, lockApp, unlockApp, isPinConfigured, refreshPinStatus } = useAutoLock();
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState<boolean>(false);
+  const [isBiometricsModalOpen, setIsBiometricsModalOpen] = useState<boolean>(false);
+  const [pinModalMode, setPinModalMode] = useState<PinModalMode>('setup');
+
+  const requireUnlock = (action: () => void) => {
+    if (isPinConfigured && isLocked) {
+      lockApp();
+    } else {
+      action();
+    }
+  };
+
+  // Optional Biometric Unlock handler
+  const handleBiometricUnlock = async () => {
+    const res = await verifyBiometric();
+    if (res.success) {
+      unlockApp();
+      showToast('생체 인증(Biometrics)으로 잠금이 해제되었습니다.');
+    } else if (res.error && !res.error.includes('취소')) {
+      showToast(res.error);
+    }
+  };
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -132,53 +183,57 @@ export default function App() {
     }
   };
 
-  // Create New My Card (Requirement #1)
+  // Create New My Card (Protected by PIN if locked)
   const handleOpenCreateModal = () => {
-    const newCardTemplate: StoredCard = {
-      id: `my-card-${Date.now()}`,
-      isMyCard: true,
-      isDefault: false,
-      slug: '',
-      theme: 'emerald',
-      category: '글로벌 네트워크',
-      createdAt: new Date().toISOString().split('T')[0],
-      notes: '신규 프로필 명함',
-      data: {
-        ...activeCard.data,
-        organization: '',
-        organizationKr: '',
-        title: '',
-        titleKr: '',
-        website: 'https://mrpark.indonesiacenter.net',
-        websiteDisplay: 'mrpark.indonesiacenter.net',
-        email: 'mrpark@indonesiacenter.net'
-      }
-    };
-    setEditingCard(newCardTemplate);
-    setIsCreatingCard(true);
-    setIsEditorOpen(true);
+    requireUnlock(() => {
+      const newCardTemplate: StoredCard = {
+        id: `my-card-${Date.now()}`,
+        isMyCard: true,
+        isDefault: false,
+        slug: '',
+        theme: 'emerald',
+        category: '글로벌 네트워크',
+        createdAt: new Date().toISOString().split('T')[0],
+        notes: '신규 프로필 명함',
+        data: {
+          ...activeCard.data,
+          organization: '',
+          organizationKr: '',
+          title: '',
+          titleKr: '',
+          website: 'https://mrpark.indonesiacenter.net',
+          websiteDisplay: 'mrpark.indonesiacenter.net',
+          email: 'mrpark@indonesiacenter.net'
+        }
+      };
+      setEditingCard(newCardTemplate);
+      setIsCreatingCard(true);
+      setIsEditorOpen(true);
+    });
   };
 
-  // Duplicate Current Card as Template
+  // Duplicate Current Card as Template (Protected by PIN if locked)
   const handleDuplicateMyCard = (sourceCard: StoredCard) => {
-    const newCardTemplate: StoredCard = {
-      id: `my-card-${Date.now()}`,
-      isMyCard: true,
-      isDefault: false,
-      slug: `${sourceCard.slug || 'card'}-copy`,
-      theme: sourceCard.theme,
-      category: sourceCard.category,
-      createdAt: new Date().toISOString().split('T')[0],
-      notes: `${sourceCard.data.organization} 복제 프로필`,
-      data: {
-        ...sourceCard.data,
-        title: `${sourceCard.data.title}`,
-        titleKr: `${sourceCard.data.titleKr}`
-      }
-    };
-    setEditingCard(newCardTemplate);
-    setIsCreatingCard(true);
-    setIsEditorOpen(true);
+    requireUnlock(() => {
+      const newCardTemplate: StoredCard = {
+        id: `my-card-${Date.now()}`,
+        isMyCard: true,
+        isDefault: false,
+        slug: `${sourceCard.slug || 'card'}-copy`,
+        theme: sourceCard.theme,
+        category: sourceCard.category,
+        createdAt: new Date().toISOString().split('T')[0],
+        notes: `${sourceCard.data.organization} 복제 프로필`,
+        data: {
+          ...sourceCard.data,
+          title: `${sourceCard.data.title}`,
+          titleKr: `${sourceCard.data.titleKr}`
+        }
+      };
+      setEditingCard(newCardTemplate);
+      setIsCreatingCard(true);
+      setIsEditorOpen(true);
+    });
   };
 
   // Set as Primary Default Card
@@ -190,19 +245,21 @@ export default function App() {
     showToast('기본 대표 명함으로 지정되었습니다.');
   };
 
-  // Delete Secondary My Card
+  // Delete Secondary My Card (Protected by PIN if locked)
   const handleDeleteMyCard = (id: string) => {
-    const currentMyCards = cards.filter(c => c.isMyCard);
-    if (currentMyCards.length <= 1) {
-      showToast('최소 1개의 내 명함은 유지되어야 합니다.');
-      return;
-    }
-    setCards(prev => prev.filter(c => c.id !== id));
-    if (activeCardId === id) {
-      const remaining = currentMyCards.filter(c => c.id !== id);
-      setActiveCardId(remaining[0].id);
-    }
-    showToast('명함이 삭제되었습니다.');
+    requireUnlock(() => {
+      const currentMyCards = cards.filter(c => c.isMyCard);
+      if (currentMyCards.length <= 1) {
+        showToast('최소 1개의 내 명함은 유지되어야 합니다.');
+        return;
+      }
+      setCards(prev => prev.filter(c => c.id !== id));
+      if (activeCardId === id) {
+        const remaining = currentMyCards.filter(c => c.id !== id);
+        setActiveCardId(remaining[0].id);
+      }
+      showToast('명함이 삭제되었습니다.');
+    });
   };
 
   const handleShare = async () => {
@@ -291,28 +348,20 @@ export default function App() {
       {/* SCREEN UI CONTAINER */}
       <div 
         id="screen-app-container" 
-        className="min-h-screen bg-[#09090b] text-neutral-100 flex flex-col justify-between selection:bg-neutral-100 selection:text-neutral-950 font-sans"
+        className="min-h-screen bg-[#0B0C10] text-neutral-100 flex flex-col justify-between selection:bg-neutral-100 selection:text-neutral-950 font-sans"
       >
         {/* Top Minimalist Luxury Header */}
-        <header className="sticky top-0 z-40 w-full border-b border-neutral-900/90 bg-[#09090b]/85 backdrop-blur-xl px-4 sm:px-8 py-3 flex items-center justify-between">
+        <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#0B0C10]/90 backdrop-blur-xl px-4 sm:px-8 py-3 flex items-center justify-between">
           
           {/* Institutional Wordmark */}
           <div className="flex items-center gap-2.5 sm:gap-3">
-            <div className="w-6 h-6 rounded-full border border-neutral-700/80 flex items-center justify-center text-[10px] font-serif text-neutral-300 shrink-0">
-              韓
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-xs sm:text-sm font-semibold tracking-[0.2em] uppercase text-white">
-                Korean Center
-              </span>
-              <span className="hidden md:inline text-[10px] font-mono tracking-widest text-neutral-400 uppercase">
-                Card Studio
-              </span>
-            </div>
+            <span className="text-xs sm:text-sm font-semibold tracking-[0.25em] uppercase text-white font-sans">
+              KOREAN CENTER <span className="text-neutral-400 font-light hidden sm:inline">CARD STUDIO</span>
+            </span>
           </div>
 
           {/* Center Navigation: Segmented Switcher (내 명함 vs 보관함) */}
-          <nav className="flex items-center p-1 bg-neutral-950 rounded-2xl border border-neutral-800/80 shadow-inner">
+          <nav className="flex items-center p-1 bg-[#121318] rounded-2xl border border-white/5 shadow-inner">
             <button
               onClick={() => {
                 setActiveTab('my-card');
@@ -321,7 +370,7 @@ export default function App() {
               }}
               className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'my-card'
-                  ? 'bg-neutral-800 text-white shadow-sm ring-1 ring-white/10'
+                  ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
                   : 'text-neutral-400 hover:text-neutral-200'
               }`}
             >
@@ -330,43 +379,96 @@ export default function App() {
             </button>
 
             <button
-              onClick={() => setActiveTab('vault')}
+              onClick={() => {
+                requireUnlock(() => {
+                  setActiveTab('vault');
+                });
+              }}
               className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'vault'
-                  ? 'bg-neutral-800 text-white shadow-sm ring-1 ring-white/10'
+                  ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
                   : 'text-neutral-400 hover:text-neutral-200'
               }`}
             >
               <FolderArchive className="w-3.5 h-3.5" />
               <span>명함 보관함</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-300">
+              {isPinConfigured && isLocked && (
+                <Lock className="w-3 h-3 text-[#C5A880]" />
+              )}
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-black/40 border border-white/5 text-neutral-400">
                 {cards.length}
               </span>
             </button>
           </nav>
 
-          {/* Right Header: Actions (Vault only) */}
-          <div className="flex items-center gap-1.5 sm:gap-2 min-h-[32px]">
-            {activeTab === 'vault' && (
-              <>
-                <button
-                  onClick={() => setIsSyncModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white text-xs font-semibold transition-all cursor-pointer active:scale-95 shadow-sm"
-                  title="스마트폰과 보관함 동기화"
-                >
-                  <Smartphone className="w-3.5 h-3.5 text-[#C5A880]" />
-                  <span className="hidden sm:inline">기기 연결</span>
-                </button>
-                <button
-                  onClick={() => setIsScanOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition-all cursor-pointer active:scale-95 shadow-sm"
-                  title="카메라로 종이 명함 촬영 및 자동 등록"
-                >
-                  <Camera className="w-3.5 h-3.5" />
-                  <span>명함 스캔</span>
-                </button>
-              </>
+          {/* Right Header: Consolidated Security & Settings Popover */}
+          <div className="flex items-center gap-1.5 sm:gap-2 min-h-[32px] relative" ref={settingsMenuRef}>
+            {/* If PIN configured: Minimalist Lock icon for instant lock */}
+            {isPinConfigured && (
+              <button
+                onClick={() => {
+                  lockApp();
+                  showToast('화면이 보안 잠금되었습니다.');
+                }}
+                className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer active:scale-95"
+                title="즉시 화면 잠금 (Lock Screen)"
+                aria-label="화면 잠금"
+              >
+                <Lock className="w-4 h-4 text-[#C5A880]" />
+              </button>
             )}
+
+            {/* Consolidated Settings Popover Trigger */}
+            <div className="relative">
+              <button
+                onClick={() => setIsSettingsMenuOpen(!isSettingsMenuOpen)}
+                className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 border border-white/5 transition-all cursor-pointer active:scale-95"
+                title="보안 및 기기 설정"
+                aria-label="설정 메뉴"
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+
+              {isSettingsMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#121318] border border-white/10 shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-xs">
+                  <button
+                    onClick={() => {
+                      setIsSettingsMenuOpen(false);
+                      setPinModalMode(isPinConfigured ? 'change' : 'setup');
+                      setIsConfigModalOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
+                  >
+                    <Lock className="w-3.5 h-3.5 text-[#C5A880]" />
+                    <span>{isPinConfigured ? 'PIN 번호 변경 / 관리' : '4자리 PIN 보안 설정'}</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsSettingsMenuOpen(false);
+                      setIsBiometricsModalOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
+                  >
+                    <Fingerprint className="w-3.5 h-3.5 text-[#C5A880]" />
+                    <span>생체 인증 (Face ID / 지문)</span>
+                  </button>
+
+                  <div className="my-1 border-t border-white/5" />
+
+                  <button
+                    onClick={() => {
+                      setIsSettingsMenuOpen(false);
+                      setIsSyncModalOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
+                  >
+                    <Smartphone className="w-3.5 h-3.5 text-[#C5A880]" />
+                    <span>기기 연결 및 동기화</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
@@ -411,16 +513,14 @@ export default function App() {
                   theme={activeCard.theme} 
                   isFlipped={isFlipped}
                   onFlip={() => setIsFlipped(prev => !prev)}
-                  onOpenQr={() => setIsQrOpen(true)}
-                  onOpenPrint={() => setIsPrintOpen(true)}
-                  onShare={handleShare}
-                  onSelectTheme={handleThemeChange}
+                  onOpenShare={() => setIsShareModalOpen(true)}
                   onOpenEdit={() => {
-                    setEditingCard(activeCard);
-                    setIsCreatingCard(false);
-                    setIsEditorOpen(true);
+                    requireUnlock(() => {
+                      setEditingCard(activeCard);
+                      setIsCreatingCard(false);
+                      setIsEditorOpen(true);
+                    });
                   }}
-                  onOpenExport={() => setIsExportOpen(true)}
                 />
               </div>
             </div>
@@ -428,26 +528,42 @@ export default function App() {
             /* ================= VIEW 2: THE VAULT (CARD / LIST) ================= */
             <VaultView
               cards={cards}
+              isLocked={isPinConfigured && isLocked}
+              onUnlockRequest={() => {
+                lockApp();
+              }}
               onSelectCard={(selected) => {
                 setActiveCardId(selected.id);
                 setActiveTab('my-card');
               }}
               onEditCard={(cardToEdit) => {
-                setEditingCard(cardToEdit);
-                setIsCreatingCard(false);
-                setIsEditorOpen(true);
+                requireUnlock(() => {
+                  setEditingCard(cardToEdit);
+                  setIsCreatingCard(false);
+                  setIsEditorOpen(true);
+                });
               }}
-              onDeleteCard={handleDeleteCard}
+              onDeleteCard={(id) => {
+                requireUnlock(() => {
+                  handleDeleteCard(id);
+                });
+              }}
               onExportCard={(cardToExport) => {
                 setActiveCardId(cardToExport.id);
                 setIsExportOpen(true);
               }}
-              onOpenScan={() => setIsScanOpen(true)}
+              onOpenScan={() => {
+                requireUnlock(() => {
+                  setIsScanOpen(true);
+                });
+              }}
               onOpenSync={() => setIsSyncModalOpen(true)}
               onOpenEditor={() => {
-                setEditingCard(activeCard);
-                setIsCreatingCard(false);
-                setIsEditorOpen(true);
+                requireUnlock(() => {
+                  setEditingCard(activeCard);
+                  setIsCreatingCard(false);
+                  setIsEditorOpen(true);
+                });
               }}
             />
           )}
@@ -470,6 +586,14 @@ export default function App() {
         )}
 
         {/* Modals */}
+        <ShareModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          data={activeCard.data}
+          onOpenPrint={() => setIsPrintOpen(true)}
+          onOpenExport={() => setIsExportOpen(true)}
+        />
+
         <QrModal
           isOpen={isQrOpen}
           onClose={() => setIsQrOpen(false)}
@@ -500,6 +624,43 @@ export default function App() {
         <DeviceSyncModal
           isOpen={isSyncModalOpen}
           onClose={() => setIsSyncModalOpen(false)}
+        />
+
+        {/* Fullscreen Lock Screen Overlay when app is locked */}
+        <PinLockModal
+          isOpen={isLocked && isPinConfigured}
+          mode="unlock"
+          allowCancel={false}
+          onUnlock={() => {
+            unlockApp();
+            showToast('보안 잠금이 해제되었습니다.');
+          }}
+          onBiometricUnlock={handleBiometricUnlock}
+        />
+
+        {/* PIN Configuration Modal (Setup / Change / Disable) */}
+        <PinLockModal
+          isOpen={isConfigModalOpen}
+          mode={pinModalMode}
+          allowCancel={true}
+          onClose={() => setIsConfigModalOpen(false)}
+          onSuccess={() => {
+            refreshPinStatus();
+            showToast(pinModalMode === 'setup' ? '4자리 PIN 잠금이 설정되었습니다.' : 'PIN 번호가 성공적으로 변경되었습니다.');
+          }}
+        />
+
+        {/* Dedicated Register Biometrics UI Setting Modal */}
+        <BiometricsSettingModal
+          isOpen={isBiometricsModalOpen}
+          onClose={() => setIsBiometricsModalOpen(false)}
+          onOpenPinSetup={() => {
+            setPinModalMode(isPinConfigured ? 'change' : 'setup');
+            setIsConfigModalOpen(true);
+          }}
+          onStatusChange={() => {
+            refreshPinStatus();
+          }}
         />
 
         {editingCard && (
