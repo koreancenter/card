@@ -3,7 +3,7 @@ import { CARD_DATA } from './vcard';
 
 export const INITIAL_CARDS: StoredCard[] = [
   {
-    id: 'my-card-park-gihong',
+    id: 'sample-card-park-gihong',
     isMyCard: true,
     isDefault: true,
     slug: 'mrpark',
@@ -167,33 +167,66 @@ export const INITIAL_CARDS: StoredCard[] = [
   }
 ];
 
-const STORAGE_KEY = 'koreancenter_stored_cards_v2';
+export const SAMPLE_CARDS = INITIAL_CARDS;
+
+const STORAGE_KEY = 'user_cards';
+const LEGACY_STORAGE_KEY = 'koreancenter_stored_cards_v2';
 
 export function loadStoredCards(): StoredCard[] {
-  if (typeof window === 'undefined') return INITIAL_CARDS;
+  if (typeof window === 'undefined') return [];
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_CARDS));
-      return INITIAL_CARDS;
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      // Purge any stale legacy seeded dummy cards from previous scaffolds
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+      localStorage.removeItem('saved_cards');
+      return [];
     }
-    const parsed: StoredCard[] = JSON.parse(data);
+    const parsed: StoredCard[] = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
       return parsed;
     }
-    return INITIAL_CARDS;
+    return [];
   } catch (e) {
     console.error('Failed to load cards from storage', e);
-    return INITIAL_CARDS;
+    return [];
   }
 }
 
 export function saveStoredCards(cards: StoredCard[]): void {
   if (typeof window === 'undefined') return;
   try {
+    if (!cards || cards.length === 0) {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+      localStorage.removeItem('saved_cards');
+      return;
+    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
     localStorage.setItem('saved_cards', JSON.stringify(cards));
   } catch (e) {
     console.error('Failed to save cards to storage', e);
+  }
+}
+
+/**
+ * Completely clears all local data stored by GOGUMA CARD STUDIO:
+ * user cards, PIN hash, biometric keys, sync IDs, and lazy setup preferences.
+ */
+export function clearAllLocalData(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
+    localStorage.removeItem('saved_cards');
+    localStorage.removeItem('app_pin_hash');
+    localStorage.removeItem('app_pin_last_verified_at');
+    localStorage.removeItem('biometric_credential_id');
+    localStorage.removeItem('wallet_sync_id');
+    localStorage.removeItem('card_sync_id');
+    localStorage.removeItem('lazy_pin_dismissed');
+    sessionStorage.clear();
+  } catch (e) {
+    console.error('Failed to reset local data', e);
   }
 }

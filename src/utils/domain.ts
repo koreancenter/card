@@ -42,6 +42,7 @@ export function getCardDisplayUrl(card: StoredCard): string {
  */
 export function resolveCardFromLocation(cards: StoredCard[]): StoredCard | null {
   if (typeof window === 'undefined') return null;
+  if (!cards || cards.length === 0) return null;
 
   const hostname = window.location.hostname.toLowerCase();
   const pathname = window.location.pathname.replace(/^\/+|\/+$/g, '');

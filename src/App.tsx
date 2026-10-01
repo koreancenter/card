@@ -18,6 +18,11 @@ import { PhotoScanModal } from './components/PhotoScanModal';
 import { CardEditorModal } from './components/CardEditorModal';
 import { VaultView } from './components/VaultView';
 import { DeviceSyncModal } from './components/DeviceSyncModal';
+import { WelcomeCard } from './components/WelcomeCard';
+import { LazyPinSetupModal } from './components/LazyPinSetupModal';
+import { LegalModal, LegalDocType } from './components/LegalModal';
+import { ResetDataModal } from './components/ResetDataModal';
+import { SAMPLE_CARDS, clearAllLocalData } from './utils/initialCards';
 import { APP_BASE_DOMAIN, resolveCardFromLocation, getCardShareUrl } from './utils/domain';
 import { pullWalletFromEdge, pushWalletToEdge } from './utils/syncWallet';
 import { PinLockModal, PinModalMode } from './components/PinLockModal';
@@ -39,10 +44,12 @@ import {
 
 export default function App() {
   const [cards, setCards] = useState<StoredCard[]>(() => loadStoredCards());
+  const [isSamplePreview, setIsSamplePreview] = useState<boolean>(false);
+  const [samplePreviewTheme, setSamplePreviewTheme] = useState<CardTheme>('sumi_ink');
   const [activeCardId, setActiveCardId] = useState<string>(() => {
     const loaded = loadStoredCards();
     const defaultCard = loaded.find(c => c.isMyCard && c.isDefault);
-    return defaultCard?.id || loaded[0]?.id || 'my-card-park-gihong';
+    return defaultCard?.id || loaded[0]?.id || '';
   });
 
   const [activeTab, setActiveTab] = useState<'my-card' | 'vault'>('my-card');
@@ -58,6 +65,10 @@ export default function App() {
   const [isCreatingCard, setIsCreatingCard] = useState<boolean>(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState<boolean>(false);
+  const [isLazyPinModalOpen, setIsLazyPinModalOpen] = useState<boolean>(false);
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState<boolean>(false);
+  const [legalDocType, setLegalDocType] = useState<LegalDocType>('privacy');
+  const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
   const settingsMenuRef = useRef<HTMLDivElement>(null);
   const [editingCard, setEditingCard] = useState<StoredCard | null>(null);
 
@@ -141,6 +152,7 @@ export default function App() {
   // URL query parameter (?card=...), Pathname (/mrpark), & Custom Domain smart routing
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (cards.length === 0) return;
 
     try {
       const matched = resolveCardFromLocation(cards);
@@ -153,7 +165,12 @@ export default function App() {
     }
   }, [cards]);
 
-  const activeCard: StoredCard = cards.find(c => c.id === activeCardId) || cards[0];
+  const activeCard: StoredCard | undefined = cards.length > 0
+    ? (cards.find(c => c.id === activeCardId) || cards[0])
+    : (isSamplePreview 
+        ? { ...SAMPLE_CARDS[0], theme: samplePreviewTheme } 
+        : undefined);
+
   const myCards = cards.filter(c => c.isMyCard);
 
   // Print Config for active card
@@ -191,28 +208,45 @@ export default function App() {
       const newCardTemplate: StoredCard = {
         id: `my-card-${Date.now()}`,
         isMyCard: true,
-        isDefault: false,
+        isDefault: cards.length === 0,
         slug: '',
-        theme: 'sumi_ink',
+        theme: activeCard?.theme || 'sumi_ink',
         layout_type: 'editorial_minimal',
         card_features: {
           show_en_name: true,
           show_sub_org: true,
           show_address: true,
-          monogram_text: 'PK'
+          monogram_text: ''
         },
         category: '글로벌 네트워크',
         createdAt: new Date().toISOString().split('T')[0],
-        notes: '신규 프로필 명함',
-        data: {
+        notes: '내 디지털 명함',
+        data: activeCard && cards.length > 0 ? {
           ...activeCard.data,
           organization: '',
           organizationKr: '',
           title: '',
           titleKr: '',
-          website: 'https://mrpark.indonesiacenter.net',
-          websiteDisplay: 'mrpark.indonesiacenter.net',
-          email: 'mrpark@indonesiacenter.net'
+          website: '',
+          websiteDisplay: '',
+          email: ''
+        } : {
+          organization: '',
+          organizationKr: '',
+          name: '',
+          nameKr: '',
+          title: '',
+          titleKr: '',
+          phone: '',
+          phoneRaw: '',
+          whatsappUrl: '',
+          email: '',
+          website: '',
+          websiteDisplay: '',
+          addressLines: [],
+          addressKr: '',
+          googleMapsUrl: '',
+          naverMapsUrl: ''
         }
       };
       setEditingCard(newCardTemplate);
@@ -272,6 +306,7 @@ export default function App() {
   };
 
   const handleShare = async () => {
+    if (!activeCard) return;
     const targetUrl = getCardShareUrl(activeCard);
     const displayUrl = activeCard.data.websiteDisplay || targetUrl;
     const shareData = {
@@ -296,15 +331,24 @@ export default function App() {
   };
 
   const handleThemeChange = (newTheme: CardTheme) => {
-    setCards(prev => prev.map(c => c.id === activeCard.id ? { ...c, theme: newTheme } : c));
+    if (cards.length === 0 && isSamplePreview) {
+      setSamplePreviewTheme(newTheme);
+      return;
+    }
+    if (activeCard) {
+      setCards(prev => prev.map(c => c.id === activeCard.id ? { ...c, theme: newTheme } : c));
+    }
   };
 
   const handleSaveCard = (savedCard: StoredCard) => {
+    const isFirstEverCard = cards.length === 0;
+
     setCards(prev => {
       let nextCards = [...prev];
-      // If marked as default, clear default on other cards
-      if (savedCard.isDefault) {
+      // If marked as default or is first card, ensure default
+      if (savedCard.isDefault || isFirstEverCard) {
         nextCards = nextCards.map(c => ({ ...c, isDefault: false }));
+        savedCard.isDefault = true;
       }
 
       const exists = nextCards.some(c => c.id === savedCard.id);
@@ -316,12 +360,32 @@ export default function App() {
     });
 
     setActiveCardId(savedCard.id);
+    setIsSamplePreview(false);
+
     if (savedCard.isMyCard) {
       setActiveTab('my-card');
       showToast(isCreatingCard ? '새로운 내 명함이 생성되었습니다.' : '내 명함 정보가 수정되었습니다.');
     } else {
       showToast(`'${savedCard.data.name}' 명함이 보관함에 등록되었습니다.`);
     }
+
+    // Trigger optional PIN protection prompt ("Lazy Setup") only after the user creates and saves their first card
+    if (isFirstEverCard && !isPinConfigured && typeof window !== 'undefined' && localStorage.getItem('lazy_pin_dismissed') !== 'true') {
+      setTimeout(() => {
+        setIsLazyPinModalOpen(true);
+      }, 450);
+    }
+  };
+
+  const handleConfirmReset = () => {
+    clearAllLocalData();
+    setCards([]);
+    setActiveCardId('');
+    setIsSamplePreview(false);
+    setActiveTab('my-card');
+    refreshPinStatus();
+    unlockApp();
+    showToast('모든 로컬 데이터가 안전하게 초기화되었습니다.');
   };
 
   const handleDeleteCard = (cardId: string) => {
@@ -413,10 +477,12 @@ export default function App() {
           {/* Right Header: Theme Palette Selector & Consolidated Security */}
           <div className="flex items-center gap-1.5 sm:gap-2 min-h-[32px] relative" ref={settingsMenuRef}>
             {/* Quick Luxury Theme Palette Selector */}
-            <ThemeSelector
-              currentTheme={activeCard.theme}
-              onSelectTheme={handleThemeChange}
-            />
+            {activeCard && (
+              <ThemeSelector
+                currentTheme={activeCard.theme}
+                onSelectTheme={handleThemeChange}
+              />
+            )}
 
             {/* If PIN configured: Minimalist Lock icon for instant lock */}
             {isPinConfigured && (
@@ -493,8 +559,71 @@ export default function App() {
           {activeTab === 'my-card' ? (
             /* ================= VIEW 1: LUXURY CARD SHOWCASE & CAROUSEL ================= */
             <div className="w-full flex flex-col items-center">
-              {/* Context Bar only if viewing someone else's card from the vault */}
-              {!activeCard.isMyCard ? (
+              {cards.length === 0 && !isSamplePreview ? (
+                /* STEP 1: FIRST-TIME VISITOR LUXURY ONBOARDING STATE */
+                <WelcomeCard
+                  onCreateFirstCard={handleOpenCreateModal}
+                  onExploreSample={() => {
+                    setIsSamplePreview(true);
+                    setActiveCardId(SAMPLE_CARDS[0].id);
+                  }}
+                />
+              ) : isSamplePreview && cards.length === 0 && activeCard ? (
+                /* TEMPORARY SHOWCASE SAMPLE PREVIEW MODE */
+                <div className="w-full flex flex-col items-center space-y-4">
+                  {/* Subtle Context Kicker */}
+                  <div className="w-full max-w-[540px] px-4 py-2.5 rounded-2xl bg-[#16181D] border border-[#C5A880]/30 shadow-lg flex items-center justify-between text-xs animate-in fade-in duration-200">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#C5A880] animate-pulse" />
+                      <span className="font-semibold text-neutral-200">샘플 둘러보기 모드</span>
+                      <span className="text-[11px] text-neutral-400 hidden sm:inline">(3D 회전 및 기능 체험)</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleOpenCreateModal}
+                        className="px-3.5 py-1.5 rounded-xl bg-[#C5A880] hover:bg-[#D6B991] text-neutral-950 font-bold text-xs transition-all cursor-pointer shadow-md active:scale-95"
+                      >
+                        + 내 첫 명함 만들기
+                      </button>
+                      <button
+                        onClick={() => setIsSamplePreview(false)}
+                        className="px-2.5 py-1.5 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer text-xs"
+                      >
+                        시작 화면으로
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Interactive Card Canvas */}
+                  <div className="w-full max-w-[540px]">
+                    <CardContainer 
+                      data={activeCard.data} 
+                      theme={activeCard.theme} 
+                      layout_type={activeCard.layout_type}
+                      card_features={activeCard.card_features}
+                      isPhotoCard={activeCard.isPhotoCard}
+                      photoUrl={activeCard.scannedImage}
+                      backPhotoUrl={activeCard.scannedImageBack}
+                      isFlipped={isFlipped}
+                      onFlip={() => setIsFlipped(prev => !prev)}
+                      onOpenShare={() => setIsShareModalOpen(true)}
+                      onOpenEdit={() => {
+                        handleOpenCreateModal();
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : !activeCard ? (
+                /* Fallback if no cards exist */
+                <WelcomeCard
+                  onCreateFirstCard={handleOpenCreateModal}
+                  onExploreSample={() => {
+                    setIsSamplePreview(true);
+                    setActiveCardId(SAMPLE_CARDS[0].id);
+                  }}
+                />
+              ) : !activeCard.isMyCard ? (
+                /* Context Bar only if viewing someone else's card from the vault */
                 <div className="w-full flex flex-col items-center space-y-4">
                   <div className="flex items-center justify-between w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px] text-xs">
                     <button
@@ -588,9 +717,13 @@ export default function App() {
               onOpenSync={() => setIsSyncModalOpen(true)}
               onOpenEditor={() => {
                 requireUnlock(() => {
-                  setEditingCard(activeCard);
-                  setIsCreatingCard(false);
-                  setIsEditorOpen(true);
+                  if (activeCard) {
+                    setEditingCard(activeCard);
+                    setIsCreatingCard(false);
+                    setIsEditorOpen(true);
+                  } else {
+                    handleOpenCreateModal();
+                  }
                 });
               }}
             />
@@ -598,10 +731,38 @@ export default function App() {
 
         </main>
 
-        {/* Discreet Editorial Footer */}
-        <footer className="border-t border-neutral-900 py-5 px-4 text-center text-neutral-400 font-sans text-[11px]">
-          <p>
-            © {new Date().getFullYear()} Korean Center Global Network. Executive Card Platform.
+        {/* Discreet Minimalist Footer with Legal Disclosures & Local Data Reset */}
+        <footer className="border-t border-white/5 py-6 px-4 text-center text-neutral-400 font-sans text-xs">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[12px] mb-2.5">
+            <button
+              onClick={() => {
+                setLegalDocType('privacy');
+                setIsLegalModalOpen(true);
+              }}
+              className="text-neutral-400 hover:text-neutral-200 transition-colors cursor-pointer"
+            >
+              개인정보처리방침
+            </button>
+            <span aria-hidden="true" className="text-neutral-700">·</span>
+            <button
+              onClick={() => {
+                setLegalDocType('terms');
+                setIsLegalModalOpen(true);
+              }}
+              className="text-neutral-400 hover:text-neutral-200 transition-colors cursor-pointer"
+            >
+              서비스 이용약관
+            </button>
+            <span aria-hidden="true" className="text-neutral-700">·</span>
+            <button
+              onClick={() => setIsResetModalOpen(true)}
+              className="text-neutral-400 hover:text-rose-400 transition-colors cursor-pointer"
+            >
+              로컬 데이터 초기화
+            </button>
+          </div>
+          <p className="text-[11px] text-neutral-500">
+            © {new Date().getFullYear()} GOGUMA CARD STUDIO · 회원가입 없는 로컬 퍼스트 아키텍처
           </p>
         </footer>
 
@@ -693,6 +854,40 @@ export default function App() {
           onStatusChange={() => {
             refreshPinStatus();
           }}
+        />
+
+        {/* Lazy PIN Setup Modal (triggers only after user creates and saves first card) */}
+        <LazyPinSetupModal
+          isOpen={isLazyPinModalOpen}
+          onClose={() => {
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('lazy_pin_dismissed', 'true');
+            }
+            setIsLazyPinModalOpen(false);
+            showToast('설정 메뉴에서 언제든 4자리 PIN을 설정할 수 있습니다.');
+          }}
+          onProceedSetup={() => {
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('lazy_pin_dismissed', 'true');
+            }
+            setIsLazyPinModalOpen(false);
+            setPinModalMode('setup');
+            setIsConfigModalOpen(true);
+          }}
+        />
+
+        {/* Legal Disclosures Modal (Privacy Policy & Terms of Service) */}
+        <LegalModal
+          isOpen={isLegalModalOpen}
+          initialDoc={legalDocType}
+          onClose={() => setIsLegalModalOpen(false)}
+        />
+
+        {/* Local Data Reset Confirmation Modal */}
+        <ResetDataModal
+          isOpen={isResetModalOpen}
+          onClose={() => setIsResetModalOpen(false)}
+          onConfirmReset={handleConfirmReset}
         />
 
         {editingCard && (
