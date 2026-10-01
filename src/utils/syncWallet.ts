@@ -10,31 +10,58 @@ export function getOrCreateSyncId(): string {
   return id;
 }
 
-// 2. 다른 기기의 Sync ID로 덮어쓰고 D1에서 최신 보관함 가져오기
+// 2. 다른 기기의 Sync ID로 덮어쓰고 최신 보관함 가져오기
 export async function pullWalletFromEdge(syncId: string): Promise<any[] | null> {
+  if (!syncId) return null;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 6000);
+
   try {
-    const res = await fetch(`/api/sync?id=${syncId}`);
-    const data = await res.json();
-    if (data.success && Array.isArray(data.cards)) {
-      localStorage.setItem(SYNC_KEY, syncId);
-      return data.cards;
+    const res = await fetch(`/api/sync?id=${encodeURIComponent(syncId)}`, {
+      signal: controller.signal,
+      headers: { 'Accept': 'application/json' }
+    });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.cards)) {
+        localStorage.setItem(SYNC_KEY, syncId);
+        return data.cards;
+      }
     }
   } catch (err) {
-    console.error("Failed to pull wallet from edge:", err);
+    // Non-blocking local-first fallback
+    clearTimeout(timeoutId);
   }
   return null;
 }
 
-// 3. 현재 로컬 보관함 목록을 D1으로 백그라운드 동기화 (디바운스 처리 가능)
+// 3. 현재 로컬 보관함 목록을 백그라운드 동기화 (오프라인/에러 시 조용히 로컬 유지)
 export async function pushWalletToEdge(cards: any[]): Promise<void> {
+  if (!cards || !Array.isArray(cards) || cards.length === 0) return;
   const syncId = getOrCreateSyncId();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+
   try {
-    await fetch("/api/sync", {
+    const res = await fetch("/api/sync", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
+      headers: { 
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
       body: JSON.stringify({ syncId, cards }),
     });
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      // Local fallback without throwing
+      return;
+    }
   } catch (err) {
-    console.error("Failed to push wallet to edge:", err);
+    // Quiet fail-safe: local-first storage preserves all cards in browser localStorage
+    clearTimeout(timeoutId);
   }
 }

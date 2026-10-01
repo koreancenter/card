@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { CardData, CardTheme, CardOrientation } from '../types/card';
+import { CardData, CardTheme, CardOrientation, CardLayoutType, CardFeatures } from '../types/card';
 import { BusinessCardFront } from './BusinessCardFront';
 import { BusinessCardBack } from './BusinessCardBack';
 import { ActionButtons } from './ActionButtons';
@@ -8,29 +8,41 @@ import { RefreshCw, Smartphone, Monitor } from 'lucide-react';
 interface CardContainerProps {
   data: CardData;
   theme: CardTheme;
+  layout_type?: CardLayoutType;
+  card_features?: CardFeatures;
   isFlipped: boolean;
   onFlip: () => void;
   onOpenEdit?: () => void;
   onOpenShare: () => void;
+  isPhotoCard?: boolean;
+  photoUrl?: string;
+  backPhotoUrl?: string;
 }
 
 export const CardContainer: React.FC<CardContainerProps> = ({
   data,
   theme,
+  layout_type = 'editorial_minimal',
+  card_features,
   isFlipped,
   onFlip,
   onOpenEdit,
   onOpenShare,
+  isPhotoCard = false,
+  photoUrl,
+  backPhotoUrl,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [orientation, setOrientation] = useState<CardOrientation>('landscape');
+  const [orientation, setOrientation] = useState<CardOrientation>(() => 
+    layout_type === 'vertical_atelier' ? 'portrait' : 'landscape'
+  );
 
-  // Automatically default to portrait on mobile screens
+  // Sync orientation if layout changes to vertical atelier
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+    if (layout_type === 'vertical_atelier') {
       setOrientation('portrait');
     }
-  }, []);
+  }, [layout_type]);
 
   // Touch swipe handling
   const touchStartX = useRef<number | null>(null);
@@ -48,29 +60,33 @@ export const CardContainer: React.FC<CardContainerProps> = ({
     touchStartX.current = null;
   };
 
-  const isPortrait = orientation === 'portrait';
+  const isVerticalAtelier = layout_type === 'vertical_atelier';
+  const isPortrait = isVerticalAtelier || orientation === 'portrait';
 
   return (
-    <div className={`w-full ${isPortrait ? 'max-w-[340px] sm:max-w-[360px]' : 'max-w-[560px]'} mx-auto select-none flex flex-col items-center transition-all duration-300`}>
+    <div className={`w-full ${isPortrait ? 'max-w-[340px] sm:max-w-[370px]' : 'max-w-[560px]'} mx-auto select-none flex flex-col items-center transition-all duration-300`}>
       {/* Discreet Utility Bar Above Card: Orientation Toggle & Flip */}
       <div className="flex items-center justify-end w-full px-1 mb-2.5">
         <div className="inline-flex items-center gap-1 p-0.5 rounded-full bg-[#121318]/70 border border-white/5 text-neutral-400 text-xs">
-          {/* Orientation Toggle (Landscape / Portrait) */}
-          <button
-            onClick={() => setOrientation(prev => prev === 'portrait' ? 'landscape' : 'portrait')}
-            className="p-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all cursor-pointer"
-            title={isPortrait ? '가로형 명함 보기' : '세로형 명함 보기'}
-            aria-label="명함 방향 전환"
-          >
-            {isPortrait ? <Monitor className="w-3.5 h-3.5" /> : <Smartphone className="w-3.5 h-3.5" />}
-          </button>
-
-          <span className="w-px h-3 bg-white/10" />
+          {/* Orientation Toggle (if not locked to vertical atelier) */}
+          {!isVerticalAtelier && (
+            <>
+              <button
+                onClick={() => setOrientation(prev => prev === 'portrait' ? 'landscape' : 'portrait')}
+                className="p-1.5 rounded-full hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+                title={isPortrait ? '가로형 명함 보기' : '세로형 명함 보기'}
+                aria-label="명함 방향 전환"
+              >
+                {isPortrait ? <Monitor className="w-3.5 h-3.5" /> : <Smartphone className="w-3.5 h-3.5" />}
+              </button>
+              <span className="w-px h-3 bg-white/10" />
+            </>
+          )}
 
           {/* Discreet Flip Trigger */}
           <button
             onClick={onFlip}
-            className="flex items-center gap-1 px-2 py-1 rounded-full hover:text-white hover:bg-white/5 transition-all cursor-pointer text-[11px]"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full hover:text-white hover:bg-white/5 transition-all cursor-pointer text-[11px]"
             title="앞·뒷면 뒤집기 (스페이스바)"
             aria-label="앞·뒷면 뒤집기"
           >
@@ -80,7 +96,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
         </div>
       </div>
 
-      {/* 3D Tactile Card Canvas (Clean Matte, No Mouse Glare Follower) */}
+      {/* 3D Tactile Card Canvas */}
       <div 
         className="w-full [perspective:1400px] relative"
         onTouchStart={handleTouchStart}
@@ -118,8 +134,12 @@ export const CardContainer: React.FC<CardContainerProps> = ({
           >
             <BusinessCardFront 
               data={data} 
-              theme={theme} 
+              theme={theme}
+              layout_type={layout_type}
+              card_features={card_features}
               orientation={orientation}
+              isPhotoCard={isPhotoCard}
+              photoUrl={photoUrl}
             />
           </div>
 
@@ -136,8 +156,10 @@ export const CardContainer: React.FC<CardContainerProps> = ({
           >
             <BusinessCardBack 
               data={data} 
-              theme={theme} 
+              theme={theme}
+              layout_type={layout_type}
               orientation={orientation}
+              backPhotoUrl={backPhotoUrl}
             />
           </div>
         </div>
@@ -149,6 +171,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
           data={data}
           onOpenEdit={onOpenEdit}
           onOpenShare={onOpenShare}
+          isPhotoCard={isPhotoCard}
         />
       </div>
     </div>

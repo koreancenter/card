@@ -9,7 +9,14 @@ export const INITIAL_CARDS: StoredCard[] = [
     slug: 'mrpark',
     customDomain: 'mrpark.koreancenter.net',
     category: '글로벌 네트워크',
-    theme: 'sand',
+    theme: 'sumi_ink',
+    layout_type: 'editorial_minimal',
+    card_features: {
+      show_en_name: true,
+      show_sub_org: true,
+      show_address: true,
+      monogram_text: 'PK'
+    },
     createdAt: '2026-03-01',
     notes: '본인 공식 디지털 명함 (card.goguma.app/mrpark | mrpark.koreancenter.net)',
     data: {
@@ -25,7 +32,14 @@ export const INITIAL_CARDS: StoredCard[] = [
     slug: 'indonesia',
     customDomain: 'mrpark.indonesiacenter.net',
     category: '글로벌 네트워크',
-    theme: 'emerald',
+    theme: 'deep_forest',
+    layout_type: 'monogram_executive',
+    card_features: {
+      show_en_name: true,
+      show_sub_org: true,
+      show_address: true,
+      monogram_text: 'IC'
+    },
     createdAt: '2026-03-05',
     notes: '인도네시아 센터 총괄의장 명함 (card.goguma.app/indonesia | mrpark.indonesiacenter.net)',
     data: {
@@ -54,9 +68,17 @@ export const INITIAL_CARDS: StoredCard[] = [
     id: 'card-michael-harrison',
     isMyCard: false,
     category: 'VIP 파트너',
-    theme: 'navy',
+    theme: 'classic_navy',
+    layout_type: 'monogram_executive',
+    card_features: {
+      show_en_name: true,
+      show_sub_org: true,
+      show_address: true,
+      monogram_text: 'MH'
+    },
     createdAt: '2026-03-12',
-    notes: '워싱턴 DC 국제문화교류 심포지엄 미팅',
+    notes: '워싱턴 DC 국제문화교류 심포지엄 미팅 (실물 명함 사진 보관)',
+    scannedImage: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
     data: {
       organization: 'Global Heritage Foundation',
       organizationKr: '글로벌헤리티지재단',
@@ -80,7 +102,14 @@ export const INITIAL_CARDS: StoredCard[] = [
     id: 'card-jung-seoyun',
     isMyCard: false,
     category: '공공·기관',
-    theme: 'sand',
+    theme: 'warm_paper',
+    layout_type: 'warm_organic',
+    card_features: {
+      show_en_name: true,
+      show_sub_org: true,
+      show_address: true,
+      monogram_text: '서윤'
+    },
     createdAt: '2026-03-18',
     notes: '공공 외교 문화 콘텐츠 공동 기획 협력사',
     data: {
@@ -106,9 +135,17 @@ export const INITIAL_CARDS: StoredCard[] = [
     id: 'card-james-vance',
     isMyCard: false,
     category: '투자·금융',
-    theme: 'titanium',
+    theme: 'sumi_ink',
+    layout_type: 'swiss_typo_bold',
+    card_features: {
+      show_en_name: true,
+      show_sub_org: true,
+      show_address: true,
+      monogram_text: 'JV'
+    },
     createdAt: '2026-03-22',
-    notes: '아시아태평양 벤처 펀드 운용 총괄',
+    notes: '아시아태평양 벤처 펀드 운용 총괄 (실물 명함 보관)',
+    scannedImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80',
     data: {
       organization: 'Vance & Partners Capital',
       organizationKr: '밴스 앤 파트너스 캐피탈',
@@ -130,7 +167,7 @@ export const INITIAL_CARDS: StoredCard[] = [
   }
 ];
 
-const STORAGE_KEY = 'koreancenter_stored_cards_v1';
+const STORAGE_KEY = 'koreancenter_stored_cards_v2';
 
 export function loadStoredCards(): StoredCard[] {
   if (typeof window === 'undefined') return INITIAL_CARDS;
@@ -142,29 +179,7 @@ export function loadStoredCards(): StoredCard[] {
     }
     const parsed: StoredCard[] = JSON.parse(data);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      // Ensure my-card-park-gihong has slug and isDefault
-      let updatedList = parsed.map(c => {
-        if (c.id === 'my-card-park-gihong') {
-          return {
-            ...c,
-            isMyCard: true,
-            isDefault: c.isDefault !== undefined ? c.isDefault : true,
-            slug: c.slug || 'koreancenter',
-            theme: c.theme === 'obsidian' ? ('sand' as const) : c.theme
-          };
-        }
-        return c;
-      });
-
-      // If user doesn't have the Indonesia Center sample card yet, append it as a secondary my-card
-      const hasIndonesia = updatedList.some(c => c.id === 'my-card-indonesia-center' || c.slug === 'indonesia');
-      if (!hasIndonesia) {
-        const indoCard = INITIAL_CARDS.find(c => c.id === 'my-card-indonesia-center');
-        if (indoCard) {
-          updatedList.splice(1, 0, indoCard);
-        }
-      }
-      return updatedList;
+      return parsed;
     }
     return INITIAL_CARDS;
   } catch (e) {

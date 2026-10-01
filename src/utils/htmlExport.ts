@@ -9,7 +9,11 @@ export function generateStandaloneHtml(data: CardData, theme: CardTheme = 'sand'
   const officialUrl = data.website || 'https://mrpark.koreancenter.net';
 
   // Theme color maps for inline generation
-  const themeColors: Record<CardTheme, { bg: string; text: string; textSec: string; border: string; accent: string }> = {
+  const themeColors: Record<string, { bg: string; text: string; textSec: string; border: string; accent: string }> = {
+    sumi_ink: { bg: '#0B0C10', text: '#F8F4EB', textSec: '#C5BEB3', border: '#262420', accent: '#C5A880' },
+    warm_paper: { bg: '#F8F4EB', text: '#1F2023', textSec: '#4F4C47', border: '#DFD7C7', accent: '#6B1D42' },
+    deep_forest: { bg: '#0D1F18', text: '#F4F7F4', textSec: '#AEC2B4', border: '#1C362A', accent: '#C2A478' },
+    classic_navy: { bg: '#0A1128', text: '#F0F4FC', textSec: '#A8BADB', border: '#1E2C52', accent: '#D0D9E8' },
     sand: { bg: '#f8f6f0', text: '#191614', textSec: '#484037', border: '#ded7cb', accent: '#d97706' },
     cotton: { bg: '#fcfcfb', text: '#171717', textSec: '#525252', border: '#e5e5e5', accent: '#171717' },
     obsidian: { bg: '#0c0c0d', text: '#ffffff', textSec: '#9ca3af', border: '#262626', accent: '#d4af37' },
@@ -20,7 +24,7 @@ export function generateStandaloneHtml(data: CardData, theme: CardTheme = 'sand'
     slate: { bg: '#10151f', text: '#f1f5f9', textSec: '#94a3b8', border: '#334155', accent: '#64748b' }
   };
 
-  const selectedTheme = themeColors[theme] || themeColors.sand;
+  const selectedTheme = themeColors[theme] || themeColors.sumi_ink;
 
   return `<!DOCTYPE html>
 <html lang="ko" class="dark">

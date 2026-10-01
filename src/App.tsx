@@ -14,7 +14,7 @@ import { QrModal } from './components/QrModal';
 import { PrintModal } from './components/PrintModal';
 import { PrintSheet } from './components/PrintSheet';
 import { ExportModal } from './components/ExportModal';
-import { ScanCardModal } from './components/ScanCardModal';
+import { PhotoScanModal } from './components/PhotoScanModal';
 import { CardEditorModal } from './components/CardEditorModal';
 import { VaultView } from './components/VaultView';
 import { DeviceSyncModal } from './components/DeviceSyncModal';
@@ -22,6 +22,7 @@ import { APP_BASE_DOMAIN, resolveCardFromLocation, getCardShareUrl } from './uti
 import { pullWalletFromEdge, pushWalletToEdge } from './utils/syncWallet';
 import { PinLockModal, PinModalMode } from './components/PinLockModal';
 import { BiometricsSettingModal } from './components/BiometricsSettingModal';
+import { ThemeSelector } from './components/ThemeSelector';
 import { useAutoLock } from './hooks/useAutoLock';
 import { verifyBiometric } from './utils/biometrics';
 import { 
@@ -192,7 +193,14 @@ export default function App() {
         isMyCard: true,
         isDefault: false,
         slug: '',
-        theme: 'emerald',
+        theme: 'sumi_ink',
+        layout_type: 'editorial_minimal',
+        card_features: {
+          show_en_name: true,
+          show_sub_org: true,
+          show_address: true,
+          monogram_text: 'PK'
+        },
         category: '글로벌 네트워크',
         createdAt: new Date().toISOString().split('T')[0],
         notes: '신규 프로필 명함',
@@ -357,7 +365,7 @@ export default function App() {
           {/* Institutional Wordmark */}
           <div className="flex items-center gap-2.5 sm:gap-3">
             <span className="text-xs sm:text-sm font-semibold tracking-[0.25em] uppercase text-white font-sans">
-              KOREAN CENTER <span className="text-neutral-400 font-light hidden sm:inline">CARD STUDIO</span>
+              GOGUMA <span className="text-neutral-400 font-light hidden sm:inline">CARD STUDIO</span>
             </span>
           </div>
 
@@ -402,8 +410,14 @@ export default function App() {
             </button>
           </nav>
 
-          {/* Right Header: Consolidated Security & Settings Popover */}
+          {/* Right Header: Theme Palette Selector & Consolidated Security */}
           <div className="flex items-center gap-1.5 sm:gap-2 min-h-[32px] relative" ref={settingsMenuRef}>
+            {/* Quick Luxury Theme Palette Selector */}
+            <ThemeSelector
+              currentTheme={activeCard.theme}
+              onSelectTheme={handleThemeChange}
+            />
+
             {/* If PIN configured: Minimalist Lock icon for instant lock */}
             {isPinConfigured && (
               <button
@@ -499,6 +513,11 @@ export default function App() {
                     <CardContainer 
                       data={activeCard.data} 
                       theme={activeCard.theme} 
+                      layout_type={activeCard.layout_type}
+                      card_features={activeCard.card_features}
+                      isPhotoCard={activeCard.isPhotoCard}
+                      photoUrl={activeCard.scannedImage}
+                      backPhotoUrl={activeCard.scannedImageBack}
                       isFlipped={isFlipped}
                       onFlip={() => setIsFlipped(prev => !prev)}
                       onOpenShare={() => setIsShareModalOpen(true)}
@@ -595,36 +614,40 @@ export default function App() {
         )}
 
         {/* Modals */}
-        <ShareModal
-          isOpen={isShareModalOpen}
-          onClose={() => setIsShareModalOpen(false)}
-          data={activeCard.data}
-          onOpenPrint={() => setIsPrintOpen(true)}
-          onOpenExport={() => setIsExportOpen(true)}
-        />
+        {activeCard && (
+          <>
+            <ShareModal
+              isOpen={isShareModalOpen}
+              onClose={() => setIsShareModalOpen(false)}
+              data={activeCard.data}
+              onOpenPrint={() => setIsPrintOpen(true)}
+              onOpenExport={() => setIsExportOpen(true)}
+            />
 
-        <QrModal
-          isOpen={isQrOpen}
-          onClose={() => setIsQrOpen(false)}
-          data={activeCard.data}
-        />
+            <QrModal
+              isOpen={isQrOpen}
+              onClose={() => setIsQrOpen(false)}
+              data={activeCard.data}
+            />
 
-        <PrintModal
-          isOpen={isPrintOpen}
-          onClose={() => setIsPrintOpen(false)}
-          data={activeCard.data}
-          config={printConfig}
-          onConfigChange={setPrintConfig}
-        />
+            <PrintModal
+              isOpen={isPrintOpen}
+              onClose={() => setIsPrintOpen(false)}
+              data={activeCard.data}
+              config={printConfig}
+              onConfigChange={setPrintConfig}
+            />
 
-        <ExportModal
-          isOpen={isExportOpen}
-          onClose={() => setIsExportOpen(false)}
-          card={activeCard.data}
-          theme={activeCard.theme}
-        />
+            <ExportModal
+              isOpen={isExportOpen}
+              onClose={() => setIsExportOpen(false)}
+              card={activeCard.data}
+              theme={activeCard.theme}
+            />
+          </>
+        )}
 
-        <ScanCardModal
+        <PhotoScanModal
           isOpen={isScanOpen}
           onClose={() => setIsScanOpen(false)}
           onSaveCard={handleSaveCard}
@@ -690,7 +713,7 @@ export default function App() {
       </div>
 
       {/* PRINT-ONLY VECTOR CONTAINER (Triggered on window.print()) */}
-      <PrintSheet data={activeCard.data} config={printConfig} />
+      {activeCard && <PrintSheet data={activeCard.data} config={printConfig} />}
     </>
   );
 }

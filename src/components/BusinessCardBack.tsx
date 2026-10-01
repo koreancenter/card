@@ -1,33 +1,63 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { CardData, CardTheme, CardOrientation } from '../types/card';
+import { CardData, CardTheme, CardOrientation, CardLayoutType } from '../types/card';
+import { resolveThemeStyles } from '../constants/templates';
 
 interface BusinessCardBackProps {
   data: CardData;
-  theme: CardTheme;
+  theme?: CardTheme;
+  layout_type?: CardLayoutType;
   orientation?: CardOrientation;
   isPrintPreview?: boolean;
+  backPhotoUrl?: string;
 }
 
 export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
   data,
-  theme,
+  theme = 'sumi_ink',
+  layout_type = 'editorial_minimal',
   orientation = 'landscape',
-  isPrintPreview = false
+  isPrintPreview = false,
+  backPhotoUrl
 }) => {
   const [qrSvg, setQrSvg] = useState<string>('');
 
-  const isLight = theme === 'cotton' || theme === 'sand';
-  const isPortrait = orientation === 'portrait';
+  const themeStyles = resolveThemeStyles(theme);
+  const isLight = themeStyles.isLight;
+  const isVerticalAtelier = layout_type === 'vertical_atelier';
+  const isPortrait = isVerticalAtelier || orientation === 'portrait';
+
+  // If back photo is provided, render authentic back photo
+  if (backPhotoUrl) {
+    return (
+      <div 
+        className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
+          isPrintPreview ? 'border-0' : `border ${themeStyles.border} shadow-2xl`
+        } bg-[#0A0B0E] transition-all duration-300`}
+        style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
+      >
+        <img 
+          src={backPhotoUrl} 
+          alt="실물 명함 뒷면" 
+          className="w-full h-full object-cover rounded-2xl"
+        />
+        <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
+          <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-[#C5A880] tracking-wider uppercase shadow-sm">
+            BACK PHOTO
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
-    // Official production domain for digital business card
+    // Target domain for digital business card
     const targetUrl = data.website || 'https://mrpark.koreancenter.net';
     QRCode.toString(targetUrl, {
       type: 'svg',
       margin: 0,
       color: {
-        dark: isLight ? (theme === 'sand' ? '#27231f' : '#171717') : '#f5f5f5',
+        dark: isLight ? '#1F2023' : '#F8F4EB',
         light: '#00000000'
       },
       errorCorrectionLevel: 'M'
@@ -39,89 +69,6 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
         console.error('Error generating QR', err);
       });
   }, [theme, isLight, data.website]);
-
-  const themeStyles = {
-    obsidian: {
-      cardBg: 'bg-[#0c0c0d]',
-      border: 'border-neutral-800/70',
-      textPrimary: 'text-neutral-100',
-      textSecondary: 'text-neutral-400',
-      textMuted: 'text-neutral-500',
-      tagline: 'text-neutral-300',
-      hairline: 'border-neutral-800/60',
-      qrBg: 'bg-neutral-900/80'
-    },
-    cotton: {
-      cardBg: 'bg-[#fcfcfb]',
-      border: 'border-neutral-200',
-      textPrimary: 'text-neutral-900',
-      textSecondary: 'text-neutral-600',
-      textMuted: 'text-neutral-400',
-      tagline: 'text-neutral-700',
-      hairline: 'border-neutral-200/80',
-      qrBg: 'bg-neutral-100/80'
-    },
-    titanium: {
-      cardBg: 'bg-[#18181b]',
-      border: 'border-zinc-700/60',
-      textPrimary: 'text-zinc-100',
-      textSecondary: 'text-zinc-400',
-      textMuted: 'text-zinc-500',
-      tagline: 'text-zinc-300',
-      hairline: 'border-zinc-800/60',
-      qrBg: 'bg-zinc-900/80'
-    },
-    navy: {
-      cardBg: 'bg-[#080e1a]',
-      border: 'border-slate-800/70',
-      textPrimary: 'text-slate-100',
-      textSecondary: 'text-slate-300',
-      textMuted: 'text-slate-400',
-      tagline: 'text-sky-300',
-      hairline: 'border-slate-800/60',
-      qrBg: 'bg-slate-900/80'
-    },
-    emerald: {
-      cardBg: 'bg-[#08140e]',
-      border: 'border-emerald-950/80 ring-1 ring-emerald-900/30',
-      textPrimary: 'text-emerald-50',
-      textSecondary: 'text-emerald-200/80',
-      textMuted: 'text-emerald-400/60',
-      tagline: 'text-amber-200/90',
-      hairline: 'border-emerald-900/40',
-      qrBg: 'bg-emerald-950/80'
-    },
-    sand: {
-      cardBg: 'bg-[#f8f6f0]',
-      border: 'border-[#ded7cb] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.55),0_0_1px_1px_rgba(255,255,255,0.08)]',
-      textPrimary: 'text-[#191614]',
-      textSecondary: 'text-[#484037]',
-      textMuted: 'text-[#6b6155]',
-      tagline: 'text-[#544b40]',
-      hairline: 'border-[#ded6c9]',
-      qrBg: 'bg-white'
-    },
-    burgundy: {
-      cardBg: 'bg-[#15070b]',
-      border: 'border-rose-950/70 ring-1 ring-rose-900/20',
-      textPrimary: 'text-rose-50',
-      textSecondary: 'text-rose-200/80',
-      textMuted: 'text-rose-400/60',
-      tagline: 'text-rose-200/90',
-      hairline: 'border-rose-900/40',
-      qrBg: 'bg-rose-950/80'
-    },
-    slate: {
-      cardBg: 'bg-[#10151f]',
-      border: 'border-slate-800/70',
-      textPrimary: 'text-slate-100',
-      textSecondary: 'text-slate-300',
-      textMuted: 'text-slate-400',
-      tagline: 'text-slate-300',
-      hairline: 'border-slate-800/60',
-      qrBg: 'bg-slate-900/80'
-    }
-  }[theme];
 
   return (
     <div 
@@ -136,12 +83,12 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
         aspectRatio: isPortrait ? '5 / 8' : '9 / 5',
       }}
     >
-      {/* Subtle paper grain texture */}
+      {/* Subtle fine art paper grain texture */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.035] mix-blend-overlay"
+        className="absolute inset-0 pointer-events-none opacity-[0.032] mix-blend-overlay"
         style={{
           backgroundImage: `radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)`,
-          backgroundSize: '16px 16px'
+          backgroundSize: '14px 14px'
         }}
       />
 
@@ -157,13 +104,16 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
           } font-bold tracking-tight ${themeStyles.textPrimary} break-keep whitespace-normal`}>
             대한민국이 브랜드입니다.
           </h2>
-          <p className={`${
-            isPortrait
-              ? 'text-xs sm:text-sm tracking-[0.24em]'
-              : isPrintPreview 
-                ? 'text-[10px] sm:text-xs tracking-[0.2em]' 
-                : 'text-[10px] sm:text-sm md:text-[14px] tracking-[0.22em]'
-          } font-bold uppercase ${themeStyles.tagline}`}>
+          <p 
+            className={`${
+              isPortrait
+                ? 'text-xs sm:text-sm tracking-[0.24em]'
+                : isPrintPreview 
+                  ? 'text-[10px] sm:text-xs tracking-[0.2em]' 
+                  : 'text-[10px] sm:text-sm md:text-[14px] tracking-[0.22em]'
+            } font-bold uppercase`}
+            style={{ color: themeStyles.accent }}
+          >
             KOREA IS THE BRAND.
           </p>
         </div>
@@ -183,7 +133,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
 
       {/* Bottom Area: Portrait has centered QR block; Landscape has row */}
       {isPortrait ? (
-        <div className={`relative z-10 pt-4 border-t ${themeStyles.hairline} flex flex-col items-center justify-center text-center space-y-2.5`}>
+        <div className={`relative z-10 pt-4 border-t ${themeStyles.accentHairline} flex flex-col items-center justify-center text-center space-y-2.5`}>
           <a
             href={data.website}
             target="_blank"
@@ -194,7 +144,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
           >
             {qrSvg && (
               <div 
-                className={`w-16 h-16 sm:w-20 sm:h-20 p-1.5 rounded-xl ${themeStyles.qrBg} border ${themeStyles.hairline} flex items-center justify-center shrink-0 shadow-md group-hover/qr:ring-1 group-hover/qr:ring-white/20 transition-all [&>svg]:w-full [&>svg]:h-full mb-1.5`}
+                className={`w-16 h-16 sm:w-20 sm:h-20 p-1.5 rounded-xl ${themeStyles.qrBg} border ${themeStyles.accentHairline} flex items-center justify-center shrink-0 shadow-md group-hover/qr:ring-1 group-hover/qr:ring-white/20 transition-all [&>svg]:w-full [&>svg]:h-full mb-1.5`}
                 dangerouslySetInnerHTML={{ __html: qrSvg }}
                 title="디지털 명함 바로가기 QR 코드"
               />
@@ -213,7 +163,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
         /* Landscape bottom bar */
         <div className={`relative z-10 ${
           isPrintPreview ? 'pt-1.5 text-[9px]' : 'pt-2 sm:pt-3 text-[9px] sm:text-[11px]'
-        } border-t ${themeStyles.hairline} flex items-center justify-between`}>
+        } border-t ${themeStyles.accentHairline} flex items-center justify-between`}>
           <a 
             href={data.website}
             target="_blank"
@@ -226,7 +176,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
               <div 
                 className={`${
                   isPrintPreview ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-6 h-6 sm:w-8 sm:h-8'
-                } p-0.5 sm:p-1 rounded ${themeStyles.qrBg} border ${themeStyles.hairline} flex items-center justify-center shrink-0 [&>svg]:w-full [&>svg]:h-full`}
+                } p-0.5 sm:p-1 rounded ${themeStyles.qrBg} border ${themeStyles.accentHairline} flex items-center justify-center shrink-0 [&>svg]:w-full [&>svg]:h-full`}
                 dangerouslySetInnerHTML={{ __html: qrSvg }}
                 title="디지털 명함 바로가기 QR 코드"
               />

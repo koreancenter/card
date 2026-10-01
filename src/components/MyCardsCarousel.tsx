@@ -40,6 +40,34 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
   const [dragOffset, setDragOffset] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
+  // If no personal cards exist, immediately present the centered "새 명함 만들기" ghost card
+  if (cards.length === 0) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center py-8 px-4 animate-in fade-in duration-300">
+        <div className="w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px]">
+          <div 
+            onClick={onCreateNewCard}
+            className="w-full rounded-3xl border-2 border-dashed border-[#C5A880]/40 hover:border-[#C5A880] bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 flex flex-col items-center justify-center p-8 sm:p-14 text-center group shadow-2xl cursor-pointer active:scale-[0.99]"
+            style={{ aspectRatio: '9 / 5' }}
+          >
+            <div className="w-16 h-16 rounded-full border border-[#C5A880]/50 group-hover:border-[#C5A880] flex items-center justify-center text-[#C5A880] bg-[#C5A880]/15 group-hover:bg-[#C5A880]/25 group-hover:scale-110 transition-all duration-300 mb-4 shadow-lg">
+              <Plus className="w-8 h-8 text-[#C5A880]" />
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-white tracking-tight group-hover:text-[#C5A880] transition-colors">
+              새 명함 만들기
+            </h3>
+            <p className="text-xs text-neutral-400 mt-2 max-w-[280px] leading-relaxed">
+              등록된 내 명함이 없습니다. 첫 번째 럭셔리 디지털 명함을 만들어 보세요.
+            </p>
+            <span className="mt-5 px-5 py-2.5 rounded-xl bg-[#C5A880] text-black text-xs font-bold tracking-tight shadow-md group-hover:bg-[#d6b991] transition-all">
+              지금 첫 명함 생성하기
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Sync currentIndex when activeCardId changes externally
   useEffect(() => {
     const idx = cards.findIndex(c => c.id === activeCardId);
@@ -249,7 +277,11 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                       <BusinessCardFront 
                         data={card.data} 
                         theme={card.theme} 
-                        orientation="landscape"
+                        layout_type={card.layout_type}
+                        card_features={card.card_features}
+                        orientation={card.layout_type === 'vertical_atelier' ? 'portrait' : 'landscape'}
+                        isPhotoCard={card.isPhotoCard}
+                        photoUrl={card.scannedImage}
                       />
                     </div>
 
@@ -267,7 +299,9 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                       <BusinessCardBack 
                         data={card.data} 
                         theme={card.theme} 
-                        orientation="landscape"
+                        layout_type={card.layout_type}
+                        orientation={card.layout_type === 'vertical_atelier' ? 'portrait' : 'landscape'}
+                        backPhotoUrl={card.scannedImageBack}
                       />
                     </div>
                   </div>
@@ -322,6 +356,7 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
             data={activeCard.data}
             onOpenEdit={() => onOpenEdit && onOpenEdit(activeCard)}
             onOpenShare={() => onOpenShare(activeCard)}
+            isPhotoCard={activeCard.isPhotoCard}
           />
         )}
       </div>
