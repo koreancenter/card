@@ -1,12 +1,14 @@
 import React from 'react';
-import { CardData } from '../types/card';
+import { CardData, CardOrientation } from '../types/card';
 import { 
   Phone,
   MessageSquare,
   Mail,
   Globe,
   Edit3,
-  Share2
+  Share2,
+  RectangleHorizontal,
+  RectangleVertical
 } from 'lucide-react';
 
 interface ActionButtonsProps {
@@ -14,19 +16,23 @@ interface ActionButtonsProps {
   onOpenEdit?: () => void;
   onOpenShare: () => void;
   isPhotoCard?: boolean;
+  orientation?: CardOrientation;
+  onToggleOrientation?: () => void;
 }
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({
   data,
   onOpenEdit,
   onOpenShare,
+  orientation = 'landscape',
+  onToggleOrientation,
 }) => {
   const phoneTarget = data.phoneRaw || data.phone?.replace(/[^0-9+]/g, '');
   const iconButtonClass = "w-8 h-8 rounded-full flex items-center justify-center text-white/60 hover:text-[#C5A880] hover:bg-white/5 active:scale-95 transition-all duration-200 cursor-pointer";
 
   return (
     <div 
-      className="inline-flex items-center bg-[#16181D]/80 border border-white/10 backdrop-blur-md px-4 py-2 rounded-full shadow-xl"
+      className="inline-flex items-center bg-white/[0.02] px-3.5 py-1.5 rounded-full"
       role="toolbar" 
       aria-label="명함 빠른 작업"
     >
@@ -83,7 +89,23 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       {/* 1px Vertical Divider */}
       <span className="border-r border-white/10 h-4 mx-2 self-center" />
 
-      {/* 5. Edit */}
+      {/* 5. Orientation Toggle (명함 가로/세로 보기) */}
+      {onToggleOrientation && (
+        <button
+          onClick={onToggleOrientation}
+          className={iconButtonClass}
+          title={orientation === 'portrait' ? '명함 가로 보기' : '명함 세로 보기'}
+          aria-label={orientation === 'portrait' ? '명함 가로 보기' : '명함 세로 보기'}
+        >
+          {orientation === 'portrait' ? (
+            <RectangleHorizontal className="w-4 h-4" />
+          ) : (
+            <RectangleVertical className="w-4 h-4" />
+          )}
+        </button>
+      )}
+
+      {/* 6. Edit */}
       {onOpenEdit && (
         <button
           onClick={onOpenEdit}
@@ -95,7 +117,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         </button>
       )}
 
-      {/* 6. Share */}
+      {/* 7. Share */}
       <button
         onClick={onOpenShare}
         className={iconButtonClass}

@@ -19,7 +19,108 @@ interface CardEditorModalProps {
   isCreating?: boolean;
 }
 
-export type EditorTab = 'layout_theme' | 'profile_typography' | 'contact_channels';
+export type EditorTab = 'theme_styling' | 'layout' | 'profile_typography' | 'contact_channels';
+
+export const THEME_OPTIONS: {
+  id: CardTheme;
+  name: string;
+  nameEn: string;
+  description: string;
+  canvasBg: string;
+  dotColor: string;
+  accent: string;
+  accentName: string;
+  isCurated: boolean;
+}[] = [
+  {
+    id: 'sumi_ink',
+    name: '수묵 인크 (Sumi Ink)',
+    nameEn: 'Sumi Ink & Champagne Brass',
+    description: '깊은 먹색 매트 캔버스와 웜 아이보리 활자, 샴페인 황동 액센트',
+    canvasBg: 'bg-[#0B0C10]',
+    dotColor: '#0B0C10',
+    accent: '#C5A880',
+    accentName: '샴페인 브라스 (#C5A880)',
+    isCurated: true
+  },
+  {
+    id: 'warm_paper',
+    name: '웜 페이퍼 (Warm Paper)',
+    nameEn: 'Fine Cotton Ivory & Deep Wine',
+    description: '파인아트 코튼 아이보리와 딥 차콜 활자, 딥 와인 프라이머리 액센트',
+    canvasBg: 'bg-[#F8F4EB]',
+    dotColor: '#F8F4EB',
+    accent: '#6B1D42',
+    accentName: '딥 와인 (#6B1D42)',
+    isCurated: true
+  },
+  {
+    id: 'deep_forest',
+    name: '딥 포레스트 (Deep Forest)',
+    nameEn: 'Dark Forest Emerald & Antique Bronze',
+    description: '절제된 다크 에메랄드와 오프화이트 활자, 웜 앤틱 브론즈 디테일',
+    canvasBg: 'bg-[#0D1F18]',
+    dotColor: '#0D1F18',
+    accent: '#C2A478',
+    accentName: '앤틱 브론즈 (#C2A478)',
+    isCurated: true
+  },
+  {
+    id: 'classic_navy',
+    name: '클래식 네이비 (Classic Navy)',
+    nameEn: 'Midnight Indigo & Platinum',
+    description: '미드나잇 인디고와 실버화이트 활자, 플래티넘 림 힌트',
+    canvasBg: 'bg-[#0A1128]',
+    dotColor: '#0A1128',
+    accent: '#D0D9E8',
+    accentName: '플래티넘 실버 (#D0D9E8)',
+    isCurated: true
+  },
+  {
+    id: 'obsidian',
+    name: '옵시디언 블랙 (Obsidian Black)',
+    nameEn: 'Matte Obsidian & Pure Gold',
+    description: '칠흑 같은 흑요석 매트 질감과 선명한 퓨어 골드 액센트',
+    canvasBg: 'bg-[#0C0C0D]',
+    dotColor: '#0C0C0D',
+    accent: '#D4AF37',
+    accentName: '퓨어 골드 (#D4AF37)',
+    isCurated: false
+  },
+  {
+    id: 'sand',
+    name: '샌드 캐시미어 (Sand Cashmere)',
+    nameEn: 'Sand Linen & Charcoal',
+    description: '따뜻한 모래사장 린넨 텍스처와 부드러운 차콜 그레이 활자',
+    canvasBg: 'bg-[#F6F3EC]',
+    dotColor: '#F6F3EC',
+    accent: '#544B40',
+    accentName: '소프트 차콜 (#544B40)',
+    isCurated: false
+  },
+  {
+    id: 'burgundy',
+    name: '임페리얼 버건디 (Imperial Burgundy)',
+    nameEn: 'Velvet Wine & Rose Gold',
+    description: '기품 있는 딥 벨벳 와인 컬러와 로즈골드 메탈릭 하이라이트',
+    canvasBg: 'bg-[#15070B]',
+    dotColor: '#15070B',
+    accent: '#E6A5B8',
+    accentName: '로즈골드 (#E6A5B8)',
+    isCurated: false
+  },
+  {
+    id: 'titanium',
+    name: '티타늄 그레이 (Titanium Gray)',
+    nameEn: 'Industrial Titanium & Chrome',
+    description: '정밀 가공된 티타늄 금속 톤과 현대적인 크롬 실버 라인',
+    canvasBg: 'bg-[#18181B]',
+    dotColor: '#18181B',
+    accent: '#A1A1AA',
+    accentName: '크롬 실버 (#A1A1AA)',
+    isCurated: false
+  }
+];
 
 export const CardEditorModal: React.FC<CardEditorModalProps> = ({
   isOpen,
@@ -48,7 +149,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
   const [scannedImage, setScannedImage] = useState<string | undefined>(card.scannedImage);
   const [scannedImageBack, setScannedImageBack] = useState<string | undefined>(card.scannedImageBack);
   const [showDnsHelp, setShowDnsHelp] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<EditorTab>('layout_theme');
+  const [activeTab, setActiveTab] = useState<EditorTab>('theme_styling');
   const [previewFace, setPreviewFace] = useState<'front' | 'back'>('front');
   const [copiedUrl, setCopiedUrl] = useState<boolean>(false);
 
@@ -76,7 +177,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
       setIsPhotoCard(Boolean(card.isPhotoCard));
       setScannedImage(card.scannedImage);
       setScannedImageBack(card.scannedImageBack);
-      setActiveTab('layout_theme');
+      setActiveTab('theme_styling');
       setPreviewFace('front');
     }
   }, [card, isOpen, isMyCardMode]);
@@ -295,45 +396,58 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
           </button>
         </div>
 
-        {/* 3 Step Segmented Tab Control */}
+        {/* 4 Step Segmented Tab Control */}
         <div className="flex items-center gap-1.5 px-4 sm:px-6 pt-3 pb-2.5 border-b border-white/5 bg-[#0B0C10]/80 overflow-x-auto no-scrollbar text-xs">
           <button
             type="button"
-            onClick={() => setActiveTab('layout_theme')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all cursor-pointer whitespace-nowrap ${
-              activeTab === 'layout_theme'
+            onClick={() => setActiveTab('theme_styling')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-medium transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'theme_styling'
+                ? 'bg-[#C5A880] text-black font-bold shadow-md'
+                : 'text-neutral-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Palette className="w-3.5 h-3.5" />
+            <span>1. 테마 & 스타일링 (Theme / Styling)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('layout')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-medium transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'layout'
                 ? 'bg-[#C5A880] text-black font-bold shadow-md'
                 : 'text-neutral-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>1. 레이아웃 & 테마 (Layout & Theme)</span>
+            <span>2. 레이아웃 프리셋 (Layout)</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('profile_typography')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-medium transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'profile_typography'
                 ? 'bg-[#C5A880] text-black font-bold shadow-md'
                 : 'text-neutral-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <User className="w-3.5 h-3.5" />
-            <span>2. 프로필 & 타이포 (Profile & Typography)</span>
+            <span>3. 프로필 & 활자 (Profile)</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('contact_channels')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl font-medium transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'contact_channels'
                 ? 'bg-[#C5A880] text-black font-bold shadow-md'
                 : 'text-neutral-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <Globe className="w-3.5 h-3.5" />
-            <span>3. 연락처 & 도메인 (Contact & Channels)</span>
+            <span>4. 연락처 & 도메인 (Contact)</span>
           </button>
         </div>
 
@@ -343,125 +457,163 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
           {/* ================= LEFT COLUMN: STEP FORMS (7 COLS) ================= */}
           <div className="lg:col-span-7 space-y-5">
             
-            {/* ---------------- STEP 1: LAYOUT & THEME TAB ---------------- */}
-            {activeTab === 'layout_theme' && (
-              <div className="space-y-5 animate-in fade-in duration-200">
-                {/* 1. Interactive Preview Selector for 5 Layout Thumbnail Cards */}
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between">
+            {/* ---------------- STEP 1: DEDICATED THEME & STYLING TAB ---------------- */}
+            {activeTab === 'theme_styling' && (
+              <div className="space-y-4 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <Palette className="w-3.5 h-3.5 text-[#C5A880]" />
+                      <span>머티리얼 텍스처 & 테마 팔레트 (Theme & Material Swatches)</span>
+                    </label>
+                    <p className="text-[11px] text-neutral-400">
+                      명함 전·후면에 일관되게 적용될 프리미엄 촉감 질감과 메탈릭 액센트 팔레트입니다.
+                    </p>
+                  </div>
+                  <span className="text-[10px] text-[#C5A880] font-mono shrink-0">Tactile Fine Art</span>
+                </div>
+
+                {/* Theme Palette Cards Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {THEME_OPTIONS.map((t) => {
+                    const isSelected = theme === t.id;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => setTheme(t.id)}
+                        className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center gap-3.5 group ${
+                          isSelected
+                            ? 'bg-white/10 border-[#C5A880] ring-1 ring-[#C5A880]/50 shadow-md'
+                            : 'bg-[#14151C] border-white/5 hover:border-white/15 hover:bg-[#181922]'
+                        }`}
+                      >
+                        {/* Visual Swatch Circle with 2-Tone Concentric Design */}
+                        <div 
+                          className="relative w-10 h-10 rounded-full border border-white/20 shrink-0 shadow-lg flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105"
+                          style={{ backgroundColor: t.dotColor }}
+                        >
+                          <div 
+                            className="w-3.5 h-3.5 rounded-full shadow-md border border-black/20"
+                            style={{ backgroundColor: t.accent }}
+                          />
+                          {isSelected && (
+                            <div className="absolute inset-0 ring-2 ring-[#C5A880] ring-offset-2 ring-offset-[#0F1015] rounded-full" />
+                          )}
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className={`font-bold text-xs truncate ${isSelected ? 'text-[#C5A880]' : 'text-white'}`}>
+                              {t.name}
+                            </span>
+                            {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#C5A880] shrink-0" />}
+                          </div>
+                          <p className="text-[10px] text-neutral-400 truncate mt-0.5">
+                            {t.description}
+                          </p>
+                          <div className="flex items-center justify-between mt-1 pt-1 border-t border-white/5">
+                            <span 
+                              className="text-[9px] font-mono font-medium truncate"
+                              style={{ color: t.accent }}
+                            >
+                              {t.accentName}
+                            </span>
+                            {t.isCurated && (
+                              <span className="text-[8px] font-mono text-[#C5A880] bg-[#C5A880]/10 px-1 rounded">
+                                Curated
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Navigation CTA to next step */}
+                <div className="pt-3 flex justify-end border-t border-white/5">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('layout')}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C5A880] hover:bg-[#d6b991] text-black font-bold text-xs transition-colors cursor-pointer shadow-md"
+                  >
+                    <span>다음: 레이아웃 프리셋 선택</span>
+                    <span>→</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ---------------- STEP 2: LAYOUT PRESETS TAB ---------------- */}
+            {activeTab === 'layout' && (
+              <div className="space-y-4 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
                     <label className="text-xs font-bold text-white flex items-center gap-1.5">
                       <Layers className="w-3.5 h-3.5 text-[#C5A880]" />
                       <span>5대 럭셔리 레이아웃 프리셋 (Layout Presets)</span>
                     </label>
-                    <span className="text-[10px] text-[#C5A880] font-mono">Curated Semi-Custom</span>
+                    <p className="text-[11px] text-neutral-400">
+                      직함과 성향, 활동 분야에 맞춰 설계된 완벽한 그리드 비례를 선택합니다.
+                    </p>
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                    {LAYOUT_PRESETS.map((preset) => {
-                      const isSelected = layoutType === preset.id;
-                      return (
-                        <button
-                          key={preset.id}
-                          type="button"
-                          onClick={() => setLayoutType(preset.id)}
-                          className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between group ${
-                            isSelected
-                              ? 'bg-[#C5A880]/15 border-[#C5A880] shadow-md ring-1 ring-[#C5A880]/40'
-                              : 'bg-[#14151C] border-white/5 hover:border-white/20 hover:bg-[#181922]'
-                          }`}
-                        >
-                          {/* Mini wireframe */}
-                          <div className="mb-2.5 w-full">
-                            {renderLayoutMiniWireframe(preset.id, isSelected)}
-                          </div>
-
-                          <div>
-                            <div className="flex items-center justify-between mb-0.5">
-                              <span className={`font-bold text-xs ${isSelected ? 'text-[#C5A880]' : 'text-white'}`}>
-                                {preset.name}
-                              </span>
-                              <span className="text-[9px] font-mono text-neutral-400">
-                                {preset.aspectRatio}
-                              </span>
-                            </div>
-                            <p className="text-[10px] text-neutral-400 line-clamp-2 leading-relaxed">
-                              {preset.description}
-                            </p>
-                          </div>
-
-                          <div className="mt-2 pt-1.5 border-t border-white/5 flex items-center justify-between">
-                            <span className="text-[9px] text-neutral-400 truncate">
-                              {preset.recommendedFor.split(',')[0]}
-                            </span>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-[#C5A880] shrink-0" />}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <span className="text-[10px] text-[#C5A880] font-mono shrink-0">Architectural Grid</span>
                 </div>
 
-                {/* 2. Visual Swatch Circles for 4 Curated Material Palettes */}
-                <div className="space-y-3 pt-3 border-t border-white/5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-white flex items-center gap-1.5">
-                      <Palette className="w-3.5 h-3.5 text-[#C5A880]" />
-                      <span>4대 큐레이션 머티리얼 팔레트 (Material Swatches)</span>
-                    </label>
-                    <span className="text-[10px] text-neutral-400 font-mono">Tactile Art Finishes</span>
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-1">
+                  {LAYOUT_PRESETS.map((preset) => {
+                    const isSelected = layoutType === preset.id;
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => setLayoutType(preset.id)}
+                        className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between group ${
+                          isSelected
+                            ? 'bg-[#C5A880]/15 border-[#C5A880] shadow-md ring-1 ring-[#C5A880]/40'
+                            : 'bg-[#14151C] border-white/5 hover:border-white/20 hover:bg-[#181922]'
+                        }`}
+                      >
+                        {/* Mini wireframe */}
+                        <div className="mb-2.5 w-full">
+                          {renderLayoutMiniWireframe(preset.id, isSelected)}
+                        </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {LUXURY_THEME_PRESETS.map((t) => {
-                      const isSelected = theme === t.id;
-                      return (
-                        <button
-                          key={t.id}
-                          type="button"
-                          onClick={() => setTheme(t.id)}
-                          className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center gap-3.5 ${
-                            isSelected
-                              ? 'bg-white/10 border-[#C5A880] ring-1 ring-[#C5A880]/50 shadow-md'
-                              : 'bg-[#14151C] border-white/5 hover:border-white/15 hover:bg-[#181922]'
-                          }`}
-                        >
-                          {/* Visual Swatch Circle with 2-Tone Concentric Design */}
-                          <div 
-                            className="relative w-10 h-10 rounded-full border border-white/20 shrink-0 shadow-lg flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105"
-                            style={{ backgroundColor: t.dotColor }}
-                          >
-                            <div 
-                              className="w-3.5 h-3.5 rounded-full shadow-md border border-black/20"
-                              style={{ backgroundColor: t.accent }}
-                            />
-                            {isSelected && (
-                              <div className="absolute inset-0 ring-2 ring-[#C5A880] ring-offset-2 ring-offset-[#0F1015] rounded-full" />
-                            )}
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <span className="font-bold text-xs text-white truncate">{t.name}</span>
-                              {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#C5A880]" />}
-                            </div>
-                            <p className="text-[10px] text-neutral-400 truncate mt-0.5">
-                              {t.description.split('와 ')[0]}
-                            </p>
-                            <span 
-                              className="text-[9px] font-mono mt-0.5 block truncate font-medium"
-                              style={{ color: t.accent }}
-                            >
-                              Accent • {t.accentName}
+                        <div>
+                          <div className="flex items-center justify-between mb-0.5">
+                            <span className={`font-bold text-xs ${isSelected ? 'text-[#C5A880]' : 'text-white'}`}>
+                              {preset.name}
+                            </span>
+                            <span className="text-[9px] font-mono text-neutral-400">
+                              {preset.aspectRatio}
                             </span>
                           </div>
-                        </button>
-                      );
-                    })}
-                  </div>
+                          <p className="text-[10px] text-neutral-400 line-clamp-2 leading-relaxed">
+                            {preset.description}
+                          </p>
+                        </div>
+
+                        <div className="mt-2 pt-1.5 border-t border-white/5 flex items-center justify-between">
+                          <span className="text-[9px] text-neutral-400 truncate">
+                            {preset.recommendedFor.split(',')[0]}
+                          </span>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-[#C5A880] shrink-0" />}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {/* Navigation CTA to next step */}
-                <div className="pt-2 flex justify-end">
+                {/* Navigation CTA to previous & next step */}
+                <div className="pt-3 flex justify-between border-t border-white/5">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('theme_styling')}
+                    className="px-4 py-2 rounded-xl text-neutral-400 hover:text-white transition-colors cursor-pointer text-xs"
+                  >
+                    ← 이전: 테마 & 스타일링
+                  </button>
                   <button
                     type="button"
                     onClick={() => setActiveTab('profile_typography')}
@@ -655,10 +807,10 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                 <div className="pt-2 flex justify-between">
                   <button
                     type="button"
-                    onClick={() => setActiveTab('layout_theme')}
+                    onClick={() => setActiveTab('layout')}
                     className="px-4 py-2 rounded-xl text-neutral-400 hover:text-white transition-colors cursor-pointer text-xs"
                   >
-                    ← 이전: 레이아웃 & 테마
+                    ← 이전: 레이아웃 프리셋
                   </button>
                   <button
                     type="button"

@@ -1,25 +1,25 @@
 import { CardData } from '../types/card';
 
 export const CARD_DATA: CardData = {
-  organization: 'Korean Center Global Network',
-  organizationKr: '한국센터글로벌네트워크',
-  name: 'PARK, GIHONG',
-  nameKr: '박기홍',
-  title: 'President Director',
-  titleKr: '대표이사 / 이사장',
-  phone: '+62-812-2824-9672',
-  phoneRaw: '+6281228249672',
-  whatsappUrl: 'https://wa.me/6281228249672',
-  email: 'mrpark@koreancenter.net',
-  website: 'https://mrpark.koreancenter.net',
-  websiteDisplay: 'mrpark.koreancenter.net',
+  organization: 'VANCE ARCHITECTURAL STUDIO',
+  organizationKr: '글로벌 디자인 랩',
+  name: 'ALEXANDER VANCE',
+  nameKr: '알렉산더 밴스',
+  title: 'Principal Architect',
+  titleKr: '대표 건축가',
+  phone: '+82 10-1234-5678',
+  phoneRaw: '+821012345678',
+  whatsappUrl: 'https://wa.me/821012345678',
+  email: 'alexander@vancestudio.design',
+  website: 'https://card.goguma.app/vance',
+  websiteDisplay: 'card.goguma.app/vance',
   addressLines: [
-    '108-803, Yeokgok-ro 19, Wonmi-gu',
-    'Bucheon-si, Kyeonggi-do'
+    '77 Cheongdam-ro, Gangnam-gu',
+    'Seoul 06015, Republic of Korea'
   ],
-  addressKr: '경기도 부천시 원미구 역곡로 19, 108동 803호',
-  googleMapsUrl: 'https://www.google.com/maps/search/?api=1&query=19+Yeokgok-ro+Bucheon-si+Gyeonggi-do',
-  naverMapsUrl: 'https://map.naver.com/v5/search/%EA%B2%BD%EA%B8%B0%EB%8F%84%20%EB%Boot%EC%B2%9C%EC%8B%9C%20%EC%9B%90%EB%AF%B8%EA%B5%AC%20%EC%97%AD%EA%B3%A1%EB%A1%9C%2019'
+  addressKr: '서울특별시 강남구 청담로 77',
+  googleMapsUrl: 'https://maps.google.com/?q=Gangnam+Seoul',
+  naverMapsUrl: 'https://map.naver.com'
 };
 
 /**

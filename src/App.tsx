@@ -27,7 +27,6 @@ import { APP_BASE_DOMAIN, resolveCardFromLocation, getCardShareUrl } from './uti
 import { pullWalletFromEdge, pushWalletToEdge } from './utils/syncWallet';
 import { PinLockModal, PinModalMode } from './components/PinLockModal';
 import { BiometricsSettingModal } from './components/BiometricsSettingModal';
-import { ThemeSelector } from './components/ThemeSelector';
 import { useAutoLock } from './hooks/useAutoLock';
 import { verifyBiometric } from './utils/biometrics';
 import { 
@@ -39,13 +38,14 @@ import {
   Lock,
   ShieldCheck,
   Fingerprint,
-  Settings
+  Settings,
+  Plus,
+  LogOut
 } from 'lucide-react';
 
 export default function App() {
   const [cards, setCards] = useState<StoredCard[]>(() => loadStoredCards());
   const [isSamplePreview, setIsSamplePreview] = useState<boolean>(false);
-  const [samplePreviewTheme, setSamplePreviewTheme] = useState<CardTheme>('sumi_ink');
   const [activeCardId, setActiveCardId] = useState<string>(() => {
     const loaded = loadStoredCards();
     const defaultCard = loaded.find(c => c.isMyCard && c.isDefault);
@@ -168,7 +168,7 @@ export default function App() {
   const activeCard: StoredCard | undefined = cards.length > 0
     ? (cards.find(c => c.id === activeCardId) || cards[0])
     : (isSamplePreview 
-        ? { ...SAMPLE_CARDS[0], theme: samplePreviewTheme } 
+        ? SAMPLE_CARDS[0] 
         : undefined);
 
   const myCards = cards.filter(c => c.isMyCard);
@@ -330,16 +330,6 @@ export default function App() {
     }
   };
 
-  const handleThemeChange = (newTheme: CardTheme) => {
-    if (cards.length === 0 && isSamplePreview) {
-      setSamplePreviewTheme(newTheme);
-      return;
-    }
-    if (activeCard) {
-      setCards(prev => prev.map(c => c.id === activeCard.id ? { ...c, theme: newTheme } : c));
-    }
-  };
-
   const handleSaveCard = (savedCard: StoredCard) => {
     const isFirstEverCard = cards.length === 0;
 
@@ -474,16 +464,8 @@ export default function App() {
             </button>
           </nav>
 
-          {/* Right Header: Theme Palette Selector & Consolidated Security */}
+          {/* Right Header: Minimal Security Lock & Consolidated Settings */}
           <div className="flex items-center gap-1.5 sm:gap-2 min-h-[32px] relative" ref={settingsMenuRef}>
-            {/* Quick Luxury Theme Palette Selector */}
-            {activeCard && (
-              <ThemeSelector
-                currentTheme={activeCard.theme}
-                onSelectTheme={handleThemeChange}
-              />
-            )}
-
             {/* If PIN configured: Minimalist Lock icon for instant lock */}
             {isPinConfigured && (
               <button
@@ -571,25 +553,34 @@ export default function App() {
               ) : isSamplePreview && cards.length === 0 && activeCard ? (
                 /* TEMPORARY SHOWCASE SAMPLE PREVIEW MODE */
                 <div className="w-full flex flex-col items-center space-y-4">
-                  {/* Subtle Context Kicker */}
-                  <div className="w-full max-w-[540px] px-4 py-2.5 rounded-2xl bg-[#16181D] border border-[#C5A880]/30 shadow-lg flex items-center justify-between text-xs animate-in fade-in duration-200">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#C5A880] animate-pulse" />
-                      <span className="font-semibold text-neutral-200">샘플 둘러보기 모드</span>
-                      <span className="text-[11px] text-neutral-400 hidden sm:inline">(3D 회전 및 기능 체험)</span>
+                  {/* Luxury Minimalist Showcase Top Bar */}
+                  <div className="w-full max-w-[540px] px-1 py-0.5 flex items-center justify-between text-xs animate-in fade-in duration-200">
+                    {/* Left: Concise Mode Indicator */}
+                    <div className="flex items-center gap-1.5 text-xs text-white/50 font-normal">
+                      <span className="text-[#C5A880] text-[8px] leading-none">●</span>
+                      <span>샘플 모드</span>
                     </div>
-                    <div className="flex items-center gap-2">
+
+                    {/* Right: Minimalist Action Icons with Tooltips */}
+                    <div className="flex items-center gap-1.5">
+                      {/* Create My Card Action */}
                       <button
                         onClick={handleOpenCreateModal}
-                        className="px-3.5 py-1.5 rounded-xl bg-[#C5A880] hover:bg-[#D6B991] text-neutral-950 font-bold text-xs transition-all cursor-pointer shadow-md active:scale-95"
+                        className="p-1.5 rounded-lg text-[#C5A880] hover:text-[#d6b991] hover:bg-white/5 transition-all cursor-pointer active:scale-90 flex items-center justify-center"
+                        title="내 명함 만들기"
+                        aria-label="내 명함 만들기"
                       >
-                        + 내 첫 명함 만들기
+                        <Plus className="w-4 h-4 stroke-[2.2]" />
                       </button>
+
+                      {/* Exit to Welcome Screen Action */}
                       <button
                         onClick={() => setIsSamplePreview(false)}
-                        className="px-2.5 py-1.5 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer text-xs"
+                        className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/5 transition-all cursor-pointer active:scale-90 flex items-center justify-center"
+                        title="시작 화면으로"
+                        aria-label="시작 화면으로"
                       >
-                        시작 화면으로
+                        <LogOut className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>

@@ -64,7 +64,7 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
               className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#C5A880] hover:bg-[#D6B991] text-neutral-950 font-bold text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-[#C5A880]/15 hover:shadow-[#C5A880]/30 flex items-center justify-center gap-2 cursor-pointer active:scale-95 whitespace-nowrap"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
-              <span>+ 첫 명함 만들기</span>
+              <span>첫 명함 만들기</span>
             </button>
 
             {/* Secondary Text Button */}

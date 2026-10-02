@@ -3,34 +3,31 @@ import { CARD_DATA } from './vcard';
 
 export const INITIAL_CARDS: StoredCard[] = [
   {
-    id: 'sample-card-park-gihong',
+    id: 'sample-card-alexander-vance',
     isMyCard: true,
     isDefault: true,
-    slug: 'mrpark',
-    customDomain: 'mrpark.koreancenter.net',
-    category: '글로벌 네트워크',
+    slug: 'vance',
+    customDomain: 'card.goguma.app/vance',
+    category: '아키텍처·디자인',
     theme: 'sumi_ink',
     layout_type: 'editorial_minimal',
     card_features: {
       show_en_name: true,
       show_sub_org: true,
       show_address: true,
-      monogram_text: 'PK'
+      monogram_text: 'AV'
     },
     createdAt: '2026-03-01',
-    notes: '본인 공식 디지털 명함 (card.goguma.app/mrpark | mrpark.koreancenter.net)',
+    notes: 'GOGUMA CARD STUDIO 아키텍처 쇼케이스 샘플 명함',
     data: {
       ...CARD_DATA,
-      website: 'https://card.goguma.app/mrpark',
-      websiteDisplay: 'card.goguma.app/mrpark'
+      website: 'https://card.goguma.app/vance',
+      websiteDisplay: 'card.goguma.app/vance'
     }
   },
   {
-    id: 'my-card-indonesia-center',
-    isMyCard: true,
-    isDefault: false,
-    slug: 'indonesia',
-    customDomain: 'mrpark.indonesiacenter.net',
+    id: 'sample-card-elena-rostova',
+    isMyCard: false,
     category: '글로벌 네트워크',
     theme: 'deep_forest',
     layout_type: 'monogram_executive',
@@ -38,29 +35,29 @@ export const INITIAL_CARDS: StoredCard[] = [
       show_en_name: true,
       show_sub_org: true,
       show_address: true,
-      monogram_text: 'IC'
+      monogram_text: 'ER'
     },
     createdAt: '2026-03-05',
-    notes: '인도네시아 센터 총괄의장 명함 (card.goguma.app/indonesia | mrpark.indonesiacenter.net)',
+    notes: '글로벌 디자인 랩 인터내셔널 파트너',
     data: {
-      organization: 'Indonesia Center Global Network',
-      organizationKr: '인도네시아센터글로벌네트워크',
-      name: 'PARK, GIHONG',
-      nameKr: '박기홍',
-      title: 'Founder & Executive Chairman',
-      titleKr: '설립자 / 총괄의장',
-      phone: '+62-812-2824-9672',
-      phoneRaw: '+6281228249672',
-      whatsappUrl: 'https://wa.me/6281228249672',
-      email: 'mrpark@indonesiacenter.net',
-      website: 'https://card.goguma.app/indonesia',
-      websiteDisplay: 'card.goguma.app/indonesia',
+      organization: 'Studio Rostova & Partners',
+      organizationKr: '로스토바 스튜디오 디자인',
+      name: 'Elena Rostova',
+      nameKr: '엘레나 로스토바',
+      title: 'Design Director',
+      titleKr: '총괄 디자인 디렉터',
+      phone: '+44 20 7946 0991',
+      phoneRaw: '+442079460991',
+      whatsappUrl: 'https://wa.me/442079460991',
+      email: 'elena@rostovastudio.com',
+      website: 'https://rostovastudio.com',
+      websiteDisplay: 'rostovastudio.com',
       addressLines: [
-        'Cyber 2 Tower, 18th Fl, Jl. H.R. Rasuna Said',
-        'Jakarta Selatan 12950, Indonesia'
+        '28 Shoreditch High Street',
+        'London E1 6PG, United Kingdom'
       ],
-      addressKr: '인도네시아 자카르타 남부 라수나 사이드 사이버 2 타워 18층',
-      googleMapsUrl: 'https://maps.google.com/?q=Jakarta+Indonesia',
+      addressKr: '영국 런던 쇼디치 하이스트리트 28',
+      googleMapsUrl: 'https://maps.google.com/?q=London+UK',
       naverMapsUrl: 'https://map.naver.com'
     }
   },
