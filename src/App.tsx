@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { CardTheme, PrintConfig, StoredCard } from './types/card';
-import { loadStoredCards, saveStoredCards } from './utils/initialCards';
+import { loadUserCards, saveUserCards, loadStoredCards, saveStoredCards } from './utils/initialCards';
 import { CardContainer } from './components/CardContainer';
 import { MyCardsCarousel } from './components/MyCardsCarousel';
 import { MyCardSwitcher } from './components/MyCardSwitcher';
@@ -14,7 +14,7 @@ import { QrModal } from './components/QrModal';
 import { PrintModal } from './components/PrintModal';
 import { PrintSheet } from './components/PrintSheet';
 import { ExportModal } from './components/ExportModal';
-import { PhotoScanModal } from './components/PhotoScanModal';
+import { PhotoArchiveModal } from './components/PhotoArchiveModal';
 import { CardEditorModal } from './components/CardEditorModal';
 import { VaultView } from './components/VaultView';
 import { DeviceSyncModal } from './components/DeviceSyncModal';
@@ -44,10 +44,10 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const [cards, setCards] = useState<StoredCard[]>(() => loadStoredCards());
+  const [cards, setCards] = useState<StoredCard[]>(() => loadUserCards());
   const [isSamplePreview, setIsSamplePreview] = useState<boolean>(false);
   const [activeCardId, setActiveCardId] = useState<string>(() => {
-    const loaded = loadStoredCards();
+    const loaded = loadUserCards();
     const defaultCard = loaded.find(c => c.isMyCard && c.isDefault);
     return defaultCard?.id || loaded[0]?.id || '';
   });
@@ -116,7 +116,7 @@ export default function App() {
 
   // Sync cards with local storage
   useEffect(() => {
-    saveStoredCards(cards);
+    saveUserCards(cards);
   }, [cards]);
 
   // 1. URL Sync Detection & Initialization (Cross-device anonymous wallet)
@@ -799,7 +799,7 @@ export default function App() {
           </>
         )}
 
-        <PhotoScanModal
+        <PhotoArchiveModal
           isOpen={isScanOpen}
           onClose={() => setIsScanOpen(false)}
           onSaveCard={handleSaveCard}

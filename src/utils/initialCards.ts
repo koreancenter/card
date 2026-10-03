@@ -166,17 +166,16 @@ export const INITIAL_CARDS: StoredCard[] = [
 
 export const SAMPLE_CARDS = INITIAL_CARDS;
 
-const STORAGE_KEY = 'user_cards';
+const STORAGE_KEY = 'my_cards';
+const FALLBACK_STORAGE_KEY = 'user_cards';
 const LEGACY_STORAGE_KEY = 'koreancenter_stored_cards_v2';
 
-export function loadStoredCards(): StoredCard[] {
+export function loadUserCards(): StoredCard[] {
   if (typeof window === 'undefined') return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem('my_cards') || localStorage.getItem(FALLBACK_STORAGE_KEY);
     if (!raw) {
-      // Purge any stale legacy seeded dummy cards from previous scaffolds
-      localStorage.removeItem(LEGACY_STORAGE_KEY);
-      localStorage.removeItem('saved_cards');
+      // Never automatically seed or save INITIAL_CARDS
       return [];
     }
     const parsed: StoredCard[] = JSON.parse(raw);
@@ -190,21 +189,27 @@ export function loadStoredCards(): StoredCard[] {
   }
 }
 
-export function saveStoredCards(cards: StoredCard[]): void {
+export const loadStoredCards = loadUserCards;
+
+export function saveUserCards(cards: StoredCard[]): void {
   if (typeof window === 'undefined') return;
   try {
     if (!cards || cards.length === 0) {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem('my_cards');
+      localStorage.removeItem(FALLBACK_STORAGE_KEY);
       localStorage.removeItem(LEGACY_STORAGE_KEY);
       localStorage.removeItem('saved_cards');
       return;
     }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+    localStorage.setItem('my_cards', JSON.stringify(cards));
+    localStorage.setItem(FALLBACK_STORAGE_KEY, JSON.stringify(cards));
     localStorage.setItem('saved_cards', JSON.stringify(cards));
   } catch (e) {
     console.error('Failed to save cards to storage', e);
   }
 }
+
+export const saveStoredCards = saveUserCards;
 
 /**
  * Completely clears all local data stored by GOGUMA CARD STUDIO:
@@ -213,7 +218,8 @@ export function saveStoredCards(cards: StoredCard[]): void {
 export function clearAllLocalData(): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('my_cards');
+    localStorage.removeItem(FALLBACK_STORAGE_KEY);
     localStorage.removeItem(LEGACY_STORAGE_KEY);
     localStorage.removeItem('saved_cards');
     localStorage.removeItem('app_pin_hash');

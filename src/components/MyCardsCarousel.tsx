@@ -40,6 +40,17 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
   const [dragOffset, setDragOffset] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
+  // Subtle tactile haptic vibration feedback for mobile devices (Vibration API)
+  const triggerTactileHaptic = () => {
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(15);
+      } catch {
+        // Silently ignore if restricted
+      }
+    }
+  };
+
   // If no personal cards exist, immediately present the centered "새 명함 만들기" ghost card
   if (cards.length === 0) {
     return (
@@ -230,6 +241,7 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                   if (!isCenter) {
                     goToSlide(idx);
                   } else {
+                    triggerTactileHaptic();
                     setIsFlipped(prev => !prev);
                   }
                 }}
@@ -254,6 +266,7 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                       <div 
                         onClick={(e) => {
                           e.stopPropagation();
+                          triggerTactileHaptic();
                           setIsFlipped(prev => !prev);
                         }}
                         className="absolute top-3 right-3 z-30 opacity-40 group-hover:opacity-100 transition-opacity p-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white/80 cursor-pointer hover:scale-105 active:scale-95"

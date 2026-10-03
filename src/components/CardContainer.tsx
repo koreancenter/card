@@ -46,6 +46,22 @@ export const CardContainer: React.FC<CardContainerProps> = ({
   // Touch swipe handling
   const touchStartX = useRef<number | null>(null);
 
+  // Subtle tactile haptic vibration feedback for mobile devices (Vibration API)
+  const triggerHapticFeedback = () => {
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(15);
+      } catch {
+        // Silently ignore if restricted by device or browser policy
+      }
+    }
+  };
+
+  const handleCardFlip = () => {
+    triggerHapticFeedback();
+    onFlip();
+  };
+
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -54,7 +70,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
     if (touchStartX.current === null) return;
     const diff = e.changedTouches[0].clientX - touchStartX.current;
     if (Math.abs(diff) > 40) {
-      onFlip();
+      handleCardFlip();
     }
     touchStartX.current = null;
   };
@@ -72,7 +88,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
       >
         <div
           ref={cardRef}
-          onClick={onFlip}
+          onClick={handleCardFlip}
           style={{
             transform: `rotateY(${isFlipped ? 180 : 0}deg)`,
             transformStyle: 'preserve-3d',

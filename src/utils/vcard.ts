@@ -1,8 +1,8 @@
 import { CardData } from '../types/card';
 
 export const CARD_DATA: CardData = {
-  organization: 'VANCE ARCHITECTURAL STUDIO',
-  organizationKr: '글로벌 디자인 랩',
+  organization: 'VANCE STUDIO',
+  organizationKr: '밴스 건축 스튜디오',
   name: 'ALEXANDER VANCE',
   nameKr: '알렉산더 밴스',
   title: 'Principal Architect',
@@ -10,7 +10,7 @@ export const CARD_DATA: CardData = {
   phone: '+82 10-1234-5678',
   phoneRaw: '+821012345678',
   whatsappUrl: 'https://wa.me/821012345678',
-  email: 'alexander@vancestudio.design',
+  email: 'alexander@vance.design',
   website: 'https://card.goguma.app/vance',
   websiteDisplay: 'card.goguma.app/vance',
   addressLines: [
