@@ -16,7 +16,7 @@ export const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, data }) => {
   const [copied, setCopied] = useState(false);
 
   // The official production destination URL
-  const targetUrl = data.website || 'https://mrpark.koreancenter.net';
+  const targetUrl = data.website || 'https://card.goguma.app/master';
 
   useEffect(() => {
     if (!isOpen) return;

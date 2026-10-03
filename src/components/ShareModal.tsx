@@ -9,10 +9,8 @@ import {
   Download, 
   Printer, 
   UserPlus, 
-  QrCode, 
   Share2, 
-  FileCode, 
-  ExternalLink 
+  FileCode 
 } from 'lucide-react';
 
 interface ShareModalProps {
@@ -34,7 +32,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   const [copied, setCopied] = useState<boolean>(false);
   const [qrType, setQrType] = useState<'url' | 'vcard'>('url');
 
-  const targetUrl = data.website || (typeof window !== 'undefined' ? window.location.href : 'https://mrpark.koreancenter.net');
+  const targetUrl = data.website || (typeof window !== 'undefined' ? window.location.href : 'https://card.goguma.app/master');
   const displayHost = data.websiteDisplay || targetUrl.replace(/^https?:\/\//, '');
 
   useEffect(() => {
@@ -44,10 +42,10 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
     QRCode.toDataURL(contentToEncode, {
       width: 400,
-      margin: 2,
+      margin: 1.5,
       color: {
         dark: '#0B0C10',
-        light: '#ffffff'
+        light: '#F7F5F0'
       },
       errorCorrectionLevel: 'M'
     })
@@ -71,7 +69,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
     if (!dataUrl) return;
     const a = document.createElement('a');
     a.href = dataUrl;
-    a.download = `QR_${data.name}_${qrType.toUpperCase()}.png`;
+    a.download = `QR_${(data.name || 'Card').replace(/[^a-zA-Z0-9가-힣]/g, '_')}_${qrType.toUpperCase()}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -109,12 +107,13 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           onClick={onClose}
           className="absolute top-5 right-5 p-2 text-white/40 hover:text-white rounded-full hover:bg-white/5 transition-colors cursor-pointer"
           title="닫기"
+          aria-label="닫기"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
-        <div className="text-center mb-5">
+        <div className="text-center mb-4">
           <span className="text-[10px] font-mono tracking-widest text-[#C5A880] uppercase block mb-1">
             DIGITAL CARD SHARING
           </span>
@@ -126,107 +125,116 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           </p>
         </div>
 
-        {/* QR Code Container */}
-        <div className="relative p-4 rounded-2xl bg-white shadow-xl mb-4 group flex flex-col items-center">
+        {/* Minimalist QR Mode Toggle on Dark Surface */}
+        <div className="flex items-center gap-1.5 mb-3 px-1 py-0.5">
+          <button
+            onClick={() => setQrType('url')}
+            className={`px-3 py-1 text-xs font-medium transition-all relative cursor-pointer ${
+              qrType === 'url' ? 'text-[#C5A880]' : 'text-white/45 hover:text-white/70'
+            }`}
+          >
+            <span>웹 링크 QR</span>
+            {qrType === 'url' && (
+              <span className="absolute bottom-0 inset-x-2.5 h-[1.5px] bg-[#C5A880] rounded-full" />
+            )}
+          </button>
+          <span className="text-white/15 text-xs font-light">|</span>
+          <button
+            onClick={() => setQrType('vcard')}
+            className={`px-3 py-1 text-xs font-medium transition-all relative cursor-pointer ${
+              qrType === 'vcard' ? 'text-[#C5A880]' : 'text-white/45 hover:text-white/70'
+            }`}
+          >
+            <span>연락처 저장 QR</span>
+            {qrType === 'vcard' && (
+              <span className="absolute bottom-0 inset-x-2.5 h-[1.5px] bg-[#C5A880] rounded-full" />
+            )}
+          </button>
+        </div>
+
+        {/* Refined Warm Fine-Paper QR Code Container */}
+        <div className="relative p-5 rounded-3xl bg-[#F7F5F0] border border-white/10 shadow-[0_16px_36px_rgba(0,0,0,0.45)] mb-4 flex flex-col items-center justify-center">
           {dataUrl ? (
             <img 
               src={dataUrl} 
               alt="Digital Card QR" 
-              className="w-44 h-44 object-contain rounded-lg"
+              className="w-44 h-44 object-contain rounded-xl"
             />
           ) : (
             <div className="w-44 h-44 flex items-center justify-center text-neutral-400 text-xs">
               QR 생성 중...
             </div>
           )}
-
-          {/* QR Type Switcher */}
-          <div className="flex items-center gap-1 mt-2.5 bg-neutral-100 p-0.5 rounded-lg border border-neutral-200">
-            <button
-              onClick={() => setQrType('url')}
-              className={`px-2.5 py-0.5 rounded text-[10px] font-medium transition-colors cursor-pointer ${
-                qrType === 'url' ? 'bg-[#0B0C10] text-white shadow-sm' : 'text-neutral-600 hover:text-black'
-              }`}
-            >
-              웹 링크 QR
-            </button>
-            <button
-              onClick={() => setQrType('vcard')}
-              className={`px-2.5 py-0.5 rounded text-[10px] font-medium transition-colors cursor-pointer ${
-                qrType === 'vcard' ? 'bg-[#0B0C10] text-white shadow-sm' : 'text-neutral-600 hover:text-black'
-              }`}
-            >
-              연락처 저장 QR
-            </button>
-          </div>
         </div>
 
-        {/* Link Copy Bar */}
-        <div className="w-full flex items-center justify-between p-2 rounded-xl bg-black/40 border border-white/5 mb-4">
-          <span className="text-[11px] font-mono text-neutral-400 truncate px-2">
+        {/* Streamlined Deep Matte Share URL Box */}
+        <div className="w-full bg-[#0B0C10] border border-white/10 rounded-xl px-4 py-3 flex items-center justify-between gap-2 mb-4">
+          <span className="text-xs font-mono text-white/80 truncate select-all">
             {displayHost}
           </span>
           <button
             onClick={handleCopyLink}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-white text-xs font-medium transition-all cursor-pointer shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#C5A880]/15 hover:bg-[#C5A880]/25 active:bg-[#C5A880]/30 border border-[#C5A880]/30 text-[#C5A880] text-xs font-medium transition-all cursor-pointer shrink-0"
+            title="링크 복사"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? '복사됨' : '복사'}</span>
           </button>
         </div>
 
-        {/* Action Grid (vCard, Print, HTML, QR Download) */}
-        <div className="w-full grid grid-cols-2 gap-2 text-xs">
-          {/* Save vCard */}
+        {/* Primary Direct Actions (Split into 2 Main Luxury Buttons) */}
+        <div className="w-full grid grid-cols-2 gap-2.5 mb-3.5">
           <button
             onClick={() => downloadVCard(data)}
-            className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 border border-white/10 text-neutral-200 font-medium transition-all cursor-pointer active:scale-98"
+            className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] active:scale-[0.98] border border-white/10 text-white/90 text-xs font-medium transition-all cursor-pointer shadow-sm group"
+            title="연락처 파일 다운로드"
           >
-            <UserPlus className="w-4 h-4 text-[#C5A880]" />
+            <UserPlus className="w-4 h-4 text-[#C5A880] transition-transform group-hover:scale-105" />
             <span>연락처(.vcf) 저장</span>
           </button>
 
-          {/* Native / System Share */}
           <button
             onClick={handleNativeShare}
-            className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 border border-white/10 text-neutral-200 font-medium transition-all cursor-pointer active:scale-98"
+            className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] active:scale-[0.98] border border-white/10 text-white/90 text-xs font-medium transition-all cursor-pointer shadow-sm group"
+            title="시스템 공유 창 열기"
           >
-            <Share2 className="w-4 h-4 text-[#C5A880]" />
+            <Share2 className="w-4 h-4 text-[#C5A880] transition-transform group-hover:scale-105" />
             <span>명함 바로 공유</span>
           </button>
+        </div>
 
-          {/* High-res Print / PDF */}
+        {/* Export & Pro Tools (Subtle bottom row) */}
+        <div className="w-full pt-3 border-t border-white/5 flex items-center justify-center gap-4 text-xs">
           {onOpenPrint && (
             <button
               onClick={() => {
                 onClose();
                 onOpenPrint();
               }}
-              className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 border border-white/10 text-neutral-200 font-medium transition-all cursor-pointer active:scale-98"
+              className="flex items-center gap-1.5 text-white/60 hover:text-white text-[11px] font-medium transition-colors cursor-pointer py-1 px-2 rounded-lg hover:bg-white/5"
             >
-              <Printer className="w-4 h-4 text-neutral-400" />
+              <Printer className="w-3.5 h-3.5 text-white/40" />
               <span>인쇄 / PDF 출력</span>
             </button>
           )}
 
-          {/* Standalone HTML Export */}
           {onOpenExport ? (
             <button
               onClick={() => {
                 onClose();
                 onOpenExport();
               }}
-              className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 border border-white/10 text-neutral-200 font-medium transition-all cursor-pointer active:scale-98"
+              className="flex items-center gap-1.5 text-white/60 hover:text-white text-[11px] font-medium transition-colors cursor-pointer py-1 px-2 rounded-lg hover:bg-white/5"
             >
-              <FileCode className="w-4 h-4 text-neutral-400" />
-              <span>단일 HTML 저장</span>
+              <FileCode className="w-3.5 h-3.5 text-white/40" />
+              <span>독립 HTML 배포</span>
             </button>
           ) : (
             <button
               onClick={handleDownloadQr}
-              className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 border border-white/10 text-neutral-200 font-medium transition-all cursor-pointer active:scale-98"
+              className="flex items-center gap-1.5 text-white/60 hover:text-white text-[11px] font-medium transition-colors cursor-pointer py-1 px-2 rounded-lg hover:bg-white/5"
             >
-              <Download className="w-4 h-4 text-neutral-400" />
+              <Download className="w-3.5 h-3.5 text-white/40" />
               <span>QR 이미지 저장</span>
             </button>
           )}

@@ -6,7 +6,7 @@ export function generateStandaloneHtml(data: CardData, theme: CardTheme = 'sand'
   const vcardEncoded = encodeURIComponent(vcardString);
   const pageTitle = `${data.name} (${data.nameKr}) — ${data.organization}`;
   const pageDesc = `${data.organizationKr} ${data.titleKr} ${data.name}의 디지털 명함입니다.`;
-  const officialUrl = data.website || 'https://mrpark.koreancenter.net';
+  const officialUrl = data.website || 'https://card.goguma.app/master';
 
   // Theme color maps for inline generation
   const themeColors: Record<string, { bg: string; text: string; textSec: string; border: string; accent: string }> = {

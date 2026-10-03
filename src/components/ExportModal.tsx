@@ -120,12 +120,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                 <div className="p-3.5 rounded-xl bg-neutral-950/70 border border-neutral-800 space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-white">1. Cloudflare Pages (무료 & 가장 쉬움)</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">추천</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] bg-[#C5A880]/10 text-[#C5A880] border border-[#C5A880]/20 font-medium">추천</span>
                   </div>
                   <p className="text-neutral-400 text-[11px]">
                     1) 아래 <strong>[HTML 파일 다운로드]</strong> 버튼을 클릭하여 <code className="text-neutral-200">index.html</code> 저장<br />
                     2) Cloudflare Pages 대시보드에서 <strong>'Direct Upload(직접 업로드)'</strong> 선택<br />
-                    3) 방금 다운로드한 폴더를 드래그 앤 드롭하면 10초 만에 전 세계 CDN 무료 배포 및 개인 도메인(예: <code className="text-amber-300">mrpark.koreancenter.net</code>) 연결 완료!
+                    3) 방금 다운로드한 폴더를 드래그 앤 드롭하면 10초 만에 전 세계 CDN 무료 배포 및 개인 도메인(예: <code className="text-[#C5A880]">yourdomain.com</code>) 연결 완료!
                   </p>
                 </div>
 

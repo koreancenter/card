@@ -52,7 +52,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
 
   useEffect(() => {
     // Target domain for digital business card
-    const targetUrl = data.website || 'https://mrpark.koreancenter.net';
+    const targetUrl = data.website || 'https://card.goguma.app/master';
     QRCode.toString(targetUrl, {
       type: 'svg',
       margin: 0,
