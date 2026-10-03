@@ -367,7 +367,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
         }
       `}</style>
       <div 
-        className="relative w-full max-w-6xl h-[88vh] max-h-[860px] flex flex-col rounded-3xl bg-[#0F1015] border border-white/10 text-neutral-100 shadow-2xl overflow-hidden"
+        className="CardEditorModal relative w-full max-w-6xl h-[88vh] max-h-[860px] flex flex-col rounded-3xl bg-[#0F1015] border border-white/10 text-neutral-100 shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -440,11 +440,11 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
           </button>
         </div>
 
-        {/* Main Content Area: Split View (Inputs Left 5 cols, Hero Preview Right 7 cols) */}
-        <div className="flex-1 grid grid-cols-12 overflow-hidden">
+        {/* Main Content Area: Split View (Inputs Left 5 cols on desktop / Below on mobile, Hero Preview Right 7 cols on desktop / Top on mobile) */}
+        <div className="flex-1 grid grid-cols-12 overflow-y-auto lg:overflow-hidden editor-scrollbar">
           
-          {/* ================= LEFT PANEL: CLEAN FORM INSPECTOR (5 COLS / ~45%) ================= */}
-          <div className="col-span-12 lg:col-span-5 h-full overflow-y-auto p-5 sm:p-6 pr-4 editor-scrollbar space-y-6">
+          {/* ================= LEFT PANEL: CLEAN FORM INSPECTOR (order-2 on mobile, order-1 on desktop) ================= */}
+          <div className="order-2 lg:order-1 col-span-12 lg:col-span-5 h-auto lg:h-full lg:overflow-y-auto p-5 sm:p-6 lg:p-7 editor-scrollbar space-y-6">
             
             {/* ---------------- TAB 1: VISUAL ATELIER (THEME & LAYOUT) ---------------- */}
             {activeTab === 'visual_atelier' && (
@@ -873,8 +873,8 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
 
           </div>
 
-          {/* ================= RIGHT PANEL: LIVE HERO PREVIEW (7 COLS / ~55% WIDTH) ================= */}
-          <div className="col-span-12 lg:col-span-7 h-full flex flex-col items-center justify-between bg-black/30 border-t lg:border-t-0 lg:border-l border-white/5 p-6 lg:p-8 relative overflow-hidden">
+          {/* ================= RIGHT PANEL: LIVE HERO PREVIEW (order-1 on mobile, order-2 on desktop) ================= */}
+          <div className="order-1 lg:order-2 col-span-12 lg:col-span-7 h-auto lg:h-full flex flex-col items-center justify-between bg-black/25 border-b lg:border-b-0 lg:border-l border-white/5 p-6 sm:p-8 lg:p-10 xl:p-12 relative overflow-hidden">
             
             {/* Gallery Top Bar */}
             <div className="w-full flex items-center justify-between pb-2 shrink-0">
@@ -913,16 +913,17 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
               </div>
             </div>
 
-            {/* Dead-center Hero Card Canvas */}
-            <div className="flex-1 flex items-center justify-center w-full py-2">
+            {/* Dead-center Hero Card Canvas with Generous Breathing Room */}
+            <div className="flex-1 flex items-center justify-center w-full py-6 sm:py-8 lg:py-10 px-2 sm:px-4">
               <div 
                 className={`w-full ${
                   layoutType === 'vertical_atelier' 
-                    ? 'max-w-[270px] aspect-[5/8]' 
-                    : 'max-w-[460px] aspect-[1.586/1]'
+                    ? 'max-w-[220px] sm:max-w-[245px] aspect-[5/8]' 
+                    : 'max-w-[340px] sm:max-w-[390px] lg:max-w-[420px] aspect-[1.586/1]'
                 } transition-all duration-300 relative group flex items-center justify-center`}
               >
-                <div className="w-full h-full shadow-[0_28px_70px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.12)] rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.015]">
+                {/* 3D Render Canvas: Border-Free, Multi-Tier Soft Luxury Diffusion Shadows */}
+                <div className="w-full h-full rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.012] shadow-[0_20px_45px_-10px_rgba(0,0,0,0.8),0_10px_20px_-6px_rgba(0,0,0,0.5),0_35px_75px_-15px_rgba(0,0,0,0.95)]">
                   {previewFace === 'front' ? (
                     <BusinessCardFront 
                       data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
@@ -930,6 +931,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                       layout_type={layoutType}
                       card_features={features}
                       isPrintPreview={false} 
+                      hideBorder={true}
                       isPhotoCard={isPhotoCard}
                       photoUrl={scannedImage}
                     />
@@ -939,6 +941,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                       theme={theme}
                       layout_type={layoutType}
                       isPrintPreview={false}
+                      hideBorder={true}
                       backPhotoUrl={scannedImageBack}
                     />
                   )}
@@ -946,28 +949,25 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
               </div>
             </div>
 
-            {/* Understated Minimalist Link Bar & Flip Switch */}
-            <div className="w-full pt-3 shrink-0 flex items-center justify-between text-[11px] text-white/50 border-t border-white/5 font-mono">
-              <div className="flex items-center gap-2 truncate max-w-[260px] sm:max-w-[320px]">
+            {/* Understated Minimalist Link Bar (Duplicate Flip Button Removed) */}
+            <div className="w-full pt-3 shrink-0 flex items-center justify-between text-[11px] text-white/40 border-t border-white/5 font-mono">
+              <div className="flex items-center gap-2 truncate max-w-[280px] sm:max-w-[360px]">
                 <Globe className="w-3.5 h-3.5 text-[#C5A880] shrink-0" />
-                <span className="truncate text-white/70">{effectiveDisplayUrl}</span>
+                <span className="truncate text-white/60">{effectiveDisplayUrl}</span>
                 <button
                   type="button"
                   onClick={copyDisplayUrl}
                   className="text-white/40 hover:text-[#C5A880] transition-colors ml-1 cursor-pointer"
                   title="URL 복사"
+                  aria-label="URL 복사"
                 >
                   {copiedUrl ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                 </button>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setPreviewFace(prev => prev === 'front' ? 'back' : 'front')}
-                className="text-[#C5A880] hover:text-[#d6b991] font-sans text-xs font-medium transition-colors cursor-pointer shrink-0"
-              >
-                {previewFace === 'front' ? '뒷면 디자인 확인 ➔' : '앞면 디자인 확인 ➔'}
-              </button>
+              <div className="flex items-center gap-2 text-[10px] text-white/30 font-sans">
+                <span>3D 실시간 렌더링</span>
+              </div>
             </div>
 
           </div>

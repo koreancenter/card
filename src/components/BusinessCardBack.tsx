@@ -10,6 +10,7 @@ interface BusinessCardBackProps {
   orientation?: CardOrientation;
   isPrintPreview?: boolean;
   backPhotoUrl?: string;
+  hideBorder?: boolean;
 }
 
 export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
@@ -18,7 +19,8 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
   layout_type = 'editorial_minimal',
   orientation = 'landscape',
   isPrintPreview = false,
-  backPhotoUrl
+  backPhotoUrl,
+  hideBorder = false
 }) => {
   const [qrSvg, setQrSvg] = useState<string>('');
 
@@ -32,7 +34,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
     return (
       <div 
         className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
-          isPrintPreview ? 'border-0' : `border ${themeStyles.border} shadow-2xl`
+          isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border} shadow-2xl`
         } bg-[#0A0B0E] transition-all duration-300`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
@@ -78,7 +80,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
           : isPrintPreview
             ? 'p-3.5 sm:p-4'
             : 'p-3.5 sm:p-6 md:p-8'
-      } ${themeStyles.cardBg} ${isPrintPreview ? 'border-0' : `border ${themeStyles.border} shadow-2xl`} transition-colors duration-300 font-sans`}
+      } ${themeStyles.cardBg} ${isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border} shadow-2xl`} transition-colors duration-300 font-sans`}
       style={{
         aspectRatio: isPortrait ? '5 / 8' : '9 / 5',
       }}

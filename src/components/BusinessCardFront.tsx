@@ -12,6 +12,7 @@ interface BusinessCardFrontProps {
   isPrintPreview?: boolean;
   isPhotoCard?: boolean;
   photoUrl?: string;
+  hideBorder?: boolean;
 }
 
 export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
@@ -22,7 +23,8 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
   orientation = 'landscape',
   isPrintPreview = false,
   isPhotoCard = false,
-  photoUrl
+  photoUrl,
+  hideBorder = false
 }) => {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -44,7 +46,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
     return (
       <div 
         className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
-          isPrintPreview ? 'border-0' : `border ${themeStyles.border} shadow-2xl`
+          isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border} shadow-2xl`
         } bg-[#0A0B0E] transition-all duration-300`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
@@ -130,7 +132,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
       <div 
         className={`relative w-full h-full select-none flex flex-col justify-between ${
           isPortrait ? 'p-6 sm:p-7' : isPrintPreview ? 'p-3.5 sm:p-4' : 'p-4 sm:p-6 md:p-7'
-        } ${themeStyles.cardBg} ${isPrintPreview ? 'border-0' : `border ${themeStyles.border}`} transition-colors duration-300 font-sans`}
+        } ${themeStyles.cardBg} ${isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border}`} transition-colors duration-300 font-sans`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
         {textureOverlay}
@@ -235,7 +237,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
     return (
       <div 
         className={`relative w-full h-full select-none flex flex-col justify-between p-5 sm:p-7 ${themeStyles.cardBg} ${
-          isPrintPreview ? 'border-0' : `border ${themeStyles.border}`
+          isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border}`
         } transition-colors duration-300 font-sans`}
         style={{ aspectRatio: '5 / 8' }}
       >
@@ -332,7 +334,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
       <div 
         className={`relative w-full h-full select-none flex flex-col justify-between ${
           isPortrait ? 'p-6 sm:p-7' : isPrintPreview ? 'p-3 sm:p-4' : 'p-4 sm:p-6 md:p-7'
-        } ${themeStyles.cardBg} ${isPrintPreview ? 'border-0' : `border ${themeStyles.border}`} transition-colors duration-300 font-sans`}
+        } ${themeStyles.cardBg} ${isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border}`} transition-colors duration-300 font-sans`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
         {textureOverlay}
@@ -423,7 +425,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
       <div 
         className={`relative w-full h-full select-none flex flex-col justify-between ${
           isPortrait ? 'p-6 sm:p-7' : isPrintPreview ? 'p-3.5 sm:p-4' : 'p-4 sm:p-6 md:p-8'
-        } ${themeStyles.cardBg} ${isPrintPreview ? 'border-0' : `border ${themeStyles.border}`} transition-colors duration-300 font-sans`}
+        } ${themeStyles.cardBg} ${isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border}`} transition-colors duration-300 font-sans`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
         {textureOverlay}
@@ -502,7 +504,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
           : isPrintPreview
             ? 'p-3.5 sm:p-4'
             : 'p-3.5 sm:p-6 md:p-8'
-      } ${themeStyles.cardBg} ${isPrintPreview ? 'border-0' : `border ${themeStyles.border} shadow-2xl`} transition-colors duration-300 font-sans`}
+      } ${themeStyles.cardBg} ${isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border} shadow-2xl`} transition-colors duration-300 font-sans`}
       style={{
         aspectRatio: isPortrait ? '5 / 8' : '9 / 5',
       }}
