@@ -4,11 +4,12 @@ import { LAYOUT_PRESETS } from '../constants/templates';
 import { 
   X, Check, Edit3, Plus, Globe, 
   Layers, Palette, User, Phone, 
-  Upload, Trash2, Copy, CheckCircle2
+  Upload, Trash2, Copy, CheckCircle2, RotateCcw
 } from 'lucide-react';
 import { BusinessCardFront } from './BusinessCardFront';
 import { BusinessCardBack } from './BusinessCardBack';
 import { APP_BASE_DOMAIN, normalizeDomain } from '../utils/domain';
+import { CARD_DATA } from '../utils/vcard';
 
 interface CardEditorModalProps {
   isOpen: boolean;
@@ -31,56 +32,56 @@ export const THEME_OPTIONS: {
   {
     id: 'sumi_ink',
     name: '수묵 인크',
-    description: '깊은 먹색 매트 캔버스와 웜 아이보리, 샴페인 황동 액센트',
+    description: '깊은 먹색 매트 & 샴페인 황동',
     dotColor: '#0B0C10',
     accent: '#C5A880'
   },
   {
     id: 'warm_paper',
     name: '웜 페이퍼',
-    description: '파인아트 코튼 아이보리와 딥 차콜 활자, 딥 와인 프라이머리',
+    description: '파인아트 코튼 & 딥 와인',
     dotColor: '#F8F4EB',
     accent: '#6B1D42'
   },
   {
     id: 'deep_forest',
     name: '딥 포레스트',
-    description: '절제된 다크 에메랄드와 오프화이트, 앤틱 브론즈 디테일',
+    description: '다크 에메랄드 & 앤틱 브론즈',
     dotColor: '#0D1F18',
     accent: '#C2A478'
   },
   {
     id: 'classic_navy',
     name: '클래식 네이비',
-    description: '미드나잇 인디고와 실버화이트 활자, 플래티넘 실버 림',
+    description: '미드나잇 인디고 & 플래티넘',
     dotColor: '#0A1128',
     accent: '#D0D9E8'
   },
   {
     id: 'obsidian',
     name: '옵시디언 블랙',
-    description: '칠흑 같은 흑요석 매트 질감과 선명한 퓨어 골드',
+    description: '흑요석 매트 & 퓨어 골드',
     dotColor: '#0C0C0D',
     accent: '#D4AF37'
   },
   {
     id: 'sand',
     name: '샌드 캐시미어',
-    description: '따뜻한 모래사장 린넨 텍스처와 소프트 차콜 그레이',
+    description: '린넨 텍스처 & 차콜 그레이',
     dotColor: '#F6F3EC',
     accent: '#544B40'
   },
   {
     id: 'burgundy',
     name: '임페리얼 버건디',
-    description: '기품 있는 딥 벨벳 와인 컬러와 로즈골드 메탈릭 하이라이트',
+    description: '벨벳 와인 & 로즈골드',
     dotColor: '#15070B',
     accent: '#E6A5B8'
   },
   {
     id: 'titanium',
     name: '티타늄 그레이',
-    description: '정밀 가공된 티타늄 금속 톤과 현대적인 크롬 실버 라인',
+    description: '정밀 티타늄 & 크롬 실버',
     dotColor: '#18181B',
     accent: '#A1A1AA'
   }
@@ -123,7 +124,22 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
   // Sync state whenever card or isOpen changes
   useEffect(() => {
     if (isOpen) {
-      setFormData({ ...card.data });
+      const initialData: CardData = {
+        ...CARD_DATA,
+        ...card.data,
+        name: card.data.name || CARD_DATA.name,
+        nameKr: card.data.nameKr || CARD_DATA.nameKr,
+        organization: card.data.organization || CARD_DATA.organization,
+        organizationKr: card.data.organizationKr || CARD_DATA.organizationKr,
+        title: card.data.title || CARD_DATA.title,
+        titleKr: card.data.titleKr || CARD_DATA.titleKr,
+        phone: card.data.phone || CARD_DATA.phone,
+        email: card.data.email || CARD_DATA.email,
+        addressKr: card.data.addressKr || CARD_DATA.addressKr,
+        website: card.data.website || CARD_DATA.website,
+        websiteDisplay: card.data.websiteDisplay || CARD_DATA.websiteDisplay
+      };
+      setFormData(initialData);
       setTheme(card.theme || 'sumi_ink');
       setLayoutType(card.layout_type || 'editorial_minimal');
       setFeatures({
@@ -135,7 +151,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
       });
       setCategory(card.category || (isMyCardMode ? '글로벌 네트워크' : 'VIP 파트너'));
       setNotes(card.notes || '');
-      setSlug(card.slug || (card.id.startsWith('my-card') ? 'mrpark' : ''));
+      setSlug(card.slug || 'master');
       setCustomDomain(card.customDomain || '');
       setIsDefault(Boolean(card.isDefault));
       setIsPhotoCard(Boolean(card.isPhotoCard));
@@ -379,31 +395,48 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
         </div>
 
         {/* 2-Tab Unified Navigation (Visual Atelier & Identity Profile) */}
-        <div className="flex items-center px-6 py-2.5 border-b border-white/10 bg-[#0B0C10]/90 gap-2 shrink-0 text-xs">
-          <button
-            type="button"
-            onClick={() => setActiveTab('visual_atelier')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all cursor-pointer ${
-              activeTab === 'visual_atelier'
-                ? 'bg-[#C5A880] text-black font-bold shadow-md'
-                : 'text-neutral-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <Palette className="w-3.5 h-3.5" />
-            <span>비주얼 아틀리에 (소재 & 레이아웃)</span>
-          </button>
+        <div className="flex items-center justify-between px-6 py-2.5 border-b border-white/10 bg-[#0B0C10]/90 shrink-0 text-xs">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab('visual_atelier')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all cursor-pointer ${
+                activeTab === 'visual_atelier'
+                  ? 'bg-[#C5A880] text-black font-bold shadow-md'
+                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Palette className="w-3.5 h-3.5" />
+              <span>비주얼 아틀리에 (소재 & 레이아웃)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('identity_profile')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all cursor-pointer ${
+                activeTab === 'identity_profile'
+                  ? 'bg-[#C5A880] text-black font-bold shadow-md'
+                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>인적사항 & 활자 (프로필 & 채널)</span>
+            </button>
+          </div>
 
           <button
             type="button"
-            onClick={() => setActiveTab('identity_profile')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all cursor-pointer ${
-              activeTab === 'identity_profile'
-                ? 'bg-[#C5A880] text-black font-bold shadow-md'
-                : 'text-neutral-400 hover:text-white hover:bg-white/5'
-            }`}
+            onClick={() => {
+              setFormData({ ...CARD_DATA });
+              setSlug('master');
+              setTheme('sumi_ink');
+              setLayoutType('editorial_minimal');
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white/50 hover:text-[#C5A880] hover:bg-white/5 border border-transparent hover:border-[#C5A880]/30 transition-all text-xs cursor-pointer"
+            title="공식 럭셔리 샘플 데이터 복원"
           >
-            <User className="w-3.5 h-3.5" />
-            <span>인적사항 & 활자 (프로필 & 채널)</span>
+            <RotateCcw className="w-3.5 h-3.5 text-[#C5A880]" />
+            <span>샘플 데이터 복원</span>
           </button>
         </div>
 
@@ -485,7 +518,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                     {LAYOUT_PRESETS.map((preset) => {
                       const isSelected = layoutType === preset.id;
                       return (
@@ -493,22 +526,22 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                           key={preset.id}
                           type="button"
                           onClick={() => setLayoutType(preset.id)}
-                          className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between group ${
+                          className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between group ${
                             isSelected
                               ? 'bg-[#C5A880]/15 border-[#C5A880] shadow-md ring-1 ring-[#C5A880]/40'
                               : 'bg-white/[0.02] border-white/5 hover:border-white/20 hover:bg-white/[0.04]'
                           }`}
                         >
-                          <div className="mb-2.5 w-full">
+                          <div className="mb-3 w-full">
                             {renderLayoutMiniWireframe(preset.id, isSelected)}
                           </div>
 
                           <div>
-                            <div className="flex items-center justify-between mb-0.5">
-                              <span className={`font-bold text-xs ${isSelected ? 'text-[#C5A880]' : 'text-white'}`}>
+                            <div className="flex items-center justify-between mb-1 gap-2">
+                              <span className={`font-bold text-xs truncate ${isSelected ? 'text-[#C5A880]' : 'text-white'}`}>
                                 {preset.name}
                               </span>
-                              <span className="text-[9px] font-mono text-neutral-400">
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[#C5A880] shrink-0 font-medium">
                                 {preset.aspectRatio}
                               </span>
                             </div>
@@ -539,9 +572,9 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
 
             {/* ---------------- TAB 2: IDENTITY PROFILE (CONTENT & CONTACT) ---------------- */}
             {activeTab === 'identity_profile' && (
-              <div className="space-y-6 animate-in fade-in duration-200">
+              <div className="space-y-7 animate-in fade-in duration-200">
                 
-                {/* 1. Organization & Title */}
+                {/* 1. Affiliation & Role */}
                 <div className="space-y-3">
                   <label className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
                     <span className="text-[#C5A880] font-mono">01.</span>
@@ -555,7 +588,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                         type="text"
                         value={formData.organizationKr}
                         onChange={(e) => handleChange('organizationKr', e.target.value)}
-                        placeholder="예: 한국센터글로벌네트워크"
+                        placeholder="예: 고구마 AI 스튜디오"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 focus:outline-none text-white text-xs transition-colors"
                       />
                     </div>
@@ -565,7 +598,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                         type="text"
                         value={formData.organization}
                         onChange={(e) => handleChange('organization', e.target.value)}
-                        placeholder="예: Korean Center Global Network"
+                        placeholder="예: GOGUMA AI STUDIO"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 focus:outline-none text-white text-xs transition-colors"
                       />
                     </div>
@@ -578,7 +611,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                         type="text"
                         value={formData.titleKr}
                         onChange={(e) => handleChange('titleKr', e.target.value)}
-                        placeholder="예: 대표이사 / 총괄의장"
+                        placeholder="예: 대표 마스터"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 focus:outline-none text-white text-xs transition-colors"
                       />
                     </div>
@@ -588,7 +621,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                         type="text"
                         value={formData.title}
                         onChange={(e) => handleChange('title', e.target.value)}
-                        placeholder="예: President Director"
+                        placeholder="예: Principal Master"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 focus:outline-none text-white text-xs transition-colors"
                       />
                     </div>
@@ -619,7 +652,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                         type="text"
                         value={formData.nameKr}
                         onChange={(e) => handleChange('nameKr', e.target.value)}
-                        placeholder="예: 박기홍"
+                        placeholder="예: 박 기 홍"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 focus:outline-none text-white text-xs transition-colors"
                       />
                     </div>
@@ -663,7 +696,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                         type="text"
                         value={formData.phone}
                         onChange={(e) => handleChange('phone', e.target.value)}
-                        placeholder="+82 10-2824-9672"
+                        placeholder="+82 10-1234-5678"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 focus:outline-none text-white text-xs font-mono transition-colors"
                       />
                     </div>
@@ -673,7 +706,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                         type="email"
                         value={formData.email}
                         onChange={(e) => handleChange('email', e.target.value)}
-                        placeholder="mrpark@koreancenter.net"
+                        placeholder="master@goguma.app"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 focus:outline-none text-white text-xs transition-colors"
                       />
                     </div>
@@ -685,7 +718,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                       type="text"
                       value={formData.addressKr}
                       onChange={(e) => handleChange('addressKr', e.target.value)}
-                      placeholder="경기도 부천시 원미구 길주로 137"
+                      placeholder="서울특별시 강남구 청담로 77"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 focus:outline-none text-white text-xs transition-colors"
                     />
                   </div>
@@ -716,7 +749,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                         maxLength={4}
                         value={features.monogram_text || ''}
                         onChange={(e) => setFeatures(prev => ({ ...prev, monogram_text: e.target.value.toUpperCase() }))}
-                        placeholder="예: PK 또는 KC"
+                        placeholder="예: PG 또는 GA"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 focus:outline-none text-white text-xs font-mono uppercase tracking-widest transition-colors"
                       />
                     </div>
@@ -777,7 +810,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                         type="text"
                         value={slug}
                         onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                        placeholder="mrpark"
+                        placeholder="master"
                         className="w-full px-3 py-2.5 bg-transparent text-[#C5A880] focus:outline-none font-mono text-xs"
                       />
                     </div>
@@ -790,7 +823,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                         type="text"
                         value={customDomain}
                         onChange={(e) => setCustomDomain(e.target.value)}
-                        placeholder="mrpark.koreancenter.net"
+                        placeholder="card.yourdomain.com"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:outline-none text-white text-xs font-mono transition-colors"
                       />
                     </div>

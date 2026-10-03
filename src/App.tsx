@@ -28,6 +28,7 @@ import { pullWalletFromEdge, pushWalletToEdge } from './utils/syncWallet';
 import { PinLockModal, PinModalMode } from './components/PinLockModal';
 import { BiometricsSettingModal } from './components/BiometricsSettingModal';
 import { useAutoLock } from './hooks/useAutoLock';
+import { CARD_DATA } from './utils/vcard';
 import { verifyBiometric } from './utils/biometrics';
 import { 
   Check, 
@@ -209,7 +210,7 @@ export default function App() {
         id: `my-card-${Date.now()}`,
         isMyCard: true,
         isDefault: cards.length === 0,
-        slug: '',
+        slug: 'master',
         theme: activeCard?.theme || 'sumi_ink',
         layout_type: 'editorial_minimal',
         card_features: {
@@ -221,32 +222,10 @@ export default function App() {
         category: '글로벌 네트워크',
         createdAt: new Date().toISOString().split('T')[0],
         notes: '내 디지털 명함',
-        data: activeCard && cards.length > 0 ? {
-          ...activeCard.data,
-          organization: '',
-          organizationKr: '',
-          title: '',
-          titleKr: '',
-          website: '',
-          websiteDisplay: '',
-          email: ''
-        } : {
-          organization: '',
-          organizationKr: '',
-          name: '',
-          nameKr: '',
-          title: '',
-          titleKr: '',
-          phone: '',
-          phoneRaw: '',
-          whatsappUrl: '',
-          email: '',
-          website: '',
-          websiteDisplay: '',
-          addressLines: [],
-          addressKr: '',
-          googleMapsUrl: '',
-          naverMapsUrl: ''
+        data: {
+          ...CARD_DATA,
+          website: `https://${APP_BASE_DOMAIN}/master`,
+          websiteDisplay: `${APP_BASE_DOMAIN}/master`
         }
       };
       setEditingCard(newCardTemplate);

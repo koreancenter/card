@@ -33,14 +33,14 @@ export const LAYOUT_PRESETS: LayoutPresetDefinition[] = [
     iconType: 'shield-monogram'
   },
   {
-    id: 'vertical_atelier',
-    name: '버티컬 아틀리에',
-    nameEn: 'Vertical Atelier',
-    description: '5:8 세로 비율의 건축적 절제미와 정교한 마이크로 메타데이터.',
-    recommendedFor: '건축가, 크리에이티브 디렉터, 수석 컨설턴트, 아티스트',
-    defaultOrientation: 'portrait',
-    aspectRatio: '5 / 8',
-    iconType: 'vertical-ratio'
+    id: 'warm_organic',
+    name: '웜 오가닉',
+    nameEn: 'Warm Organic',
+    description: '부드러운 한지/파인아트 코튼 질감과 여백의 미학을 극대화한 클래식 비례.',
+    recommendedFor: '헤리티지 문화재단, 작가, 학술 석학, 갤러리스트',
+    defaultOrientation: 'landscape',
+    aspectRatio: '9 / 5',
+    iconType: 'organic-leaf'
   },
   {
     id: 'swiss_typo_bold',
@@ -53,14 +53,14 @@ export const LAYOUT_PRESETS: LayoutPresetDefinition[] = [
     iconType: 'swiss-bold'
   },
   {
-    id: 'warm_organic',
-    name: '웜 오가닉',
-    nameEn: 'Warm Organic',
-    description: '부드러운 한지/파인아트 코튼 질감과 여백의 미학을 극대화한 클래식 비례.',
-    recommendedFor: '헤리티지 문화재단, 작가, 학술 석학, 갤러리스트',
-    defaultOrientation: 'landscape',
-    aspectRatio: '9 / 5',
-    iconType: 'organic-leaf'
+    id: 'vertical_atelier',
+    name: '버티컬 아틀리에',
+    nameEn: 'Vertical Atelier',
+    description: '5:8 세로 비율의 건축적 절제미와 정교한 마이크로 메타데이터.',
+    recommendedFor: '건축가, 크리에이티브 디렉터, 수석 컨설턴트, 아티스트',
+    defaultOrientation: 'portrait',
+    aspectRatio: '5 / 8',
+    iconType: 'vertical-ratio'
   }
 ];
 
