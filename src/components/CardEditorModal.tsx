@@ -330,13 +330,33 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+      <style>{`
+        .editor-scrollbar::-webkit-scrollbar {
+          width: 5px;
+          height: 5px;
+        }
+        .editor-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .editor-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.12);
+          border-radius: 9999px;
+        }
+        .editor-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.25);
+        }
+        .editor-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+        }
+      `}</style>
       <div 
-        className="relative w-full max-w-5xl max-h-[94vh] flex flex-col rounded-3xl bg-[#0F1015] border border-white/10 text-neutral-100 shadow-2xl overflow-hidden"
+        className="relative w-full max-w-6xl h-[88vh] max-h-[860px] flex flex-col rounded-3xl bg-[#0F1015] border border-white/10 text-neutral-100 shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-5 sm:px-7 py-4 sm:py-5 border-b border-white/5 flex items-center justify-between shrink-0 bg-[#0B0C10]">
-          <div className="space-y-1">
+        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#0B0C10]">
+          <div className="space-y-0.5">
             <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
               {isCreating 
                 ? '새로운 럭셔리 디지털 명함 만들기' 
@@ -344,21 +364,22 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                   ? '내 디지털 명함 커스터마이징' 
                   : '명함 정보 & 디자인 에디터'}
             </h3>
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-white/50">
               절제된 여백과 큐레이션된 소재 팔레트로 완성도 높은 디지털 아이덴티티를 완성합니다.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full text-neutral-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+            className="p-2 rounded-full text-white/40 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
             title="닫기"
+            aria-label="닫기"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* 2-Tab Unified Navigation (Visual Atelier & Identity Profile) */}
-        <div className="flex items-center px-5 sm:px-7 pt-3 pb-2.5 border-b border-white/5 bg-[#0B0C10]/80 gap-2 text-xs">
+        <div className="flex items-center px-6 py-2.5 border-b border-white/10 bg-[#0B0C10]/90 gap-2 shrink-0 text-xs">
           <button
             type="button"
             onClick={() => setActiveTab('visual_atelier')}
@@ -386,11 +407,11 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
           </button>
         </div>
 
-        {/* Main Content Area: Split View (Form Left 7 cols, Gallery Showcase Right 5 cols) */}
-        <div className="p-5 sm:p-7 overflow-y-auto flex-1 text-xs grid grid-cols-1 lg:grid-cols-12 gap-7">
+        {/* Main Content Area: Split View (Inputs Left 5 cols, Hero Preview Right 7 cols) */}
+        <div className="flex-1 grid grid-cols-12 overflow-hidden">
           
-          {/* ================= LEFT COLUMN: CLEAN FORM INSPECTOR (7 COLS) ================= */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* ================= LEFT PANEL: CLEAN FORM INSPECTOR (5 COLS / ~45%) ================= */}
+          <div className="col-span-12 lg:col-span-5 h-full overflow-y-auto p-5 sm:p-6 pr-4 editor-scrollbar space-y-6">
             
             {/* ---------------- TAB 1: VISUAL ATELIER (THEME & LAYOUT) ---------------- */}
             {activeTab === 'visual_atelier' && (
@@ -819,22 +840,28 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
 
           </div>
 
-          {/* ================= RIGHT COLUMN: GALLERY SHOWCASE VIEWPORT (5 COLS) ================= */}
-          <div className="lg:col-span-5 flex flex-col justify-between p-5 rounded-3xl bg-[#0B0C10] border border-white/10 shadow-2xl relative">
+          {/* ================= RIGHT PANEL: LIVE HERO PREVIEW (7 COLS / ~55% WIDTH) ================= */}
+          <div className="col-span-12 lg:col-span-7 h-full flex flex-col items-center justify-between bg-black/30 border-t lg:border-t-0 lg:border-l border-white/5 p-6 lg:p-8 relative overflow-hidden">
             
             {/* Gallery Top Bar */}
-            <div className="w-full flex items-center justify-between pb-3 border-b border-white/5">
-              <span className="text-[11px] text-neutral-400 font-mono">
-                {layoutType === 'vertical_atelier' ? '50 × 80 mm' : '90 × 50 mm'} · {LAYOUT_PRESETS.find(p => p.id === layoutType)?.name}
-              </span>
+            <div className="w-full flex items-center justify-between pb-2 shrink-0">
+              <div className="flex items-center gap-2 font-mono text-[11px] text-white/50">
+                <span>{layoutType === 'vertical_atelier' ? '50 × 80 mm' : '90 × 50 mm (ISO/KR)'}</span>
+                <span className="text-white/20">·</span>
+                <span className="text-[#C5A880] font-sans font-medium">
+                  {LAYOUT_PRESETS.find(p => p.id === layoutType)?.name}
+                </span>
+              </div>
 
-              {/* Front / Back Toggle */}
-              <div className="flex items-center gap-1 p-0.5 rounded-lg bg-white/5 border border-white/10 text-[10px]">
+              {/* Discreet Front / Back Toggle */}
+              <div className="flex items-center p-0.5 rounded-xl bg-white/5 border border-white/10 text-xs">
                 <button
                   type="button"
                   onClick={() => setPreviewFace('front')}
-                  className={`px-2.5 py-0.5 rounded font-medium transition-colors cursor-pointer ${
-                    previewFace === 'front' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'
+                  className={`px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${
+                    previewFace === 'front' 
+                      ? 'bg-[#C5A880] text-black font-bold shadow-sm' 
+                      : 'text-white/50 hover:text-white'
                   }`}
                 >
                   앞면
@@ -842,8 +869,10 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setPreviewFace('back')}
-                  className={`px-2.5 py-0.5 rounded font-medium transition-colors cursor-pointer ${
-                    previewFace === 'back' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'
+                  className={`px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${
+                    previewFace === 'back' 
+                      ? 'bg-[#C5A880] text-black font-bold shadow-sm' 
+                      : 'text-white/50 hover:text-white'
                   }`}
                 >
                   뒷면
@@ -851,47 +880,60 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
               </div>
             </div>
 
-            {/* Tactile Card Rendering Canvas */}
-            <div className="my-auto py-6 flex flex-col items-center justify-center">
+            {/* Dead-center Hero Card Canvas */}
+            <div className="flex-1 flex items-center justify-center w-full py-2">
               <div 
                 className={`w-full ${
                   layoutType === 'vertical_atelier' 
-                    ? 'max-w-[210px] sm:max-w-[230px]' 
-                    : 'max-w-[320px] sm:max-w-[340px]'
-                } shadow-[0_24px_64px_rgba(0,0,0,0.85)] rounded-2xl overflow-hidden ring-1 ring-white/15 transition-all duration-300 hover:scale-[1.01]`}
+                    ? 'max-w-[270px] aspect-[5/8]' 
+                    : 'max-w-[460px] aspect-[1.586/1]'
+                } transition-all duration-300 relative group flex items-center justify-center`}
               >
-                {previewFace === 'front' ? (
-                  <BusinessCardFront 
-                    data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
-                    theme={theme}
-                    layout_type={layoutType}
-                    card_features={features}
-                    isPrintPreview={false} 
-                    isPhotoCard={isPhotoCard}
-                    photoUrl={scannedImage}
-                  />
-                ) : (
-                  <BusinessCardBack 
-                    data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
-                    theme={theme}
-                    layout_type={layoutType}
-                    isPrintPreview={false}
-                    backPhotoUrl={scannedImageBack}
-                  />
-                )}
+                <div className="w-full h-full shadow-[0_28px_70px_rgba(0,0,0,0.85),0_0_0_1px_rgba(255,255,255,0.12)] rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.015]">
+                  {previewFace === 'front' ? (
+                    <BusinessCardFront 
+                      data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
+                      theme={theme}
+                      layout_type={layoutType}
+                      card_features={features}
+                      isPrintPreview={false} 
+                      isPhotoCard={isPhotoCard}
+                      photoUrl={scannedImage}
+                    />
+                  ) : (
+                    <BusinessCardBack 
+                      data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
+                      theme={theme}
+                      layout_type={layoutType}
+                      isPrintPreview={false}
+                      backPhotoUrl={scannedImageBack}
+                    />
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Understated Minimalist Link Bar */}
-            <div className="w-full pt-3 border-t border-white/5 flex items-center justify-between text-[11px] text-neutral-400 font-mono">
-              <span className="truncate text-neutral-300">{effectiveDisplayUrl}</span>
+            {/* Understated Minimalist Link Bar & Flip Switch */}
+            <div className="w-full pt-3 shrink-0 flex items-center justify-between text-[11px] text-white/50 border-t border-white/5 font-mono">
+              <div className="flex items-center gap-2 truncate max-w-[260px] sm:max-w-[320px]">
+                <Globe className="w-3.5 h-3.5 text-[#C5A880] shrink-0" />
+                <span className="truncate text-white/70">{effectiveDisplayUrl}</span>
+                <button
+                  type="button"
+                  onClick={copyDisplayUrl}
+                  className="text-white/40 hover:text-[#C5A880] transition-colors ml-1 cursor-pointer"
+                  title="URL 복사"
+                >
+                  {copiedUrl ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                </button>
+              </div>
+
               <button
                 type="button"
-                onClick={copyDisplayUrl}
-                className="flex items-center gap-1 text-[#C5A880] hover:text-[#d6b991] transition-colors cursor-pointer shrink-0 ml-2 font-sans text-xs"
+                onClick={() => setPreviewFace(prev => prev === 'front' ? 'back' : 'front')}
+                className="text-[#C5A880] hover:text-[#d6b991] font-sans text-xs font-medium transition-colors cursor-pointer shrink-0"
               >
-                {copiedUrl ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedUrl ? '복사됨' : '복사'}</span>
+                {previewFace === 'front' ? '뒷면 디자인 확인 ➔' : '앞면 디자인 확인 ➔'}
               </button>
             </div>
 
@@ -899,8 +941,8 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
 
         </div>
 
-        {/* Modal Footer */}
-        <div className="px-5 sm:px-7 py-4 sm:py-5 border-t border-white/10 bg-[#0B0C10] flex items-center justify-between shrink-0">
+        {/* Modal Footer (Fixed at bottom) */}
+        <div className="px-6 py-4 border-t border-white/10 bg-[#0B0C10] flex items-center justify-between shrink-0">
           <button
             type="button"
             onClick={onClose}

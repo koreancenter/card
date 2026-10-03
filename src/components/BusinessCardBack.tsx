@@ -93,47 +93,30 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
       />
 
       {/* Center Statement */}
-      <div className={`relative z-10 ${isPortrait ? 'my-auto py-6' : 'my-auto'} text-center flex flex-col items-center justify-center space-y-2 sm:space-y-3`}>
-        <div className="space-y-1 sm:space-y-1.5">
-          <h2 className={`${
-            isPortrait 
-              ? 'text-xl sm:text-2xl'
-              : isPrintPreview 
-                ? 'text-base sm:text-lg' 
-                : 'text-base sm:text-2xl md:text-[26px]'
-          } font-bold tracking-tight ${themeStyles.textPrimary} break-keep whitespace-normal`}>
+      <div className={`relative z-10 ${isPortrait ? 'my-auto py-4' : 'my-auto py-2'} text-center flex flex-col items-center justify-center space-y-1.5`}>
+        <div className="space-y-0.5 sm:space-y-1">
+          <h2 className="text-base sm:text-lg font-bold tracking-tight text-white break-keep whitespace-normal">
             {data.backTitle || '고구마 AI 스튜디오'}
           </h2>
           <p 
-            className={`${
-              isPortrait
-                ? 'text-xs sm:text-sm tracking-[0.24em]'
-                : isPrintPreview 
-                  ? 'text-[10px] sm:text-xs tracking-[0.2em]' 
-                  : 'text-[10px] sm:text-sm md:text-[14px] tracking-[0.22em]'
-            } font-bold uppercase`}
-            style={{ color: themeStyles.accent }}
+            className="text-xs font-bold uppercase tracking-widest text-[#C5A880]"
           >
             {data.backSubtitle || 'GOGUMA AI STUDIO'}
           </p>
         </div>
 
-        <div className="pt-0.5">
-          <p className={`${
-            isPortrait
-              ? 'text-xs tracking-[0.16em]'
-              : isPrintPreview 
-                ? 'text-[9px] sm:text-[10px] tracking-[0.14em]' 
-                : 'text-[9px] sm:text-[11px] md:text-xs tracking-[0.16em]'
-          } font-semibold uppercase ${themeStyles.textSecondary} break-keep`}>
-            {data.backTagline || 'AI EXPERT GROUP'}
-          </p>
-        </div>
+        {data.backTagline && (
+          <div className="pt-0.5">
+            <p className={`text-[10px] sm:text-[11px] font-semibold uppercase ${themeStyles.textSecondary} tracking-wider break-keep`}>
+              {data.backTagline}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Bottom Area: Portrait has centered QR block; Landscape has row */}
       {isPortrait ? (
-        <div className={`relative z-10 pt-4 border-t ${themeStyles.accentHairline} flex flex-col items-center justify-center text-center space-y-2.5`}>
+        <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-2 pt-3 border-t border-white/10 mt-auto w-full">
           <a
             href={data.website}
             target="_blank"
@@ -144,54 +127,50 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
           >
             {qrSvg && (
               <div 
-                className={`w-16 h-16 sm:w-20 sm:h-20 p-1.5 rounded-xl ${themeStyles.qrBg} border ${themeStyles.accentHairline} flex items-center justify-center shrink-0 shadow-md group-hover/qr:ring-1 group-hover/qr:ring-white/20 transition-all [&>svg]:w-full [&>svg]:h-full mb-1.5`}
+                className="w-11 h-11 p-1 rounded-lg bg-white/95 border border-white/10 flex items-center justify-center shrink-0 shadow-md [&>svg]:w-full [&>svg]:h-full mb-1"
                 dangerouslySetInnerHTML={{ __html: qrSvg }}
                 title="디지털 명함 바로가기 QR 코드"
               />
             )}
-            <p className={`font-mono text-[9px] ${themeStyles.textMuted}`}>SCAN TO CONNECT</p>
-            <p className={`font-medium text-xs ${themeStyles.textSecondary} group-hover/qr:underline underline-offset-2`}>
+            <p className={`font-mono text-[8px] ${themeStyles.textMuted}`}>SCAN TO CONNECT</p>
+            <p className={`font-medium text-[11px] ${themeStyles.textSecondary} group-hover/qr:underline underline-offset-2 truncate max-w-[200px]`}>
               {data.websiteDisplay}
             </p>
           </a>
 
-          <p className={`text-[10px] ${themeStyles.textMuted}`}>
+          <p className={`text-[9px] ${themeStyles.textMuted} truncate max-w-[220px]`}>
             HQ · {data.backHqAddress || 'Gangnam-gu, Seoul, Republic of Korea'}
           </p>
         </div>
       ) : (
         /* Landscape bottom bar */
-        <div className={`relative z-10 ${
-          isPrintPreview ? 'pt-1.5 text-[9px]' : 'pt-2 sm:pt-3 text-[9px] sm:text-[11px]'
-        } border-t ${themeStyles.accentHairline} flex items-center justify-between`}>
+        <div className="relative z-10 flex items-end justify-between w-full pt-4 border-t border-white/10 mt-auto">
           <a 
             href={data.website}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 group/qr hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2 group/qr hover:opacity-90 transition-opacity min-w-0 pr-2"
             title={`${data.websiteDisplay} 바로가기`}
             onClick={(e) => e.stopPropagation()}
           >
             {qrSvg && (
               <div 
-                className={`${
-                  isPrintPreview ? 'w-6 h-6 sm:w-7 sm:h-7' : 'w-6 h-6 sm:w-8 sm:h-8'
-                } p-0.5 sm:p-1 rounded ${themeStyles.qrBg} border ${themeStyles.accentHairline} flex items-center justify-center shrink-0 [&>svg]:w-full [&>svg]:h-full`}
+                className="w-9 h-9 p-0.5 rounded-lg bg-white/95 border border-white/10 flex items-center justify-center shrink-0 shadow-sm [&>svg]:w-full [&>svg]:h-full"
                 dangerouslySetInnerHTML={{ __html: qrSvg }}
                 title="디지털 명함 바로가기 QR 코드"
               />
             )}
-            <div className="text-left leading-tight">
-              <p className={`font-mono text-[8px] sm:text-[9px] ${themeStyles.textMuted}`}>SCAN TO CONNECT</p>
-              <p className={`font-medium ${themeStyles.textSecondary} group-hover/qr:underline underline-offset-2`}>
+            <div className="text-left leading-tight min-w-0">
+              <p className={`font-mono text-[8px] ${themeStyles.textMuted}`}>SCAN TO CONNECT</p>
+              <p className={`font-medium text-[10px] sm:text-[11px] ${themeStyles.textSecondary} group-hover/qr:underline underline-offset-2 truncate max-w-[150px] sm:max-w-[200px]`}>
                 {data.websiteDisplay}
               </p>
             </div>
           </a>
 
-          <div className="text-right">
-            <p className={`font-mono text-[8px] sm:text-[9px] ${themeStyles.textMuted}`}>HQ</p>
-            <p className={`${isPrintPreview ? 'text-[8px] sm:text-[9px]' : 'text-[9px] sm:text-[11px]'} ${themeStyles.textSecondary}`}>
+          <div className="text-right shrink-0">
+            <p className={`font-mono text-[8px] ${themeStyles.textMuted}`}>HQ</p>
+            <p className={`text-[9px] sm:text-[10px] ${themeStyles.textSecondary} truncate max-w-[150px] sm:max-w-[180px]`}>
               {data.backHqAddress || 'Gangnam-gu, Seoul, Republic of Korea'}
             </p>
           </div>
