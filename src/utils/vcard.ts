@@ -1,25 +1,29 @@
 import { CardData } from '../types/card';
 
 export const CARD_DATA: CardData = {
-  organization: 'VANCE STUDIO',
-  organizationKr: '밴스 건축 스튜디오',
-  name: 'ALEXANDER VANCE',
-  nameKr: '알렉산더 밴스',
-  title: 'Principal Architect',
-  titleKr: '대표 건축가',
+  organization: 'GOGUMA AI STUDIO',
+  organizationKr: '고구마 AI 스튜디오',
+  name: 'PARK, GIHONG',
+  nameKr: '박 기 홍',
+  title: 'Principal Master',
+  titleKr: '대표 마스터',
   phone: '+82 10-1234-5678',
   phoneRaw: '+821012345678',
   whatsappUrl: 'https://wa.me/821012345678',
-  email: 'alexander@vance.design',
-  website: 'https://card.goguma.app/vance',
-  websiteDisplay: 'card.goguma.app/vance',
+  email: 'master@goguma.app',
+  website: 'https://card.goguma.app/master',
+  websiteDisplay: 'card.goguma.app/master',
   addressLines: [
     '77 Cheongdam-ro, Gangnam-gu',
     'Seoul 06015, Republic of Korea'
   ],
   addressKr: '서울특별시 강남구 청담로 77',
   googleMapsUrl: 'https://maps.google.com/?q=Gangnam+Seoul',
-  naverMapsUrl: 'https://map.naver.com'
+  naverMapsUrl: 'https://map.naver.com',
+  backTitle: '고구마 AI 스튜디오',
+  backSubtitle: 'GOGUMA AI STUDIO',
+  backTagline: 'AI EXPERT GROUP',
+  backHqAddress: 'Gangnam-gu, Seoul, Republic of Korea'
 };
 
 /**

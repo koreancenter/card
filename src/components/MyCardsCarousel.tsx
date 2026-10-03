@@ -44,7 +44,7 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
   const triggerTactileHaptic = () => {
     if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       try {
-        navigator.vibrate(15);
+        navigator.vibrate(5);
       } catch {
         // Silently ignore if restricted
       }

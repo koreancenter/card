@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { CardData, CardTheme, CardOrientation, CardLayoutType, CardFeatures } from '../types/card';
 import { BusinessCardFront } from './BusinessCardFront';
 import { BusinessCardBack } from './BusinessCardBack';
@@ -50,7 +51,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
   const triggerHapticFeedback = () => {
     if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       try {
-        navigator.vibrate(15);
+        navigator.vibrate(5);
       } catch {
         // Silently ignore if restricted by device or browser policy
       }
@@ -79,21 +80,34 @@ export const CardContainer: React.FC<CardContainerProps> = ({
   const isPortrait = isVerticalAtelier || orientation === 'portrait';
 
   return (
-    <div className={`w-full ${isPortrait ? 'max-w-[340px] sm:max-w-[370px]' : 'max-w-[560px]'} mx-auto select-none flex flex-col items-center transition-all duration-300`}>
-      {/* 3D Tactile Card Canvas - click anywhere on card to flip */}
-      <div 
+    <motion.div 
+      layout
+      transition={{ layout: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } }}
+      className={`w-full ${isPortrait ? 'max-w-[340px] sm:max-w-[370px]' : 'max-w-[560px]'} mx-auto select-none flex flex-col items-center`}
+    >
+      {/* 3D Tactile Card Canvas - Framer Motion flip with layout animation */}
+      <motion.div 
+        layout
         className="w-full [perspective:1400px] relative"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div
+        <motion.div
           ref={cardRef}
+          layout
           onClick={handleCardFlip}
+          animate={{ 
+            rotateY: isFlipped ? 180 : 0,
+          }}
+          transition={{
+            rotateY: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
+            layout: { duration: 0.45, ease: [0.16, 1, 0.3, 1] }
+          }}
+          whileHover={{ scale: 1.012 }}
+          whileTap={{ scale: 0.988 }}
           style={{
-            transform: `rotateY(${isFlipped ? 180 : 0}deg)`,
             transformStyle: 'preserve-3d',
             WebkitTransformStyle: 'preserve-3d',
-            transition: 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
           className="relative w-full cursor-pointer group shadow-[0_24px_64px_rgba(0,0,0,0.6)] rounded-2xl transition-shadow duration-300 hover:shadow-[0_32px_80px_rgba(0,0,0,0.75)]"
         >
@@ -138,11 +152,11 @@ export const CardContainer: React.FC<CardContainerProps> = ({
               backPhotoUrl={backPhotoUrl}
             />
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Bottom Actions: Centered beneath Card */}
-      <div className="w-full mt-4 px-1 flex justify-center">
+      <motion.div layout className="w-full mt-4 px-1 flex justify-center">
         <ActionButtons
           data={data}
           onOpenEdit={onOpenEdit}
@@ -151,7 +165,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
           orientation={orientation}
           onToggleOrientation={!isVerticalAtelier ? () => setOrientation(prev => prev === 'portrait' ? 'landscape' : 'portrait') : undefined}
         />
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };

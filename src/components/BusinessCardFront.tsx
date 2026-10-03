@@ -518,9 +518,9 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
           <h2 className={`${isPortrait ? 'text-sm font-bold' : isPrintPreview ? 'text-xs' : 'text-xs sm:text-sm'} font-semibold tracking-tight ${themeStyles.textPrimary}`}>
             {data.organization}
           </h2>
-          {showSubOrg && (
+          {showSubOrg && data.subOrg && (
             <p className="text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase" style={{ color: themeStyles.accent }}>
-              FOUNDATION
+              {data.subOrg}
             </p>
           )}
         </div>

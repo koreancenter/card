@@ -104,7 +104,7 @@ export function generateStandaloneHtml(data: CardData, theme: CardTheme = 'sand'
           <div>
             <p class="text-[10px] tracking-tight font-medium text-neutral-400">${data.organizationKr}</p>
             <h2 class="text-sm font-semibold tracking-tight text-white">${data.organization}</h2>
-            <p class="text-[9px] font-semibold tracking-[0.2em] uppercase text-neutral-400 mt-0.5">FOUNDATION</p>
+            ${data.subOrg ? `<p class="text-[9px] font-semibold tracking-[0.2em] uppercase text-neutral-400 mt-0.5">${data.subOrg}</p>` : ''}
           </div>
 
           <!-- Name & Title -->
@@ -134,9 +134,9 @@ export function generateStandaloneHtml(data: CardData, theme: CardTheme = 'sand'
         <!-- CARD BACK -->
         <div class="absolute inset-0 w-full h-full p-6 sm:p-7 flex flex-col justify-between backface-hidden rotate-y-180 rounded-2xl overflow-hidden" style="background-color: ${selectedTheme.bg};">
           <div class="my-auto text-center space-y-2">
-            <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">대한민국이 브랜드입니다.</h2>
-            <p class="text-xs font-bold uppercase tracking-[0.24em] text-neutral-400">KOREA IS THE BRAND.</p>
-            <p class="text-xs tracking-[0.16em] uppercase text-neutral-400 pt-1">Korean Studies Expert | Koreanist</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">${data.backTitle || '고구마 AI 스튜디오'}</h2>
+            <p class="text-xs font-bold uppercase tracking-[0.24em] text-neutral-400">${data.backSubtitle || 'GOGUMA AI STUDIO'}</p>
+            <p class="text-xs tracking-[0.16em] uppercase text-neutral-400 pt-1">${data.backTagline || 'AI EXPERT GROUP'}</p>
           </div>
 
           <!-- Dynamic QR -->

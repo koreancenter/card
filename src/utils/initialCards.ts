@@ -3,26 +3,26 @@ import { CARD_DATA } from './vcard';
 
 export const INITIAL_CARDS: StoredCard[] = [
   {
-    id: 'sample-card-alexander-vance',
+    id: 'sample-card-goguma-master',
     isMyCard: true,
     isDefault: true,
-    slug: 'vance',
-    customDomain: 'card.goguma.app/vance',
-    category: '아키텍처·디자인',
+    slug: 'master',
+    customDomain: 'card.goguma.app/master',
+    category: 'AI·기술',
     theme: 'sumi_ink',
     layout_type: 'editorial_minimal',
     card_features: {
       show_en_name: true,
-      show_sub_org: true,
+      show_sub_org: false,
       show_address: true,
-      monogram_text: 'AV'
+      monogram_text: 'PG'
     },
     createdAt: '2026-03-01',
-    notes: 'GOGUMA CARD STUDIO 아키텍처 쇼케이스 샘플 명함',
+    notes: 'GOGUMA AI STUDIO 대표 마스터 샘플 명함',
     data: {
       ...CARD_DATA,
-      website: 'https://card.goguma.app/vance',
-      websiteDisplay: 'card.goguma.app/vance'
+      website: 'https://card.goguma.app/master',
+      websiteDisplay: 'card.goguma.app/master'
     }
   },
   {
@@ -180,7 +180,24 @@ export function loadUserCards(): StoredCard[] {
     }
     const parsed: StoredCard[] = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed;
+      return parsed.map(c => {
+        if (c.id === 'sample-card-alexander-vance' || c.slug === 'vance' || c.id === 'sample-card-goguma-master' || c.slug === 'master') {
+          return {
+            ...c,
+            id: 'sample-card-goguma-master',
+            slug: 'master',
+            customDomain: 'card.goguma.app/master',
+            category: 'AI·기술',
+            data: {
+              ...CARD_DATA,
+              name: 'PARK, GIHONG',
+              website: 'https://card.goguma.app/master',
+              websiteDisplay: 'card.goguma.app/master'
+            }
+          };
+        }
+        return c;
+      });
     }
     return [];
   } catch (e) {

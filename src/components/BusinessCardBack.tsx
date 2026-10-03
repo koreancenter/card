@@ -92,7 +92,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
         }}
       />
 
-      {/* Center National Brand Statement */}
+      {/* Center Statement */}
       <div className={`relative z-10 ${isPortrait ? 'my-auto py-6' : 'my-auto'} text-center flex flex-col items-center justify-center space-y-2 sm:space-y-3`}>
         <div className="space-y-1 sm:space-y-1.5">
           <h2 className={`${
@@ -102,7 +102,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
                 ? 'text-base sm:text-lg' 
                 : 'text-base sm:text-2xl md:text-[26px]'
           } font-bold tracking-tight ${themeStyles.textPrimary} break-keep whitespace-normal`}>
-            대한민국이 브랜드입니다.
+            {data.backTitle || '고구마 AI 스튜디오'}
           </h2>
           <p 
             className={`${
@@ -114,7 +114,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
             } font-bold uppercase`}
             style={{ color: themeStyles.accent }}
           >
-            KOREA IS THE BRAND.
+            {data.backSubtitle || 'GOGUMA AI STUDIO'}
           </p>
         </div>
 
@@ -126,7 +126,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
                 ? 'text-[9px] sm:text-[10px] tracking-[0.14em]' 
                 : 'text-[9px] sm:text-[11px] md:text-xs tracking-[0.16em]'
           } font-semibold uppercase ${themeStyles.textSecondary} break-keep`}>
-            Korean Studies Expert | Koreanist
+            {data.backTagline || 'AI EXPERT GROUP'}
           </p>
         </div>
       </div>
@@ -156,7 +156,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
           </a>
 
           <p className={`text-[10px] ${themeStyles.textMuted}`}>
-            HQ · Bucheon-si, Republic of Korea
+            HQ · {data.backHqAddress || 'Gangnam-gu, Seoul, Republic of Korea'}
           </p>
         </div>
       ) : (
@@ -192,7 +192,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
           <div className="text-right">
             <p className={`font-mono text-[8px] sm:text-[9px] ${themeStyles.textMuted}`}>HQ</p>
             <p className={`${isPrintPreview ? 'text-[8px] sm:text-[9px]' : 'text-[9px] sm:text-[11px]'} ${themeStyles.textSecondary}`}>
-              Bucheon-si, Republic of Korea
+              {data.backHqAddress || 'Gangnam-gu, Seoul, Republic of Korea'}
             </p>
           </div>
         </div>

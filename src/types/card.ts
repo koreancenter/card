@@ -34,6 +34,7 @@ export interface CardFeatures {
 export interface CardData {
   organization: string;
   organizationKr: string;
+  subOrg?: string;
   name: string;
   nameKr: string;
   title: string;
@@ -49,6 +50,10 @@ export interface CardData {
   addressKr: string;
   googleMapsUrl: string;
   naverMapsUrl: string;
+  backTitle?: string;
+  backSubtitle?: string;
+  backTagline?: string;
+  backHqAddress?: string;
 }
 
 export type PrintLayout = 'single-card' | 'front-back-duo' | 'a4-sheet';
