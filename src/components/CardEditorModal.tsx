@@ -874,7 +874,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
           </div>
 
           {/* ================= RIGHT PANEL: LIVE HERO PREVIEW (order-1 on mobile, order-2 on desktop) ================= */}
-          <div className="order-1 lg:order-2 col-span-12 lg:col-span-7 h-auto lg:h-full flex flex-col items-center justify-between bg-black/25 border-b lg:border-b-0 lg:border-l border-white/5 p-6 sm:p-8 lg:p-10 xl:p-12 relative overflow-hidden">
+          <div className="order-1 lg:order-2 col-span-12 lg:col-span-7 h-auto lg:h-full flex flex-col items-center justify-between bg-black/25 border-b lg:border-b-0 lg:border-l border-white/5 p-8 sm:p-10 lg:p-12 relative overflow-hidden">
             
             {/* Gallery Top Bar */}
             <div className="w-full flex items-center justify-between pb-2 shrink-0">
@@ -914,16 +914,16 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
             </div>
 
             {/* Dead-center Hero Card Canvas with Generous Breathing Room */}
-            <div className="flex-1 flex items-center justify-center w-full py-6 sm:py-8 lg:py-10 px-2 sm:px-4">
+            <div className="flex-1 flex items-center justify-center w-full py-8 sm:py-10 lg:py-12 px-4 sm:px-6">
               <div 
                 className={`w-full ${
                   layoutType === 'vertical_atelier' 
                     ? 'max-w-[220px] sm:max-w-[245px] aspect-[5/8]' 
-                    : 'max-w-[340px] sm:max-w-[390px] lg:max-w-[420px] aspect-[1.586/1]'
+                    : 'max-w-[340px] sm:max-w-[390px] lg:max-w-[410px] aspect-[1.586/1]'
                 } transition-all duration-300 relative group flex items-center justify-center`}
               >
                 {/* 3D Render Canvas: Border-Free, Multi-Tier Soft Luxury Diffusion Shadows */}
-                <div className="w-full h-full rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.012] shadow-[0_20px_45px_-10px_rgba(0,0,0,0.8),0_10px_20px_-6px_rgba(0,0,0,0.5),0_35px_75px_-15px_rgba(0,0,0,0.95)]">
+                <div className="w-full h-full rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.012] shadow-[0_24px_55px_-12px_rgba(0,0,0,0.85),0_12px_24px_-6px_rgba(0,0,0,0.5),0_40px_85px_-15px_rgba(0,0,0,0.95)]">
                   {previewFace === 'front' ? (
                     <BusinessCardFront 
                       data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
