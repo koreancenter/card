@@ -18,7 +18,7 @@ import { BusinessCardBack } from './BusinessCardBack';
 import { APP_BASE_DOMAIN, normalizeDomain } from '../utils/domain';
 import { CARD_DATA } from '../utils/vcard';
 import { TemplateModeEditor } from './editor/TemplateModeEditor';
-import { CustomHtmlEditor, LUXURY_PROMPT_PRESETS } from './editor/CustomHtmlEditor';
+import { CustomHtmlEditor, DEFAULT_LUXURY_HTML_FRONT, DEFAULT_LUXURY_HTML_BACK } from './editor/CustomHtmlEditor';
 import { PhotoArchivingEditor } from './editor/PhotoArchivingEditor';
 
 interface CardEditorModalProps {
@@ -130,10 +130,10 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
 
   // Custom HTML Mode states
   const [htmlFront, setHtmlFront] = useState<string>(
-    card.html_front || LUXURY_PROMPT_PRESETS[0].starterFront
+    card.html_front || DEFAULT_LUXURY_HTML_FRONT
   );
   const [htmlBack, setHtmlBack] = useState<string>(
-    card.html_back || LUXURY_PROMPT_PRESETS[0].starterBack
+    card.html_back || DEFAULT_LUXURY_HTML_BACK
   );
   const [htmlEditorActiveFace, setHtmlEditorActiveFace] = useState<'front' | 'back'>('front');
 
@@ -186,8 +186,8 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
       setSlug(card.slug || 'master');
       setCustomDomain(card.customDomain || '');
       setIsDefault(Boolean(card.isDefault));
-      setHtmlFront(card.html_front || LUXURY_PROMPT_PRESETS[0].starterFront);
-      setHtmlBack(card.html_back || LUXURY_PROMPT_PRESETS[0].starterBack);
+      setHtmlFront(card.html_front || DEFAULT_LUXURY_HTML_FRONT);
+      setHtmlBack(card.html_back || DEFAULT_LUXURY_HTML_BACK);
       setFrontImageUrl(card.front_image_url || card.scannedImage);
       setBackImageUrl(card.back_image_url || card.scannedImageBack);
       setPreviewFace('front');
@@ -422,10 +422,10 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                 onChangeBackImage={setBackImageUrl}
                 cardData={formData}
                 onChangeCardData={handleFormFieldChange}
+                slug={slug}
+                onChangeSlug={setSlug}
                 notes={notes}
                 onChangeNotes={setNotes}
-                category={category}
-                onChangeCategory={setCategory}
               />
             )}
 
@@ -436,6 +436,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                 onChangeFront={setHtmlFront}
                 onChangeBack={setHtmlBack}
                 cardData={formData}
+                onChangeCardData={handleFormFieldChange}
                 activeFace={htmlEditorActiveFace}
                 onChangeActiveFace={setHtmlEditorActiveFace}
               />
@@ -455,8 +456,8 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                   {creationMode === 'template' 
                     ? LAYOUT_PRESETS.find(p => p.id === layoutType)?.name 
                     : creationMode === 'photo' 
-                      ? '실물 명함 고화질 렌더링' 
-                      : '커스텀 Tailwind 엔진'}
+                      ? '실물 명함 사진 렌더링 (900×540)' 
+                      : '커스텀 Tailwind 엔진 (1.586:1)'}
                 </span>
               </div>
 
@@ -498,29 +499,127 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
               >
                 {/* 3D Soft Diffusion Shadow */}
                 <div className="w-full h-full rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.012] shadow-[0_24px_55px_-12px_rgba(0,0,0,0.85),0_12px_24px_-6px_rgba(0,0,0,0.5),0_40px_85px_-15px_rgba(0,0,0,0.95)]">
-                  {previewFace === 'front' ? (
-                    <BusinessCardFront 
-                      data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
-                      theme={theme}
-                      layout_type={layoutType}
-                      card_features={features}
-                      isPrintPreview={false} 
-                      hideBorder={true}
-                      isPhotoCard={creationMode === 'photo'}
-                      photoUrl={frontImageUrl}
-                      html_front={creationMode === 'custom_html' ? htmlFront : undefined}
-                    />
-                  ) : (
-                    <BusinessCardBack 
-                      data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
-                      theme={theme}
-                      layout_type={layoutType}
-                      isPrintPreview={false} 
-                      hideBorder={true}
-                      backPhotoUrl={creationMode === 'photo' ? backImageUrl : undefined}
-                      html_back={creationMode === 'custom_html' ? htmlBack : undefined}
-                    />
+                  
+                  {/* MODE 1: TEMPLATE BASED CARD */}
+                  {creationMode === 'template' && (
+                    previewFace === 'front' ? (
+                      <BusinessCardFront 
+                        data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
+                        theme={theme}
+                        layout_type={layoutType}
+                        card_features={features}
+                        isPrintPreview={false} 
+                        hideBorder={true}
+                      />
+                    ) : (
+                      <BusinessCardBack 
+                        data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
+                        theme={theme}
+                        layout_type={layoutType}
+                        isPrintPreview={false} 
+                        hideBorder={true}
+                      />
+                    )
                   )}
+
+                  {/* MODE 2: PHYSICAL CARD PHOTO ARCHIVING */}
+                  {creationMode === 'photo' && (
+                    <div className="relative w-full h-full aspect-[1.586/1] bg-[#0A0B0E] border border-white/10 rounded-2xl overflow-hidden select-none">
+                      {previewFace === 'front' ? (
+                        frontImageUrl ? (
+                          <>
+                            <img
+                              src={frontImageUrl}
+                              alt={formData.name || '실물 명함 사진 앞면'}
+                              className="w-full h-full object-cover rounded-2xl"
+                            />
+                            <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
+                              <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-[#C5A880] tracking-wider uppercase shadow-sm">
+                                PHOTO ARCHIVE
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-neutral-400 bg-neutral-900/60">
+                            <Camera className="w-8 h-8 text-[#C5A880]/60 mb-2" />
+                            <p className="text-xs font-semibold text-white">등록된 명함 사진이 없습니다</p>
+                            <p className="text-[10px] text-neutral-500 mt-1">좌측 패널에서 사진을 업로드해 주세요</p>
+                          </div>
+                        )
+                      ) : (
+                        backImageUrl ? (
+                          <>
+                            <img
+                              src={backImageUrl}
+                              alt="실물 명함 사진 뒷면"
+                              className="w-full h-full object-cover rounded-2xl"
+                            />
+                            <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
+                              <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-[#C5A880] tracking-wider uppercase shadow-sm">
+                                BACK PHOTO
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <BusinessCardBack 
+                            data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
+                            theme={theme}
+                            layout_type={layoutType}
+                            isPrintPreview={false} 
+                            hideBorder={true}
+                          />
+                        )
+                      )}
+                    </div>
+                  )}
+
+                  {/* MODE 3: CUSTOM HTML / TAILWIND INJECTION */}
+                  {creationMode === 'custom_html' && (
+                    <div className="relative w-full h-full aspect-[1.586/1] bg-[#0A0B0E] border border-white/10 rounded-2xl overflow-hidden select-none">
+                      {previewFace === 'front' ? (
+                        htmlFront ? (
+                          <div 
+                            className="w-full h-full overflow-hidden rounded-2xl"
+                            dangerouslySetInnerHTML={{ 
+                              __html: htmlFront
+                                .replace(/^```html\s*/i, '')
+                                .replace(/^```\s*/i, '')
+                                .replace(/\s*```$/i, '')
+                                .trim() 
+                            }} 
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-neutral-400 bg-neutral-900/60">
+                            <Code2 className="w-8 h-8 text-[#C5A880]/60 mb-2" />
+                            <p className="text-xs font-semibold text-white">HTML 코드가 비어 있습니다</p>
+                            <p className="text-[10px] text-neutral-500 mt-1">좌측 에디터에 Tailwind HTML 코드를 입력하세요</p>
+                          </div>
+                        )
+                      ) : (
+                        htmlBack ? (
+                          <div 
+                            className="w-full h-full overflow-hidden rounded-2xl"
+                            dangerouslySetInnerHTML={{ 
+                              __html: htmlBack
+                                .replace(/^```html\s*/i, '')
+                                .replace(/^```\s*/i, '')
+                                .replace(/\s*```$/i, '')
+                                .trim() 
+                            }} 
+                          />
+                        ) : (
+                          <BusinessCardBack 
+                            data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
+                            theme={theme}
+                            layout_type={layoutType}
+                            isPrintPreview={false} 
+                            hideBorder={true}
+                          />
+                        )
+                      )}
+                    </div>
+                  )}
+
                 </div>
               </div>
             </div>
