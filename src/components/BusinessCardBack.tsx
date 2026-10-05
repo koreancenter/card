@@ -11,6 +11,7 @@ interface BusinessCardBackProps {
   isPrintPreview?: boolean;
   backPhotoUrl?: string;
   hideBorder?: boolean;
+  html_back?: string;
 }
 
 export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
@@ -20,7 +21,8 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
   orientation = 'landscape',
   isPrintPreview = false,
   backPhotoUrl,
-  hideBorder = false
+  hideBorder = false,
+  html_back
 }) => {
   const [qrSvg, setQrSvg] = useState<string>('');
 
@@ -28,6 +30,19 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
   const isLight = themeStyles.isLight;
   const isVerticalAtelier = layout_type === 'vertical_atelier';
   const isPortrait = isVerticalAtelier || orientation === 'portrait';
+
+  // Custom HTML / Tailwind Injection Back Face Rendering
+  if (html_back) {
+    return (
+      <div 
+        className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
+          isPrintPreview || hideBorder ? 'border-0' : `border border-white/10 shadow-2xl`
+        } bg-[#0A0B0E] transition-all duration-300`}
+        style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
+        dangerouslySetInnerHTML={{ __html: html_back }}
+      />
+    );
+  }
 
   // If back photo is provided, render authentic back photo
   if (backPhotoUrl) {

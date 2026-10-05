@@ -1,3 +1,47 @@
+export type CardCreationMode = 'template' | 'custom_html' | 'photo';
+
+export interface BaseCard {
+  id: string;
+  slug: string;
+  created_at: string;
+  owner_key: string;
+  creation_mode: CardCreationMode;
+  name: string;
+  phone?: string;
+  email?: string;
+  company?: string;
+  title?: string;
+  website?: string;
+}
+
+export interface TemplateCard extends BaseCard {
+  creation_mode: 'template';
+  layout_type: 'editorial_minimal' | 'monogram_executive' | 'vertical_atelier' | 'swiss_typo_bold' | 'warm_organic';
+  theme_preset: 'sumi_ink' | 'warm_paper' | 'deep_forest' | 'classic_navy';
+  details: {
+    en_name?: string;
+    sub_org?: string;
+    address?: string;
+    slogan?: string;
+    show_address: boolean;
+    show_en_name: boolean;
+  };
+}
+
+export interface CustomHtmlCard extends BaseCard {
+  creation_mode: 'custom_html';
+  html_front: string;
+  html_back?: string;
+}
+
+export interface PhotoCard extends BaseCard {
+  creation_mode: 'photo';
+  front_image_url: string; // Base64 WebP compressed
+  back_image_url?: string;
+}
+
+export type BusinessCard = TemplateCard | CustomHtmlCard | PhotoCard;
+
 export type ThemePreset =
   | 'sumi_ink'     // Deep matte ink canvas (#0B0C10), warm ivory text (#F8F4EB), champagne brass accent (#C5A880)
   | 'warm_paper'   // Subtle fine paper ivory (#F8F4EB), deep charcoal text (#1F2023), deep wine primary accent (#6B1D42)
@@ -86,6 +130,23 @@ export interface StoredCard {
   scannedImageBack?: string; // Optional physical card back photo (WebP base64 or URL)
   isPhotoCard?: boolean; // When true, renders authentic physical photo as card face
   visualMode?: 'digital' | 'photo_archive';
+
+  // 3-Way Card Creation Architecture Integration
+  creation_mode?: CardCreationMode;
+  owner_key?: string;
+  created_at?: string;
+  html_front?: string;
+  html_back?: string;
+  front_image_url?: string;
+  back_image_url?: string;
+  details?: {
+    en_name?: string;
+    sub_org?: string;
+    address?: string;
+    slogan?: string;
+    show_address: boolean;
+    show_en_name: boolean;
+  };
 }
 
 export type CardCategory = '전체' | 'VIP 파트너' | '글로벌 네트워크' | '공공·기관' | '투자·금융' | 'IT·기술' | '기타';

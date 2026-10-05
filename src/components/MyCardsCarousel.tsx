@@ -294,7 +294,8 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                         card_features={card.card_features}
                         orientation={card.layout_type === 'vertical_atelier' ? 'portrait' : 'landscape'}
                         isPhotoCard={card.isPhotoCard}
-                        photoUrl={card.scannedImage}
+                        photoUrl={card.scannedImage || card.front_image_url}
+                        html_front={card.html_front}
                       />
                     </div>
 
@@ -314,7 +315,8 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                         theme={card.theme} 
                         layout_type={card.layout_type}
                         orientation={card.layout_type === 'vertical_atelier' ? 'portrait' : 'landscape'}
-                        backPhotoUrl={card.scannedImageBack}
+                        backPhotoUrl={card.scannedImageBack || card.back_image_url}
+                        html_back={card.html_back}
                       />
                     </div>
                   </div>

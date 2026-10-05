@@ -13,6 +13,7 @@ interface BusinessCardFrontProps {
   isPhotoCard?: boolean;
   photoUrl?: string;
   hideBorder?: boolean;
+  html_front?: string;
 }
 
 export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
@@ -24,7 +25,8 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
   isPrintPreview = false,
   isPhotoCard = false,
   photoUrl,
-  hideBorder = false
+  hideBorder = false,
+  html_front
 }) => {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -40,6 +42,19 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
   const isVerticalAtelier = layout_type === 'vertical_atelier';
   const isPortrait = isVerticalAtelier || orientation === 'portrait';
   const themeStyles = resolveThemeStyles(theme);
+
+  // Custom HTML / Tailwind Injection Face Rendering
+  if (html_front) {
+    return (
+      <div 
+        className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
+          isPrintPreview || hideBorder ? 'border-0' : `border border-white/10 shadow-2xl`
+        } bg-[#0A0B0E] transition-all duration-300`}
+        style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
+        dangerouslySetInnerHTML={{ __html: html_front }}
+      />
+    );
+  }
 
   // Authentic Physical Card Photo Face Rendering
   if (isPhotoCard && photoUrl) {

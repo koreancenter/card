@@ -17,6 +17,8 @@ interface CardContainerProps {
   isPhotoCard?: boolean;
   photoUrl?: string;
   backPhotoUrl?: string;
+  html_front?: string;
+  html_back?: string;
 }
 
 export const CardContainer: React.FC<CardContainerProps> = ({
@@ -31,6 +33,8 @@ export const CardContainer: React.FC<CardContainerProps> = ({
   isPhotoCard = false,
   photoUrl,
   backPhotoUrl,
+  html_front,
+  html_back,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [orientation, setOrientation] = useState<CardOrientation>(() => 
@@ -130,6 +134,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
               orientation={orientation}
               isPhotoCard={isPhotoCard}
               photoUrl={photoUrl}
+              html_front={html_front}
             />
           </div>
 
@@ -150,6 +155,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
               layout_type={layout_type}
               orientation={orientation}
               backPhotoUrl={backPhotoUrl}
+              html_back={html_back}
             />
           </div>
         </motion.div>

@@ -614,9 +614,11 @@ export default function App() {
                       theme={activeCard.theme} 
                       layout_type={activeCard.layout_type}
                       card_features={activeCard.card_features}
-                      isPhotoCard={activeCard.isPhotoCard}
-                      photoUrl={activeCard.scannedImage}
-                      backPhotoUrl={activeCard.scannedImageBack}
+                      isPhotoCard={activeCard.isPhotoCard || activeCard.creation_mode === 'photo'}
+                      photoUrl={activeCard.scannedImage || activeCard.front_image_url}
+                      backPhotoUrl={activeCard.scannedImageBack || activeCard.back_image_url}
+                      html_front={activeCard.html_front}
+                      html_back={activeCard.html_back}
                       isFlipped={isFlipped}
                       onFlip={() => setIsFlipped(prev => !prev)}
                       onOpenShare={() => setIsShareModalOpen(true)}
