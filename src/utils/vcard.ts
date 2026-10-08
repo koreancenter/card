@@ -13,11 +13,9 @@ export const CARD_DATA: CardData = {
   email: 'master@goguma.app',
   website: 'https://card.goguma.app/master',
   websiteDisplay: 'card.goguma.app/master',
-  addressLines: [
-    '77 Cheongdam-ro, Gangnam-gu',
-    'Seoul 06015, Republic of Korea'
-  ],
-  addressKr: '서울특별시 강남구 청담로 77',
+  addressLines: [],
+  address_en: '',
+  addressKr: '서울특별시 강남구 테헤란로 152',
   googleMapsUrl: 'https://maps.google.com/?q=Gangnam+Seoul',
   naverMapsUrl: 'https://map.naver.com',
   backTitle: '고구마 AI 스튜디오',
@@ -30,9 +28,9 @@ export const CARD_DATA: CardData = {
  * Generates an RFC-compliant vCard 3.0 string
  */
 export function generateVCard(data: CardData = CARD_DATA): string {
-  const addressJoined = data.addressLines && data.addressLines.length > 0 
+  const addressJoined = data.address_en || (data.addressLines && data.addressLines.length > 0 
     ? data.addressLines.join(', ') 
-    : (data.addressKr || '');
+    : (data.addressKr || ''));
 
   const vcard = [
     'BEGIN:VCARD',

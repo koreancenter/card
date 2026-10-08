@@ -167,7 +167,7 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
   const activeCard = currentIndex < cards.length ? cards[currentIndex] : null;
 
   return (
-    <div className="w-full flex flex-col items-center select-none overflow-hidden py-2 sm:py-4">
+    <div className="w-full flex flex-col items-center select-none overflow-hidden py-1 sm:py-3">
       {/* 1. Carousel Viewport Container */}
       <div 
         ref={containerRef}
@@ -246,7 +246,7 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                   }
                 }}
               >
-                <div className="w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px] [perspective:1400px]">
+                <div className="w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px] [perspective:1400px] flex justify-center">
                   {/* 3D Flip Card */}
                   <div
                     style={{
@@ -365,7 +365,7 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
       </div>
 
       {/* 2. Bottom Actions Bar (Centered beneath Card) */}
-      <div className="w-full flex justify-center px-4 mt-3 sm:mt-4 min-h-[38px]">
+      <div className="w-full flex justify-center px-4 mt-2 sm:mt-3 min-h-[38px]">
         {activeCard && (
           <ActionButtons
             data={activeCard.data}

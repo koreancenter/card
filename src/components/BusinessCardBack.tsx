@@ -91,7 +91,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
     <div 
       className={`relative w-full h-full select-none flex flex-col justify-between ${
         isPortrait
-          ? 'p-6 sm:p-7'
+          ? 'p-5 sm:p-7'
           : isPrintPreview
             ? 'p-3.5 sm:p-4'
             : 'p-3.5 sm:p-6 md:p-8'
@@ -110,13 +110,13 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
       />
 
       {/* Center Statement */}
-      <div className={`relative z-10 ${isPortrait ? 'my-auto py-4' : 'my-auto py-2'} text-center flex flex-col items-center justify-center space-y-1.5`}>
+      <div className={`relative z-10 ${isPortrait ? 'my-auto py-3' : 'my-auto py-2'} text-center flex flex-col items-center justify-center space-y-1.5`}>
         <div className="space-y-0.5 sm:space-y-1">
-          <h2 className="text-base sm:text-lg font-bold tracking-tight text-white break-keep whitespace-normal">
+          <h2 className="text-sm sm:text-base md:text-lg font-bold tracking-tight text-white break-keep whitespace-normal">
             {data.backTitle || '고구마 AI 스튜디오'}
           </h2>
           <p 
-            className="text-xs font-bold uppercase tracking-widest text-[#C5A880]"
+            className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#C5A880]"
           >
             {data.backSubtitle || 'GOGUMA AI STUDIO'}
           </p>
@@ -124,7 +124,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
 
         {data.backTagline && (
           <div className="pt-0.5">
-            <p className={`text-[10px] sm:text-[11px] font-semibold uppercase ${themeStyles.textSecondary} tracking-wider break-keep`}>
+            <p className={`text-[9px] sm:text-[10px] font-semibold uppercase ${themeStyles.textSecondary} tracking-wider break-keep`}>
               {data.backTagline}
             </p>
           </div>
@@ -138,7 +138,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
             href={data.website}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center group/qr hover:opacity-90 transition-opacity"
+            className="flex flex-col items-center group/qr hover:opacity-90 transition-opacity justify-center cursor-pointer"
             title={`${data.websiteDisplay} 바로가기`}
             onClick={(e) => e.stopPropagation()}
           >
@@ -150,23 +150,25 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
               />
             )}
             <p className={`font-mono text-[8px] ${themeStyles.textMuted}`}>SCAN TO CONNECT</p>
-            <p className={`font-medium text-[11px] ${themeStyles.textSecondary} group-hover/qr:underline underline-offset-2 truncate max-w-[200px]`}>
+            <p className={`font-medium text-[10px] sm:text-[11px] ${themeStyles.textSecondary} group-hover/qr:underline underline-offset-2 truncate max-w-[200px]`}>
               {data.websiteDisplay}
             </p>
           </a>
 
-          <p className={`text-[9px] ${themeStyles.textMuted} truncate max-w-[220px]`}>
-            HQ · {data.backHqAddress || 'Gangnam-gu, Seoul, Republic of Korea'}
-          </p>
+          {(data.address_en || data.backHqAddress || data.addressKr) && (
+            <p className={`text-[8px] sm:text-[9px] ${themeStyles.textMuted} truncate max-w-[220px]`}>
+              HQ · {data.address_en || data.backHqAddress || data.addressKr}
+            </p>
+          )}
         </div>
       ) : (
         /* Landscape bottom bar */
-        <div className="relative z-10 flex items-end justify-between w-full pt-4 border-t border-white/10 mt-auto">
+        <div className="relative z-10 flex items-end justify-between w-full pt-3 border-t border-white/10 mt-auto">
           <a 
             href={data.website}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 group/qr hover:opacity-90 transition-opacity min-w-0 pr-2"
+            className="flex items-center gap-2 group/qr hover:opacity-90 transition-opacity min-w-0 pr-2 cursor-pointer"
             title={`${data.websiteDisplay} 바로가기`}
             onClick={(e) => e.stopPropagation()}
           >
@@ -185,12 +187,14 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
             </div>
           </a>
 
-          <div className="text-right shrink-0">
-            <p className={`font-mono text-[8px] ${themeStyles.textMuted}`}>HQ</p>
-            <p className={`text-[9px] sm:text-[10px] ${themeStyles.textSecondary} truncate max-w-[150px] sm:max-w-[180px]`}>
-              {data.backHqAddress || 'Gangnam-gu, Seoul, Republic of Korea'}
-            </p>
-          </div>
+          {(data.address_en || data.backHqAddress || data.addressKr) && (
+            <div className="text-right shrink-0">
+              <p className={`font-mono text-[8px] ${themeStyles.textMuted}`}>HQ</p>
+              <p className={`text-[8px] sm:text-[9px] ${themeStyles.textSecondary} truncate max-w-[150px] sm:max-w-[180px]`}>
+                {data.address_en || data.backHqAddress || data.addressKr}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

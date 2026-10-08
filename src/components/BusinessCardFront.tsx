@@ -117,6 +117,20 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
   const customLogo = card_features?.custom_logo;
   const monogram = card_features?.monogram_text || generateMonogram(data.name, data.nameKr);
 
+  // English address resolution without hardcoded placeholder defaults
+  const rawAddressEn = (
+    data.address_en ||
+    data.details?.address_en ||
+    (data as any).addressEn ||
+    (data.addressLines && data.addressLines.length > 0 ? data.addressLines.join(', ') : '')
+  ).trim();
+
+  // Remove hardcoded default string "77 Cheongdam-ro, Gangnam-gu, Seoul 06015, Republic of Korea"
+  const isHardcodedPlaceholder = 
+    rawAddressEn.includes('77 Cheongdam-ro') && 
+    (rawAddressEn.includes('06015') || rawAddressEn.includes('Republic of Korea'));
+  const enAddress = isHardcodedPlaceholder ? '' : rawAddressEn;
+
   // Subtle paper texture overlay (Fine tactile art paper)
   const textureOverlay = (
     <div 
@@ -146,14 +160,14 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
     return (
       <div 
         className={`relative w-full h-full select-none flex flex-col justify-between ${
-          isPortrait ? 'p-6 sm:p-7' : isPrintPreview ? 'p-3.5 sm:p-4' : 'p-4 sm:p-6 md:p-7'
+          isPortrait ? 'p-5 sm:p-7' : isPrintPreview ? 'p-3.5 sm:p-4' : 'p-4 sm:p-6 md:p-7'
         } ${themeStyles.cardBg} ${isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border}`} transition-colors duration-300 font-sans`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
         {textureOverlay}
 
         {/* Top Centered Monogram Seal */}
-        <div className="relative z-10 flex flex-col items-center justify-center pt-1 text-center space-y-2">
+        <div className="relative z-10 flex flex-col items-center justify-center pt-1 text-center space-y-1.5">
           {customLogo ? (
             <img 
               src={customLogo} 
@@ -166,7 +180,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
               style={{ borderColor: `${themeStyles.accent}70`, backgroundColor: `${themeStyles.accent}12` }}
             >
               <span 
-                className="font-serif text-xs sm:text-sm font-bold tracking-widest"
+                className="font-serif text-xs sm:text-sm font-bold tracking-widest leading-none"
                 style={{ color: themeStyles.accent }}
               >
                 {monogram}
@@ -175,11 +189,11 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
           )}
 
           <div className="space-y-0.5">
-            <h2 className={`text-[10px] sm:text-[11px] font-semibold tracking-[0.2em] uppercase ${themeStyles.textSecondary}`}>
+            <h2 className={`text-[10px] sm:text-[11px] font-semibold tracking-[0.2em] uppercase leading-tight ${themeStyles.textSecondary}`}>
               {data.organizationKr || data.organization}
             </h2>
             {showSubOrg && data.organization && (
-              <p className={`text-[8px] sm:text-[9px] tracking-[0.16em] uppercase ${themeStyles.textMuted}`}>
+              <p className={`text-[8px] sm:text-[9px] tracking-[0.16em] uppercase leading-tight ${themeStyles.textMuted}`}>
                 {data.organization}
               </p>
             )}
@@ -187,21 +201,21 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
         </div>
 
         {/* Center: Executive Name & Title in Classical Serif Balance */}
-        <div className="relative z-10 my-auto py-2 text-center space-y-1">
+        <div className="relative z-10 my-auto py-1 text-center space-y-0.5">
           <div className="space-y-0.5">
-            <h1 className={`${isPrintPreview ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl md:text-[25px]'} font-serif font-bold tracking-tight ${themeStyles.textPrimary}`}>
+            <h1 className={`${isPrintPreview ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl md:text-[25px]'} font-serif font-bold tracking-tight leading-tight ${themeStyles.textPrimary}`}>
               {data.name}
             </h1>
             {showEnName && data.nameKr && (
-              <p className={`text-xs sm:text-sm font-medium tracking-wide ${themeStyles.textMuted}`}>
+              <p className={`text-xs sm:text-sm font-medium tracking-wide leading-tight ${themeStyles.textMuted}`}>
                 {data.nameKr}
               </p>
             )}
           </div>
 
-          <div className="pt-1 flex items-center justify-center gap-1.5">
+          <div className="pt-0.5 flex items-center justify-center gap-1.5">
             <span className="w-4 h-px" style={{ backgroundColor: `${themeStyles.accent}50` }} />
-            <p className={`text-[10px] sm:text-xs font-medium tracking-wider uppercase ${themeStyles.textSecondary}`}>
+            <p className={`text-[10px] sm:text-xs font-medium tracking-wider uppercase leading-tight ${themeStyles.textSecondary}`}>
               {data.title}
               {data.titleKr && <span className={`ml-1 text-[9px] ${themeStyles.textMuted}`}>/ {data.titleKr}</span>}
             </p>
@@ -210,35 +224,50 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
         </div>
 
         {/* Bottom Contacts & Optional Address */}
-        <div className={`relative z-10 pt-2 border-t ${themeStyles.accentHairline} text-center space-y-1`}>
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[9px] sm:text-[10px]">
+        <div className={`relative z-10 pt-1.5 border-t ${themeStyles.accentHairline} text-center space-y-0.5`}>
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 text-[9px] sm:text-[10px] leading-tight">
             {data.phone && (
-              <a href={`tel:${data.phoneRaw}`} className={`font-mono ${themeStyles.textPrimary} hover:opacity-75`}>
-                {data.phone}
+              <a 
+                href={`tel:${data.phoneRaw}`} 
+                className={`whitespace-nowrap flex items-center gap-1.5 text-xs tracking-tight font-mono ${themeStyles.textPrimary} hover:opacity-75`}
+              >
+                <Phone className={`w-3.5 h-3.5 shrink-0 ${themeStyles.textMuted}`} />
+                <span>{data.phone}</span>
               </a>
             )}
             {data.email && (
               <>
                 <span className={themeStyles.textMuted}>•</span>
-                <a href={`mailto:${data.email}`} className={`${themeStyles.textPrimary} hover:opacity-75`}>
-                  {data.email}
+                <a href={`mailto:${data.email}`} className={`whitespace-nowrap flex items-center gap-1 text-xs tracking-tight ${themeStyles.textPrimary} hover:opacity-75`}>
+                  <Mail className={`w-3.5 h-3.5 shrink-0 ${themeStyles.textMuted}`} />
+                  <span className="truncate max-w-[180px]">{data.email}</span>
                 </a>
               </>
             )}
             {data.website && (
               <>
                 <span className={themeStyles.textMuted}>•</span>
-                <a href={data.website} target="_blank" rel="noopener noreferrer" className={`${themeStyles.textPrimary} hover:opacity-75`}>
-                  {data.websiteDisplay}
+                <a href={data.website} target="_blank" rel="noopener noreferrer" className={`whitespace-nowrap flex items-center gap-1 text-xs tracking-tight ${themeStyles.textPrimary} hover:opacity-75`}>
+                  <Globe className={`w-3.5 h-3.5 shrink-0 ${themeStyles.textMuted}`} />
+                  <span className="truncate max-w-[150px]">{data.websiteDisplay}</span>
                 </a>
               </>
             )}
           </div>
 
-          {showAddress && data.addressKr && (
-            <p className={`text-[8px] sm:text-[9px] ${themeStyles.textMuted} truncate px-4`}>
-              {data.addressKr}
-            </p>
+          {showAddress && (enAddress || data.addressKr) && (
+            <div className="space-y-0.5 px-4 text-center">
+              {enAddress && (
+                <p className={`text-[8px] sm:text-[9px] ${themeStyles.textPrimary} truncate leading-tight`}>
+                  {enAddress}
+                </p>
+              )}
+              {data.addressKr && (
+                <p className={`text-[8px] sm:text-[9px] ${themeStyles.textMuted} truncate leading-tight`}>
+                  {data.addressKr}
+                </p>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -306,15 +335,18 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
         <div className="relative z-10 border-t pt-3 space-y-2 text-[10px]" style={{ borderColor: `${themeStyles.accent}30` }}>
           <div className="space-y-1 font-mono text-[9px] sm:text-[10px]">
             {data.phone && (
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between whitespace-nowrap gap-2">
                 <span className={`text-[8px] uppercase tracking-wider ${themeStyles.textMuted}`}>TEL</span>
-                <a href={`tel:${data.phoneRaw}`} className={`${themeStyles.textPrimary} tabular-nums hover:underline`}>
-                  {data.phone}
+                <a 
+                  href={`tel:${data.phoneRaw}`} 
+                  className={`whitespace-nowrap flex items-center gap-1.5 text-xs tracking-tight ${themeStyles.textPrimary} tabular-nums hover:underline font-mono`}
+                >
+                  <span>{data.phone}</span>
                 </a>
               </div>
             )}
             {data.email && (
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between whitespace-nowrap gap-2">
                 <span className={`text-[8px] uppercase tracking-wider ${themeStyles.textMuted}`}>MAIL</span>
                 <a href={`mailto:${data.email}`} className={`${themeStyles.textPrimary} truncate max-w-[170px] hover:underline`}>
                   {data.email}
@@ -322,7 +354,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
               </div>
             )}
             {data.website && (
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between whitespace-nowrap gap-2">
                 <span className={`text-[8px] uppercase tracking-wider ${themeStyles.textMuted}`}>WEB</span>
                 <a href={data.website} target="_blank" rel="noopener noreferrer" className={`${themeStyles.textPrimary} hover:underline`}>
                   {data.websiteDisplay}
@@ -331,9 +363,10 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
             )}
           </div>
 
-          {showAddress && (data.addressLines[0] || data.addressKr) && (
-            <div className={`pt-1.5 border-t text-[8px] sm:text-[9px] ${themeStyles.textMuted} leading-tight`} style={{ borderColor: `${themeStyles.accent}20` }}>
-              <p>{data.addressLines[0] || data.addressKr}</p>
+          {showAddress && (enAddress || data.addressKr) && (
+            <div className={`pt-1.5 border-t text-[8px] sm:text-[9px] ${themeStyles.textMuted} leading-tight space-y-0.5`} style={{ borderColor: `${themeStyles.accent}20` }}>
+              {enAddress && <p className={`${themeStyles.textPrimary} truncate`}>{enAddress}</p>}
+              {data.addressKr && <p className="truncate">{data.addressKr}</p>}
             </div>
           )}
         </div>
@@ -348,7 +381,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
     return (
       <div 
         className={`relative w-full h-full select-none flex flex-col justify-between ${
-          isPortrait ? 'p-6 sm:p-7' : isPrintPreview ? 'p-3 sm:p-4' : 'p-4 sm:p-6 md:p-7'
+          isPortrait ? 'p-5 sm:p-7' : isPrintPreview ? 'p-3 sm:p-4' : 'p-4 sm:p-6 md:p-7'
         } ${themeStyles.cardBg} ${isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border}`} transition-colors duration-300 font-sans`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
@@ -392,39 +425,42 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
         </div>
 
         {/* Bottom: Swiss Metadata Grid with Fixed-width micro labels */}
-        <div className={`relative z-10 pt-2 border-t ${themeStyles.accentHairline} grid ${isPortrait ? 'grid-cols-1 gap-1.5' : 'grid-cols-1 sm:grid-cols-2 gap-2'} text-[9px] sm:text-[10px]`}>
-          <div className="space-y-0.5 font-mono">
+        <div className={`relative z-10 pt-2 border-t ${themeStyles.accentHairline} grid ${isPortrait ? 'grid-cols-1 gap-1.5' : 'grid-cols-[auto_1fr] gap-2'} text-[9px] sm:text-[10px]`}>
+          <div className="space-y-0.5 font-mono min-w-0 shrink-0">
             {data.phone && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 whitespace-nowrap">
                 <span className="text-[8px] font-bold w-6 uppercase text-neutral-500">TEL</span>
-                <a href={`tel:${data.phoneRaw}`} className={`${themeStyles.textPrimary} font-bold hover:underline`}>
-                  {data.phone}
+                <a 
+                  href={`tel:${data.phoneRaw}`} 
+                  className={`whitespace-nowrap flex items-center gap-1.5 text-xs tracking-tight ${themeStyles.textPrimary} font-bold hover:underline`}
+                >
+                  <span>{data.phone}</span>
                 </a>
               </div>
             )}
             {data.email && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 whitespace-nowrap">
                 <span className="text-[8px] font-bold w-6 uppercase text-neutral-500">MAIL</span>
-                <a href={`mailto:${data.email}`} className={`${themeStyles.textPrimary} truncate hover:underline`}>
+                <a href={`mailto:${data.email}`} className={`${themeStyles.textPrimary} truncate max-w-[170px] hover:underline`}>
                   {data.email}
                 </a>
               </div>
             )}
             {data.website && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 whitespace-nowrap">
                 <span className="text-[8px] font-bold w-6 uppercase text-neutral-500">WEB</span>
-                <a href={data.website} target="_blank" rel="noopener noreferrer" className={`${themeStyles.textPrimary} hover:underline`}>
+                <a href={data.website} target="_blank" rel="noopener noreferrer" className={`${themeStyles.textPrimary} truncate max-w-[170px] hover:underline`}>
                   {data.websiteDisplay}
                 </a>
               </div>
             )}
           </div>
 
-          {showAddress && (
-            <div className="flex flex-col justify-end text-[8px] sm:text-[9px] font-sans">
+          {showAddress && (enAddress || data.addressKr) && (
+            <div className="flex flex-col justify-end text-[8px] sm:text-[9px] font-sans min-w-0 pl-1">
               <span className="text-[8px] font-mono font-bold uppercase text-neutral-500 mb-0.5">LOC</span>
-              <p className={`${themeStyles.textPrimary} font-medium`}>{data.addressLines[0] || data.addressKr}</p>
-              {data.addressLines[1] && <p className={themeStyles.textMuted}>{data.addressLines[1]}</p>}
+              {enAddress && <p className={`${themeStyles.textPrimary} font-medium line-clamp-1`}>{enAddress}</p>}
+              {data.addressKr && <p className={`${themeStyles.textMuted} line-clamp-1`}>{data.addressKr}</p>}
             </div>
           )}
         </div>
@@ -439,7 +475,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
     return (
       <div 
         className={`relative w-full h-full select-none flex flex-col justify-between ${
-          isPortrait ? 'p-6 sm:p-7' : isPrintPreview ? 'p-3.5 sm:p-4' : 'p-4 sm:p-6 md:p-8'
+          isPortrait ? 'p-5 sm:p-7' : isPrintPreview ? 'p-3.5 sm:p-4' : 'p-4 sm:p-6 md:p-8'
         } ${themeStyles.cardBg} ${isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border}`} transition-colors duration-300 font-sans`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
@@ -481,10 +517,13 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
 
         {/* Bottom: Calm Contact Row */}
         <div className={`relative z-10 pt-2.5 border-t ${themeStyles.accentHairline} flex flex-col sm:flex-row sm:items-end justify-between gap-2 text-[9px] sm:text-[10px]`}>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <a href={`tel:${data.phoneRaw}`} className={`${themeStyles.textPrimary} font-mono hover:opacity-80`}>
-                {data.phone}
+          <div className="space-y-1 min-w-0">
+            <div className="flex items-center gap-2 whitespace-nowrap">
+              <a 
+                href={`tel:${data.phoneRaw}`} 
+                className={`whitespace-nowrap flex items-center gap-1.5 text-xs tracking-tight ${themeStyles.textPrimary} font-mono hover:opacity-80`}
+              >
+                <span>{data.phone}</span>
               </a>
               <span className={themeStyles.textMuted}>•</span>
               <a href={`mailto:${data.email}`} className={`${themeStyles.textPrimary} hover:opacity-80 truncate max-w-[160px]`}>
@@ -492,15 +531,16 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
               </a>
             </div>
             {data.website && (
-              <a href={data.website} target="_blank" rel="noopener noreferrer" className={`block ${themeStyles.textSecondary} hover:opacity-80`}>
+              <a href={data.website} target="_blank" rel="noopener noreferrer" className={`block ${themeStyles.textSecondary} hover:opacity-80 truncate max-w-[200px]`}>
                 {data.websiteDisplay}
               </a>
             )}
           </div>
 
-          {showAddress && (
-            <div className={`text-right text-[8px] sm:text-[9px] ${themeStyles.textMuted}`}>
-              <p>{data.addressLines[0] || data.addressKr}</p>
+          {showAddress && (enAddress || data.addressKr) && (
+            <div className={`text-right text-[8px] sm:text-[9px] ${themeStyles.textMuted} space-y-0.5 shrink-0`}>
+              {enAddress && <p className={`${themeStyles.textPrimary} truncate`}>{enAddress}</p>}
+              {data.addressKr && <p className="truncate">{data.addressKr}</p>}
             </div>
           )}
         </div>
@@ -515,7 +555,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
     <div 
       className={`relative w-full h-full select-none flex flex-col justify-between ${
         isPortrait
-          ? 'p-6 sm:p-7'
+          ? 'p-5 sm:p-7'
           : isPrintPreview
             ? 'p-3.5 sm:p-4'
             : 'p-3.5 sm:p-6 md:p-8'
@@ -528,15 +568,15 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
 
       {/* Top Header: Foundation / Network Name */}
       <div className="relative z-10 flex items-start justify-between">
-        <div className="space-y-0.5">
-          <p className={`text-[9px] sm:text-[10px] tracking-tight font-medium ${themeStyles.textSecondary}`}>
+        <div className="space-y-0.5 min-w-0 pr-2">
+          <p className={`text-[9px] sm:text-[10px] tracking-tight font-medium leading-tight ${themeStyles.textSecondary} truncate`}>
             {data.organizationKr}
           </p>
-          <h2 className={`${isPortrait ? 'text-sm font-bold' : isPrintPreview ? 'text-xs' : 'text-xs sm:text-sm'} font-semibold tracking-tight ${themeStyles.textPrimary}`}>
+          <h2 className={`${isPortrait ? 'text-xs sm:text-sm font-bold' : isPrintPreview ? 'text-[11px]' : 'text-[11px] sm:text-xs md:text-sm'} font-semibold tracking-tight leading-tight ${themeStyles.textPrimary} truncate`}>
             {data.organization}
           </h2>
           {showSubOrg && data.subOrg && (
-            <p className="text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase" style={{ color: themeStyles.accent }}>
+            <p className="text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase leading-tight truncate" style={{ color: themeStyles.accent }}>
               {data.subOrg}
             </p>
           )}
@@ -545,25 +585,25 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
       </div>
 
       {/* Center Section: Name & Position */}
-      <div className={`relative z-10 ${isPortrait ? 'my-auto py-4 space-y-2' : isPrintPreview ? 'my-auto py-1' : 'my-auto py-1.5'}`}>
-        <div className="space-y-0.5 sm:space-y-1">
-          <div className="flex items-baseline gap-2">
-            <h1 className={`${isPortrait ? 'text-2xl sm:text-3xl' : isPrintPreview ? 'text-lg sm:text-xl' : 'text-lg sm:text-2xl md:text-[26px]'} font-bold tracking-tight ${themeStyles.textPrimary}`}>
+      <div className={`relative z-10 ${isPortrait ? 'my-auto py-1.5 space-y-0.5' : isPrintPreview ? 'my-auto py-0.5' : 'my-auto py-1 space-y-0.5'}`}>
+        <div className="space-y-0.5">
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <h1 className={`${isPortrait ? 'text-xl sm:text-2xl md:text-3xl' : isPrintPreview ? 'text-base sm:text-lg' : 'text-lg sm:text-xl md:text-2xl'} font-bold tracking-tight leading-tight ${themeStyles.textPrimary} truncate max-w-full`}>
               {data.name}
             </h1>
             {showEnName && data.nameKr && (
-              <span className={`text-xs sm:text-sm font-medium ${themeStyles.textMuted}`}>
+              <span className={`text-[11px] sm:text-xs md:text-sm font-medium leading-tight ${themeStyles.textMuted} truncate`}>
                 {data.nameKr}
               </span>
             )}
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <p className={`${isPortrait ? 'text-sm font-semibold' : isPrintPreview ? 'text-xs' : 'text-xs sm:text-sm'} font-medium tracking-wide ${themeStyles.textSecondary}`}>
+            <p className={`${isPortrait ? 'text-xs sm:text-sm font-semibold' : isPrintPreview ? 'text-[11px]' : 'text-[11px] sm:text-xs md:text-sm'} font-medium tracking-wide leading-tight ${themeStyles.textSecondary} truncate`}>
               {data.title}
             </p>
             {data.titleKr && (
-              <span className={`text-[10px] sm:text-xs ${themeStyles.textMuted}`}>
+              <span className={`text-[10px] sm:text-xs leading-tight ${themeStyles.textMuted} truncate`}>
                 / {data.titleKr}
               </span>
             )}
@@ -574,34 +614,34 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
       {/* Bottom Section: Direct Contacts & Physical Address */}
       <div className={`relative z-10 ${
         isPortrait 
-          ? 'pt-4 space-y-3 text-xs border-t'
+          ? 'pt-2 space-y-1 text-xs border-t'
           : isPrintPreview 
-            ? 'pt-1.5 gap-2 text-[10px] border-t grid grid-cols-1 sm:grid-cols-2' 
-            : 'pt-2 sm:pt-3 gap-2 sm:gap-3 text-[10px] sm:text-xs border-t grid grid-cols-1 sm:grid-cols-2'
+            ? 'pt-1.5 gap-2 text-[10px] border-t grid grid-cols-[auto_1fr]' 
+            : 'pt-2 gap-3 text-[10px] sm:text-xs border-t grid grid-cols-[auto_1fr]'
       } ${themeStyles.accentHairline}`}>
         {/* Contact list */}
-        <div className={`${isPortrait ? 'space-y-2' : 'space-y-1'}`}>
+        <div className="space-y-0.5 sm:space-y-1 min-w-0 shrink-0">
           {/* Phone */}
           {data.phone && (
-            <div className="flex items-center group/item">
+            <div className="flex items-center group/item whitespace-nowrap">
               <a 
                 href={`tel:${data.phoneRaw}`}
                 title="전화 걸기 (Call)"
-                className={`inline-flex items-center gap-1.5 font-mono tabular-nums font-medium ${themeStyles.textPrimary} hover:opacity-80 transition-opacity rounded px-1 -mx-1 py-0.5 ${themeStyles.hoverHighlight}`}
+                className={`whitespace-nowrap flex items-center gap-1.5 text-xs tracking-tight font-mono tabular-nums font-medium ${themeStyles.textPrimary} hover:opacity-80 transition-opacity rounded px-1 -mx-1 py-0.5 ${themeStyles.hoverHighlight}`}
               >
-                <Phone className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${themeStyles.textMuted}`} />
-                <span>{data.phone}</span>
+                <Phone className={`w-3.5 h-3.5 shrink-0 ${themeStyles.textMuted}`} />
+                <span className="whitespace-nowrap">{data.phone}</span>
                 {!isPrintPreview && (
-                  <ArrowUpRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity" style={{ color: themeStyles.accent }} />
+                  <ArrowUpRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity shrink-0" style={{ color: themeStyles.accent }} />
                 )}
               </a>
               {!isPrintPreview && (
                 <button 
                   onClick={(e) => copyToClipboard(e, data.phone, 'phone')}
                   title="전화번호 복사"
-                  className="ml-1 p-1 rounded opacity-0 group-hover/item:opacity-100 hover:bg-neutral-500/20 transition-all text-neutral-400 cursor-pointer"
+                  className="ml-1 p-1 rounded opacity-0 group-hover/item:opacity-100 hover:bg-neutral-500/20 transition-all text-neutral-400 cursor-pointer shrink-0"
                 >
-                  {copiedKey === 'phone' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  {copiedKey === 'phone' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
               )}
             </div>
@@ -609,25 +649,25 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
 
           {/* Email */}
           {data.email && (
-            <div className="flex items-center group/item">
+            <div className="flex items-center group/item whitespace-nowrap min-w-0">
               <a 
                 href={`mailto:${data.email}`}
                 title="이메일 작성 (Send Email)"
-                className={`inline-flex items-center gap-1.5 font-medium ${themeStyles.textPrimary} hover:opacity-80 transition-opacity rounded px-1 -mx-1 py-0.5 ${themeStyles.hoverHighlight}`}
+                className={`whitespace-nowrap flex items-center gap-1.5 text-xs tracking-tight font-medium ${themeStyles.textPrimary} hover:opacity-80 transition-opacity rounded px-1 -mx-1 py-0.5 max-w-[210px] sm:max-w-[260px] ${themeStyles.hoverHighlight}`}
               >
-                <Mail className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${themeStyles.textMuted}`} />
+                <Mail className={`w-3.5 h-3.5 shrink-0 ${themeStyles.textMuted}`} />
                 <span className="truncate">{data.email}</span>
                 {!isPrintPreview && (
-                  <ArrowUpRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity" style={{ color: themeStyles.accent }} />
+                  <ArrowUpRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity shrink-0" style={{ color: themeStyles.accent }} />
                 )}
               </a>
               {!isPrintPreview && (
                 <button 
                   onClick={(e) => copyToClipboard(e, data.email, 'email')}
                   title="이메일 주소 복사"
-                  className="ml-1 p-1 rounded opacity-0 group-hover/item:opacity-100 hover:bg-neutral-500/20 transition-all text-neutral-400 cursor-pointer"
+                  className="ml-1 p-1 rounded opacity-0 group-hover/item:opacity-100 hover:bg-neutral-500/20 transition-all text-neutral-400 cursor-pointer shrink-0"
                 >
-                  {copiedKey === 'email' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  {copiedKey === 'email' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
               )}
             </div>
@@ -635,37 +675,34 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
 
           {/* Website */}
           {data.website && (
-            <div className="flex items-center group/item">
+            <div className="flex items-center group/item whitespace-nowrap min-w-0">
               <a 
                 href={data.website}
                 target="_blank"
                 rel="noopener noreferrer"
                 title="공식 홈페이지 열기 (Open Website)"
-                className={`inline-flex items-center gap-1.5 font-medium ${themeStyles.textPrimary} hover:opacity-80 transition-opacity rounded px-1 -mx-1 py-0.5 ${themeStyles.hoverHighlight}`}
+                className={`whitespace-nowrap flex items-center gap-1.5 text-xs tracking-tight font-medium ${themeStyles.textPrimary} hover:opacity-80 transition-opacity rounded px-1 -mx-1 py-0.5 max-w-[210px] sm:max-w-[260px] ${themeStyles.hoverHighlight}`}
               >
-                <Globe className={`w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 ${themeStyles.textMuted}`} />
-                <span>{data.websiteDisplay}</span>
+                <Globe className={`w-3.5 h-3.5 shrink-0 ${themeStyles.textMuted}`} />
+                <span className="truncate">{data.websiteDisplay}</span>
               </a>
             </div>
           )}
         </div>
 
         {/* Address */}
-        {showAddress && (
-          <div className={`flex flex-col justify-end text-[9px] sm:text-[10px] leading-snug ${isPortrait ? 'pt-1 border-t border-neutral-800/40' : ''}`}>
-            <div className="flex items-start gap-1">
+        {showAddress && (enAddress || data.addressKr) && (
+          <div className={`flex flex-col justify-end text-[8px] sm:text-[9px] leading-snug min-w-0 ${isPortrait ? 'pt-1 border-t border-neutral-800/40' : 'text-right sm:text-left pl-2'}`}>
+            <div className="flex items-start gap-1 min-w-0">
               <MapPin className={`w-3 h-3 shrink-0 mt-0.5 ${themeStyles.textMuted}`} />
-              <div>
-                <p className={`${themeStyles.textPrimary} font-medium`}>
-                  {data.addressLines[0] || data.addressKr}
-                </p>
-                {data.addressLines[1] && (
-                  <p className={themeStyles.textSecondary}>
-                    {data.addressLines[1]}
+              <div className="min-w-0 flex-1">
+                {enAddress && (
+                  <p className={`${themeStyles.textPrimary} font-medium line-clamp-1`}>
+                    {enAddress}
                   </p>
                 )}
-                {data.addressKr && data.addressLines[0] && (
-                  <p className="text-[8px] sm:text-[9px] mt-0.5 text-neutral-500 truncate">
+                {data.addressKr && (
+                  <p className={`${enAddress ? 'text-neutral-500 text-[8px] sm:text-[9px] mt-0.5 line-clamp-1' : `${themeStyles.textPrimary} font-medium line-clamp-1`}`}>
                     {data.addressKr}
                   </p>
                 )}

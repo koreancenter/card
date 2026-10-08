@@ -41,7 +41,9 @@ import {
   Fingerprint,
   Settings,
   Plus,
-  LogOut
+  LogOut,
+  FileText,
+  RotateCcw
 } from 'lucide-react';
 
 export default function App() {
@@ -478,28 +480,72 @@ export default function App() {
       {/* SCREEN UI CONTAINER */}
       <div 
         id="screen-app-container" 
-        className="min-h-screen bg-[#0B0C10] text-neutral-100 flex flex-col justify-between selection:bg-neutral-100 selection:text-neutral-950 font-sans"
+        className="min-h-screen bg-[#0B0C10] text-neutral-100 flex flex-col justify-between selection:bg-neutral-100 selection:text-neutral-950 font-sans pl-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)]"
       >
         {/* Top Minimalist Luxury Header */}
-        <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#0B0C10]/90 backdrop-blur-xl px-4 sm:px-8 py-3.5 flex items-center justify-between">
+        <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#0B0C10]/90 backdrop-blur-xl px-4 sm:px-8 py-3.5 pt-[calc(0.75rem+env(safe-area-inset-top,0px))] pl-[calc(1rem+env(safe-area-inset-left,0px))] pr-[calc(1rem+env(safe-area-inset-right,0px))] flex items-center justify-between main-app-header">
           {!isOwner ? (
             /* Public Visitor Header: Muted Brand Watermark Only */
-            <div className="w-full flex items-center justify-center py-0.5">
-              <span className="text-xs text-white/30 tracking-widest uppercase font-medium select-none font-sans">
-                GOGUMA CARD STUDIO
-              </span>
-            </div>
+            <>
+              <div className="w-full flex items-center justify-center py-0.5 header-brand-mark">
+                <span className="text-xs text-white/30 tracking-widest uppercase font-medium select-none font-sans">
+                  GOGUMA CARD STUDIO
+                </span>
+              </div>
+              <div className="hidden header-landscape-mini items-center bg-[#121318]/90 backdrop-blur-md border border-white/10 rounded-full px-3 py-1 shadow-2xl">
+                <span className="text-[10px] font-semibold text-[#C5A880] tracking-widest uppercase">GOGUMA</span>
+              </div>
+            </>
           ) : (
             <>
               {/* Institutional Wordmark */}
-              <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="flex items-center gap-2.5 sm:gap-3 header-brand-mark">
                 <span className="text-xs sm:text-sm font-semibold tracking-[0.25em] uppercase text-white font-sans">
                   GOGUMA <span className="text-neutral-400 font-light hidden sm:inline">CARD STUDIO</span>
                 </span>
               </div>
 
+              {/* Compressed Mini Icon in Landscape Mode */}
+              <div className="hidden header-landscape-mini items-center gap-1 bg-[#121318]/90 backdrop-blur-md border border-white/10 rounded-full p-1 shadow-2xl">
+                <button
+                  onClick={() => {
+                    if (activeTab === 'my-card') {
+                      requireUnlock(() => setActiveTab('vault'));
+                    } else {
+                      setActiveTab('my-card');
+                    }
+                  }}
+                  className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  title={activeTab === 'my-card' ? '보관함으로 전환' : '내 명함으로 전환'}
+                  aria-label="화면 전환"
+                >
+                  {activeTab === 'my-card' ? <FolderArchive className="w-3.5 h-3.5 text-[#C5A880]" /> : <CreditCard className="w-3.5 h-3.5 text-[#C5A880]" />}
+                </button>
+                {isPinConfigured && (
+                  <button
+                    onClick={() => {
+                      lockApp();
+                      showToast('화면이 보안 잠금되었습니다.');
+                    }}
+                    className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                    title="즉시 화면 잠금"
+                    aria-label="화면 잠금"
+                  >
+                    <Lock className="w-3.5 h-3.5 text-[#C5A880]" />
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsSettingsMenuOpen(prev => !prev)}
+                  className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  title="설정"
+                  aria-label="설정"
+                >
+                  <Settings className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
               {/* Center Navigation: Segmented Switcher (내 명함 vs 보관함) */}
-              <nav className="flex items-center p-1 bg-[#121318] rounded-2xl border border-white/5 shadow-inner">
+              <nav className="flex items-center p-1 bg-[#121318] rounded-2xl border border-white/5 shadow-inner header-full-nav">
                 <button
                   onClick={() => {
                     setActiveTab('my-card');
@@ -540,7 +586,7 @@ export default function App() {
               </nav>
 
               {/* Right Header: Minimal Security Lock & Consolidated Settings */}
-              <div className="flex items-center gap-1.5 sm:gap-2 min-h-[32px] relative" ref={settingsMenuRef}>
+              <div className="flex items-center gap-1.5 sm:gap-2 min-h-[32px] relative header-full-nav" ref={settingsMenuRef}>
                 {/* If PIN configured: Minimalist Lock icon for instant lock */}
                 {isPinConfigured && (
                   <button
@@ -613,7 +659,7 @@ export default function App() {
         </header>
 
         {/* Main Showcase Viewport */}
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-5 sm:py-7 max-w-6xl mx-auto w-full">
+        <main className="flex-1 flex flex-col items-center justify-center px-4 py-4 sm:py-6 max-w-6xl mx-auto w-full">
           
           {!isOwner && activeCard ? (
             /* ================= PUBLIC RECIPIENT VISITOR VIEW MODE ================= */
@@ -841,71 +887,104 @@ export default function App() {
 
         {/* Footer */}
         {isOwner ? (
-          <footer className="border-t border-white/5 py-6 px-4 text-center text-neutral-400 font-sans text-xs">
-            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[12px] mb-2.5">
-              <button
-                onClick={() => {
-                  setLegalDocType('privacy');
-                  setIsLegalModalOpen(true);
-                }}
-                className="text-neutral-400 hover:text-neutral-200 transition-colors cursor-pointer"
-              >
-                개인정보처리방침
-              </button>
-              <span aria-hidden="true" className="text-neutral-700">·</span>
-              <button
-                onClick={() => {
-                  setLegalDocType('terms');
-                  setIsLegalModalOpen(true);
-                }}
-                className="text-neutral-400 hover:text-neutral-200 transition-colors cursor-pointer"
-              >
-                서비스 이용약관
-              </button>
-              <span aria-hidden="true" className="text-neutral-700">·</span>
-              <button
-                onClick={() => setIsResetModalOpen(true)}
-                className="text-neutral-400 hover:text-rose-400 transition-colors cursor-pointer"
-              >
-                로컬 데이터 초기화
-              </button>
+          <footer className="border-t border-white/5 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
+            <div className="max-w-xl mx-auto flex flex-col items-center justify-center text-center">
+              {/* Luxury Legal Action Buttons */}
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLegalDocType('privacy');
+                    setIsLegalModalOpen(true);
+                  }}
+                  className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-[#C5A880]/50 text-neutral-400 hover:text-neutral-200 text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.12)] active:scale-95"
+                  title="개인정보처리방침"
+                >
+                  <span className="w-5 h-5 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/25 flex items-center justify-center text-[#C5A880] group-hover:bg-[#C5A880]/25 group-hover:scale-105 transition-all shrink-0">
+                    <ShieldCheck className="w-3 h-3 text-[#C5A880]" />
+                  </span>
+                  <span>개인정보처리방침</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLegalDocType('terms');
+                    setIsLegalModalOpen(true);
+                  }}
+                  className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-[#C5A880]/50 text-neutral-400 hover:text-neutral-200 text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.12)] active:scale-95"
+                  title="서비스 이용약관"
+                >
+                  <span className="w-5 h-5 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/25 flex items-center justify-center text-[#C5A880] group-hover:bg-[#C5A880]/25 group-hover:scale-105 transition-all shrink-0">
+                    <FileText className="w-3 h-3 text-[#C5A880]" />
+                  </span>
+                  <span>서비스 이용약관</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsResetModalOpen(true)}
+                  className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] hover:bg-rose-500/[0.06] border border-white/10 hover:border-rose-500/30 text-neutral-400 hover:text-rose-300 text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(244,63,94,0.1)] active:scale-95"
+                  title="로컬 데이터 초기화"
+                >
+                  <span className="w-5 h-5 rounded-full bg-white/5 border border-white/10 group-hover:border-rose-500/30 group-hover:bg-rose-500/15 flex items-center justify-center text-neutral-400 group-hover:text-rose-400 group-hover:rotate-[-45deg] transition-all shrink-0">
+                    <RotateCcw className="w-3 h-3" />
+                  </span>
+                  <span>로컬 데이터 초기화</span>
+                </button>
+              </div>
+
+              {/* Centered Brand Copyright */}
+              <p className="text-[11px] text-neutral-500 text-center tracking-wide font-sans">
+                © {new Date().getFullYear()} GOGUMA CARD STUDIO
+              </p>
             </div>
-            <p className="text-[11px] text-neutral-500">
-              © {new Date().getFullYear()} GOGUMA CARD STUDIO · 회원가입 없는 로컬 퍼스트 아키텍처
-            </p>
           </footer>
         ) : (
-          <footer className="border-t border-white/5 py-6 px-4 text-center text-neutral-400 font-sans text-xs">
-            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[12px] mb-2">
-              <button
-                onClick={() => {
-                  setLegalDocType('privacy');
-                  setIsLegalModalOpen(true);
-                }}
-                className="text-neutral-500 hover:text-neutral-300 transition-colors cursor-pointer"
-              >
-                개인정보처리방침
-              </button>
-              <span aria-hidden="true" className="text-neutral-700">·</span>
-              <button
-                onClick={() => {
-                  setLegalDocType('terms');
-                  setIsLegalModalOpen(true);
-                }}
-                className="text-neutral-500 hover:text-neutral-300 transition-colors cursor-pointer"
-              >
-                서비스 이용약관
-              </button>
+          <footer className="border-t border-white/5 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
+            <div className="max-w-xl mx-auto flex flex-col items-center justify-center text-center">
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLegalDocType('privacy');
+                    setIsLegalModalOpen(true);
+                  }}
+                  className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-[#C5A880]/50 text-neutral-400 hover:text-neutral-200 text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.12)] active:scale-95"
+                  title="개인정보처리방침"
+                >
+                  <span className="w-5 h-5 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/25 flex items-center justify-center text-[#C5A880] group-hover:bg-[#C5A880]/25 group-hover:scale-105 transition-all shrink-0">
+                    <ShieldCheck className="w-3 h-3 text-[#C5A880]" />
+                  </span>
+                  <span>개인정보처리방침</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLegalDocType('terms');
+                    setIsLegalModalOpen(true);
+                  }}
+                  className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-[#C5A880]/50 text-neutral-400 hover:text-neutral-200 text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.12)] active:scale-95"
+                  title="서비스 이용약관"
+                >
+                  <span className="w-5 h-5 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/25 flex items-center justify-center text-[#C5A880] group-hover:bg-[#C5A880]/25 group-hover:scale-105 transition-all shrink-0">
+                    <FileText className="w-3 h-3 text-[#C5A880]" />
+                  </span>
+                  <span>서비스 이용약관</span>
+                </button>
+              </div>
+
+              <p className="text-[11px] text-neutral-600 text-center tracking-wide font-sans">
+                © {new Date().getFullYear()} GOGUMA CARD STUDIO
+              </p>
             </div>
-            <p className="text-[11px] text-neutral-600">
-              © {new Date().getFullYear()} GOGUMA CARD STUDIO
-            </p>
           </footer>
         )}
 
         {/* Toast Notification */}
         {toastMessage && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-neutral-900 border border-neutral-700/80 text-white text-xs font-medium shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-neutral-900 border border-neutral-700/80 text-white text-xs font-medium shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
             <Check className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>{toastMessage}</span>
           </div>

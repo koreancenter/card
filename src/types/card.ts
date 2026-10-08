@@ -22,6 +22,7 @@ export interface TemplateCard extends BaseCard {
     en_name?: string;
     sub_org?: string;
     address?: string;
+    address_en?: string;
     slogan?: string;
     show_address: boolean;
     show_en_name: boolean;
@@ -92,6 +93,17 @@ export interface CardData {
   websiteDisplay: string;
   addressLines: string[];
   addressKr: string;
+  address_en?: string;
+  addressEn?: string;
+  details?: {
+    en_name?: string;
+    sub_org?: string;
+    address?: string;
+    address_en?: string;
+    slogan?: string;
+    show_address?: boolean;
+    show_en_name?: boolean;
+  };
   googleMapsUrl: string;
   naverMapsUrl: string;
   backTitle?: string;
@@ -143,6 +155,7 @@ export interface StoredCard {
     en_name?: string;
     sub_org?: string;
     address?: string;
+    address_en?: string;
     slogan?: string;
     show_address: boolean;
     show_en_name: boolean;

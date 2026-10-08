@@ -36,7 +36,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   onShowToast,
 }) => {
   const phoneTarget = data.phoneRaw || data.phone?.replace(/[^0-9+]/g, '');
-  const iconButtonClass = "w-8 h-8 rounded-full flex items-center justify-center text-white/60 hover:text-[#C5A880] hover:bg-white/5 active:scale-95 transition-all duration-200 cursor-pointer";
+  const iconButtonClass = "w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-white/60 hover:text-[#C5A880] hover:bg-white/10 active:scale-95 transition-all duration-200 cursor-pointer";
 
   // Direct recipient action: download .vcf contact directly without modal
   const handleDownloadContact = () => {
@@ -85,7 +85,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
 
     return (
       <div 
-        className="inline-flex items-center bg-white/[0.03] backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/5 shadow-xl"
+        className="flex items-center justify-center gap-1.5 sm:gap-2.5 py-1"
         role="toolbar" 
         aria-label="명함 빠른 작업"
       >
@@ -141,10 +141,10 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
 
         {/* 1px Vertical Divider */}
         {hasContactChannel && (
-          <span className="border-r border-white/10 h-4 mx-2 self-center" />
+          <span className="border-r border-white/10 h-3.5 mx-1 self-center" />
         )}
 
-        {/* 5. Add to Contacts (vCard) - directly downloads .vcf without opening share modal */}
+        {/* 5. Add to Contacts (vCard) */}
         <button
           onClick={handleDownloadContact}
           className={iconButtonClass}
@@ -154,7 +154,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           <UserPlus className="w-4 h-4" />
         </button>
 
-        {/* 6. Share Card Link - copies public URL or triggers native Web Share API */}
+        {/* 6. Share Card Link */}
         <button
           onClick={handleShareCardLink}
           className={iconButtonClass}
@@ -170,7 +170,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   // ================= 2. OWNER VIEW MODE (isOwner === true) =================
   return (
     <div 
-      className="inline-flex items-center bg-white/[0.02] px-3.5 py-1.5 rounded-full"
+      className="flex items-center justify-center gap-1.5 sm:gap-2.5 py-1"
       role="toolbar" 
       aria-label="명함 빠른 작업"
     >
@@ -225,7 +225,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       )}
 
       {/* 1px Vertical Divider */}
-      <span className="border-r border-white/10 h-4 mx-2 self-center" />
+      <span className="border-r border-white/10 h-3.5 mx-1 self-center" />
 
       {/* 5. Orientation Toggle (명함 가로/세로 보기) */}
       {onToggleOrientation && (

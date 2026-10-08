@@ -441,15 +441,27 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                 />
               </div>
             </div>
-            <div className="space-y-1">
-              <label className="text-[11px] text-neutral-400">사업장 주소</label>
-              <input
-                type="text"
-                value={formData.addressKr}
-                onChange={(e) => onChangeFormField('addressKr', e.target.value)}
-                placeholder="서울특별시 강남구 테헤란로 152"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] text-white text-xs"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-[11px] text-neutral-400">사업장 주소 (국문)</label>
+                <input
+                  type="text"
+                  value={formData.addressKr}
+                  onChange={(e) => onChangeFormField('addressKr', e.target.value)}
+                  placeholder="서울특별시 강남구 테헤란로 152"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] text-white text-xs"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] text-neutral-400">사업장 주소 (영문, Address EN)</label>
+                <input
+                  type="text"
+                  value={formData.address_en ?? formData.details?.address_en ?? ''}
+                  onChange={(e) => onChangeFormField('address_en', e.target.value)}
+                  placeholder="예: 77 Cheongdam-ro, Gangnam-gu, Seoul"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] text-white text-xs"
+                />
+              </div>
             </div>
           </div>
 

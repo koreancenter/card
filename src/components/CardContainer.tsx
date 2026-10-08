@@ -98,7 +98,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
       {/* 3D Tactile Card Canvas - Framer Motion flip with layout animation */}
       <motion.div 
         layout
-        className="w-full [perspective:1400px] relative"
+        className="w-full [perspective:1400px] relative flex justify-center items-center"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
