@@ -3,6 +3,7 @@ import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
 import path from 'path';
 import { GoogleGenAI } from '@google/genai';
+import { INITIAL_CARDS } from './src/utils/initialCards';
 
 dotenv.config();
 
@@ -14,6 +15,12 @@ app.use(express.json({ limit: '25mb' }));
 // In-memory sync wallet store for local-first peer synchronization
 const syncStore: Record<string, any[]> = {};
 const cardStore: Record<string, any> = {};
+
+// Pre-seed sample cards into cardStore for instant public URL resolution
+INITIAL_CARDS.forEach(card => {
+  if (card?.id) cardStore[card.id] = card;
+  if (card?.slug) cardStore[`slug:${card.slug}`] = card;
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

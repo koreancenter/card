@@ -19,6 +19,9 @@ interface CardContainerProps {
   backPhotoUrl?: string;
   html_front?: string;
   html_back?: string;
+  isOwner?: boolean;
+  cardUrl?: string;
+  onShowToast?: (msg: string) => void;
 }
 
 export const CardContainer: React.FC<CardContainerProps> = ({
@@ -35,6 +38,9 @@ export const CardContainer: React.FC<CardContainerProps> = ({
   backPhotoUrl,
   html_front,
   html_back,
+  isOwner = true,
+  cardUrl,
+  onShowToast,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [orientation, setOrientation] = useState<CardOrientation>(() => 
@@ -165,11 +171,14 @@ export const CardContainer: React.FC<CardContainerProps> = ({
       <motion.div layout className="w-full mt-4 px-1 flex justify-center">
         <ActionButtons
           data={data}
+          isOwner={isOwner}
           onOpenEdit={onOpenEdit}
           onOpenShare={onOpenShare}
           isPhotoCard={isPhotoCard}
           orientation={orientation}
-          onToggleOrientation={!isVerticalAtelier ? () => setOrientation(prev => prev === 'portrait' ? 'landscape' : 'portrait') : undefined}
+          onToggleOrientation={!isVerticalAtelier && isOwner ? () => setOrientation(prev => prev === 'portrait' ? 'landscape' : 'portrait') : undefined}
+          cardUrl={cardUrl}
+          onShowToast={onShowToast}
         />
       </motion.div>
     </motion.div>

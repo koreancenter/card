@@ -7,6 +7,7 @@ export const INITIAL_CARDS: StoredCard[] = [
     isMyCard: true,
     isDefault: true,
     slug: 'master',
+    owner_key: 'owner_master_sample',
     customDomain: 'card.goguma.app/master',
     category: 'AI·기술',
     theme: 'sumi_ink',
@@ -181,11 +182,16 @@ export function loadUserCards(): StoredCard[] {
     const parsed: StoredCard[] = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
       return parsed.map(c => {
+        const enriched = {
+          ...c,
+          owner_key: c.owner_key || (c.isMyCard ? `key_${c.id}` : undefined)
+        };
         if (c.id === 'sample-card-alexander-vance' || c.slug === 'vance' || c.id === 'sample-card-goguma-master' || c.slug === 'master') {
           return {
-            ...c,
+            ...enriched,
             id: 'sample-card-goguma-master',
             slug: 'master',
+            owner_key: c.owner_key || 'owner_master_sample',
             customDomain: 'card.goguma.app/master',
             category: 'AI·기술',
             data: {
@@ -196,7 +202,7 @@ export function loadUserCards(): StoredCard[] {
             }
           };
         }
-        return c;
+        return enriched;
       });
     }
     return [];
