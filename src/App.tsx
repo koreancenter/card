@@ -548,7 +548,7 @@ export default function App() {
                     const defaultCard = myCards.find(c => c.isDefault) || myCards[0];
                     if (defaultCard) setActiveCardId(defaultCard.id);
                   }}
-                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer ${
                     activeTab === 'my-card'
                       ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
                       : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5'
@@ -564,7 +564,7 @@ export default function App() {
                       setActiveTab('vault');
                     });
                   }}
-                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer ${
                     activeTab === 'vault'
                       ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
                       : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5'

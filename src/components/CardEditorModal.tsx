@@ -360,7 +360,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
             <button
               type="button"
               onClick={() => setCreationMode('template')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium cursor-pointer ${
                 creationMode === 'template'
                   ? 'bg-[#C5A880] text-black font-bold shadow-md'
                   : 'text-neutral-400 hover:text-white hover:bg-white/5'
@@ -374,7 +374,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
             <button
               type="button"
               onClick={() => setCreationMode('photo')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium cursor-pointer ${
                 creationMode === 'photo'
                   ? 'bg-[#C5A880] text-black font-bold shadow-md'
                   : 'text-neutral-400 hover:text-white hover:bg-white/5'
@@ -388,7 +388,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
             <button
               type="button"
               onClick={() => setCreationMode('custom_html')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium cursor-pointer ${
                 creationMode === 'custom_html'
                   ? 'bg-[#C5A880] text-black font-bold shadow-md'
                   : 'text-neutral-400 hover:text-white hover:bg-white/5'

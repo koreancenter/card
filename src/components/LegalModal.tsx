@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Shield, FileText, CheckCircle2 } from 'lucide-react';
+import { X } from 'lucide-react';
 
 export type LegalDocType = 'privacy' | 'terms';
 
@@ -28,35 +28,33 @@ export const LegalModal: React.FC<LegalModalProps> = ({
       >
         {/* Header with Segmented Switcher & Close */}
         <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-[#121318]">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto">
             <button
               onClick={() => setActiveDoc('privacy')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 border ${
                 activeDoc === 'privacy'
-                  ? 'bg-white/10 text-white border border-white/10 shadow-sm'
-                  : 'text-neutral-400 hover:text-neutral-200'
+                  ? 'bg-white/10 text-white border-white/10 shadow-sm'
+                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5 border-transparent'
               }`}
             >
-              <Shield className="w-3.5 h-3.5 text-[#C5A880]" />
               <span>개인정보처리방침</span>
             </button>
 
             <button
               onClick={() => setActiveDoc('terms')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 border ${
                 activeDoc === 'terms'
-                  ? 'bg-white/10 text-white border border-white/10 shadow-sm'
-                  : 'text-neutral-400 hover:text-neutral-200'
+                  ? 'bg-white/10 text-white border-white/10 shadow-sm'
+                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5 border-transparent'
               }`}
             >
-              <FileText className="w-3.5 h-3.5 text-[#C5A880]" />
               <span>서비스 이용약관</span>
             </button>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 cursor-pointer shrink-0 ml-2"
             aria-label="닫기"
           >
             <X className="w-4 h-4" />
@@ -68,19 +66,15 @@ export const LegalModal: React.FC<LegalModalProps> = ({
           {activeDoc === 'privacy' ? (
             <article className="space-y-5">
               <div>
-                <span className="text-[11px] font-mono text-[#C5A880] uppercase tracking-wider">
-                  Privacy Policy & Data Sovereignty
-                </span>
-                <h3 id="legal-modal-title" className="text-lg font-bold text-white tracking-tight mt-1">
-                  GOGUMA CARD STUDIO 개인정보처리방침
+                <h3 id="legal-modal-title" className="text-lg font-bold text-white tracking-tight">
+                  개인정보처리방침
                 </h3>
                 <p className="text-neutral-400 text-xs mt-1">
                   최종 개정일: 2026년 10월 1일 · 로컬 퍼스트(Local-First) 원칙
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-black/40 border border-[#C5A880]/20 flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-[#C5A880] shrink-0 mt-0.5" />
+              <div className="p-4 rounded-xl bg-black/40 border border-[#C5A880]/20">
                 <p className="text-neutral-300 leading-snug">
                   <strong className="text-white">로컬 퍼스트 핵심 원칙:</strong> 본 서비스는 이용자의 이름, 전화번호, 이메일, 직함, 조직 및 보관함 명함 정보를 중앙 데이터베이스에 일체 전송하거나 수집하지 않습니다. 모든 데이터는 이용자의 웹 브라우저 로컬 저장소에만 보관됩니다.
                 </p>
@@ -121,11 +115,8 @@ export const LegalModal: React.FC<LegalModalProps> = ({
           ) : (
             <article className="space-y-5">
               <div>
-                <span className="text-[11px] font-mono text-[#C5A880] uppercase tracking-wider">
-                  Terms of Service
-                </span>
-                <h3 id="legal-modal-title" className="text-lg font-bold text-white tracking-tight mt-1">
-                  GOGUMA CARD STUDIO 서비스 이용약관
+                <h3 id="legal-modal-title" className="text-lg font-bold text-white tracking-tight">
+                  서비스 이용약관
                 </h3>
                 <p className="text-neutral-400 text-xs mt-1">
                   최종 개정일: 2026년 10월 1일
@@ -136,7 +127,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
                 <section className="space-y-1.5">
                   <h4 className="font-semibold text-white text-sm">제1조 (목적)</h4>
                   <p className="text-neutral-300">
-                    본 약관은 GOGUMA CARD STUDIO(이하 "스튜디오")가 제공하는 로컬 퍼스트 기반 디지털 명함 제작, 관리 및 공유 플랫폼의 이용 조건과 권리·의무를 규정함을 목적으로 합니다.
+                    본 약관은 디지털 명함 스튜디오(이하 "스튜디오")가 제공하는 로컬 퍼스트 기반 디지털 명함 제작, 관리 및 공유 플랫폼의 이용 조건과 권리·의무를 규정함을 목적으로 합니다.
                   </p>
                 </section>
 
@@ -176,7 +167,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
         <div className="px-6 py-3.5 border-t border-white/5 bg-[#121318] flex items-center justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold cursor-pointer"
           >
             확인 및 닫기
           </button>
