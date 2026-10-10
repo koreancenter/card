@@ -498,12 +498,8 @@ export default function App() {
             </>
           ) : (
             <>
-              {/* Institutional Wordmark */}
-              <div className="flex items-center gap-2.5 sm:gap-3 header-brand-mark">
-                <span className="text-xs sm:text-sm font-semibold tracking-[0.25em] uppercase text-white font-sans">
-                  GOGUMA <span className="text-neutral-400 font-light hidden sm:inline">CARD STUDIO</span>
-                </span>
-              </div>
+              {/* Left Spacer for Header Balance */}
+              <div className="flex-1 flex items-center justify-start header-full-nav" />
 
               {/* Compressed Mini Icon in Landscape Mode */}
               <div className="hidden header-landscape-mini items-center gap-1 bg-[#121318]/90 backdrop-blur-md border border-white/10 rounded-full p-1 shadow-2xl">
@@ -544,18 +540,18 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Center Navigation: Segmented Switcher (내 명함 vs 보관함) */}
-              <nav className="flex items-center p-1 bg-[#121318] rounded-2xl border border-white/5 shadow-inner header-full-nav">
+              {/* Center Navigation: Switcher (내 명함 vs 보관함) */}
+              <nav className="flex items-center gap-1 sm:gap-1.5 header-full-nav">
                 <button
                   onClick={() => {
                     setActiveTab('my-card');
                     const defaultCard = myCards.find(c => c.isDefault) || myCards[0];
                     if (defaultCard) setActiveCardId(defaultCard.id);
                   }}
-                  className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'my-card'
                       ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
-                      : 'text-neutral-400 hover:text-neutral-200'
+                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5'
                   }`}
                 >
                   <CreditCard className="w-3.5 h-3.5" />
@@ -568,10 +564,10 @@ export default function App() {
                       setActiveTab('vault');
                     });
                   }}
-                  className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'vault'
                       ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
-                      : 'text-neutral-400 hover:text-neutral-200'
+                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5'
                   }`}
                 >
                   <FolderArchive className="w-3.5 h-3.5" />
@@ -579,14 +575,14 @@ export default function App() {
                   {isPinConfigured && isLocked && (
                     <Lock className="w-3 h-3 text-[#C5A880]" />
                   )}
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-black/40 border border-white/5 text-neutral-400">
+                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-white/5 border border-white/5 text-neutral-400">
                     {cards.length}
                   </span>
                 </button>
               </nav>
 
               {/* Right Header: Minimal Security Lock & Consolidated Settings */}
-              <div className="flex items-center gap-1.5 sm:gap-2 min-h-[32px] relative header-full-nav" ref={settingsMenuRef}>
+              <div className="flex-1 flex items-center justify-end gap-1.5 sm:gap-2 min-h-[32px] relative header-full-nav" ref={settingsMenuRef}>
                 {/* If PIN configured: Minimalist Lock icon for instant lock */}
                 {isPinConfigured && (
                   <button
@@ -889,21 +885,19 @@ export default function App() {
         {isOwner ? (
           <footer className="border-t border-white/5 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
             <div className="max-w-xl mx-auto flex flex-col items-center justify-center text-center">
-              {/* Luxury Legal Action Buttons */}
-              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-3">
+              {/* Luxury Legal Action Buttons (Icon-Only with Tooltips) */}
+              <div className="flex items-center justify-center gap-2.5 sm:gap-3 mb-3">
                 <button
                   type="button"
                   onClick={() => {
                     setLegalDocType('privacy');
                     setIsLegalModalOpen(true);
                   }}
-                  className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-[#C5A880]/50 text-neutral-400 hover:text-neutral-200 text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.12)] active:scale-95"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[#C5A880]/60 flex items-center justify-center text-[#C5A880] hover:text-[#d6b991] transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.2)] active:scale-95 group"
                   title="개인정보처리방침"
+                  aria-label="개인정보처리방침"
                 >
-                  <span className="w-5 h-5 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/25 flex items-center justify-center text-[#C5A880] group-hover:bg-[#C5A880]/25 group-hover:scale-105 transition-all shrink-0">
-                    <ShieldCheck className="w-3 h-3 text-[#C5A880]" />
-                  </span>
-                  <span>개인정보처리방침</span>
+                  <ShieldCheck className="w-4 h-4 text-[#C5A880] group-hover:scale-110 transition-transform duration-200" />
                 </button>
 
                 <button
@@ -912,25 +906,21 @@ export default function App() {
                     setLegalDocType('terms');
                     setIsLegalModalOpen(true);
                   }}
-                  className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-[#C5A880]/50 text-neutral-400 hover:text-neutral-200 text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.12)] active:scale-95"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[#C5A880]/60 flex items-center justify-center text-[#C5A880] hover:text-[#d6b991] transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.2)] active:scale-95 group"
                   title="서비스 이용약관"
+                  aria-label="서비스 이용약관"
                 >
-                  <span className="w-5 h-5 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/25 flex items-center justify-center text-[#C5A880] group-hover:bg-[#C5A880]/25 group-hover:scale-105 transition-all shrink-0">
-                    <FileText className="w-3 h-3 text-[#C5A880]" />
-                  </span>
-                  <span>서비스 이용약관</span>
+                  <FileText className="w-4 h-4 text-[#C5A880] group-hover:scale-110 transition-transform duration-200" />
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setIsResetModalOpen(true)}
-                  className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] hover:bg-rose-500/[0.06] border border-white/10 hover:border-rose-500/30 text-neutral-400 hover:text-rose-300 text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(244,63,94,0.1)] active:scale-95"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-rose-500/[0.08] border border-white/10 hover:border-rose-500/40 flex items-center justify-center text-neutral-400 hover:text-rose-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(244,63,94,0.15)] active:scale-95 group"
                   title="로컬 데이터 초기화"
+                  aria-label="로컬 데이터 초기화"
                 >
-                  <span className="w-5 h-5 rounded-full bg-white/5 border border-white/10 group-hover:border-rose-500/30 group-hover:bg-rose-500/15 flex items-center justify-center text-neutral-400 group-hover:text-rose-400 group-hover:rotate-[-45deg] transition-all shrink-0">
-                    <RotateCcw className="w-3 h-3" />
-                  </span>
-                  <span>로컬 데이터 초기화</span>
+                  <RotateCcw className="w-4 h-4 text-neutral-400 group-hover:text-rose-400 group-hover:rotate-[-45deg] transition-all duration-200" />
                 </button>
               </div>
 
@@ -943,20 +933,18 @@ export default function App() {
         ) : (
           <footer className="border-t border-white/5 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
             <div className="max-w-xl mx-auto flex flex-col items-center justify-center text-center">
-              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-3">
+              <div className="flex items-center justify-center gap-2.5 sm:gap-3 mb-3">
                 <button
                   type="button"
                   onClick={() => {
                     setLegalDocType('privacy');
                     setIsLegalModalOpen(true);
                   }}
-                  className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-[#C5A880]/50 text-neutral-400 hover:text-neutral-200 text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.12)] active:scale-95"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[#C5A880]/60 flex items-center justify-center text-[#C5A880] hover:text-[#d6b991] transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.2)] active:scale-95 group"
                   title="개인정보처리방침"
+                  aria-label="개인정보처리방침"
                 >
-                  <span className="w-5 h-5 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/25 flex items-center justify-center text-[#C5A880] group-hover:bg-[#C5A880]/25 group-hover:scale-105 transition-all shrink-0">
-                    <ShieldCheck className="w-3 h-3 text-[#C5A880]" />
-                  </span>
-                  <span>개인정보처리방침</span>
+                  <ShieldCheck className="w-4 h-4 text-[#C5A880] group-hover:scale-110 transition-transform duration-200" />
                 </button>
 
                 <button
@@ -965,13 +953,11 @@ export default function App() {
                     setLegalDocType('terms');
                     setIsLegalModalOpen(true);
                   }}
-                  className="group inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-[#C5A880]/50 text-neutral-400 hover:text-neutral-200 text-xs font-medium transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.12)] active:scale-95"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[#C5A880]/60 flex items-center justify-center text-[#C5A880] hover:text-[#d6b991] transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.2)] active:scale-95 group"
                   title="서비스 이용약관"
+                  aria-label="서비스 이용약관"
                 >
-                  <span className="w-5 h-5 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/25 flex items-center justify-center text-[#C5A880] group-hover:bg-[#C5A880]/25 group-hover:scale-105 transition-all shrink-0">
-                    <FileText className="w-3 h-3 text-[#C5A880]" />
-                  </span>
-                  <span>서비스 이용약관</span>
+                  <FileText className="w-4 h-4 text-[#C5A880] group-hover:scale-110 transition-transform duration-200" />
                 </button>
               </div>
 

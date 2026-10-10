@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Eye, ShieldCheck, Sparkles } from 'lucide-react';
+import { Plus, Eye } from 'lucide-react';
 
 interface WelcomeCardProps {
   onCreateFirstCard: () => void;
@@ -12,34 +12,19 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
 }) => {
   return (
     <div className="w-full max-w-[540px] mx-auto select-none flex flex-col items-center">
-      {/* 3D-Style Luxury Business Card Surface */}
+      {/* 3D-Style Luxury Business Card Surface (Responsive: Seamless on mobile, Framed card on desktop) */}
       <div 
-        className="w-full relative rounded-2xl bg-[#16181D] border border-white/10 hover:border-[#C5A880]/40 transition-all duration-300 shadow-[0_24px_64px_rgba(0,0,0,0.6)] hover:shadow-[0_32px_80px_rgba(0,0,0,0.75)] p-7 sm:p-9 flex flex-col justify-between overflow-hidden group min-h-[320px] sm:min-h-[340px]"
-        style={{ aspectRatio: '1.586 / 1' }}
+        className="w-full relative bg-transparent sm:bg-[#16181D] border-0 sm:border sm:border-white/10 sm:rounded-2xl sm:shadow-[0_24px_64px_rgba(0,0,0,0.6)] sm:hover:border-[#C5A880]/40 sm:hover:shadow-[0_32px_80px_rgba(0,0,0,0.75)] transition-all duration-300 p-2 py-6 sm:p-9 flex flex-col justify-between overflow-hidden group aspect-auto sm:aspect-[1.586/1] sm:min-h-[340px]"
       >
         {/* Subtle Luxury Ambient Glow & Watermark Geometry */}
         <div 
-          className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-[#C5A880]/5 blur-3xl pointer-events-none group-hover:bg-[#C5A880]/10 transition-colors duration-500" 
+          className="hidden sm:block absolute -top-24 -right-24 w-64 h-64 rounded-full bg-[#C5A880]/5 blur-3xl pointer-events-none group-hover:bg-[#C5A880]/10 transition-colors duration-500" 
           aria-hidden="true"
         />
         <div 
-          className="absolute -bottom-24 -left-24 w-64 h-64 rounded-full bg-white/[0.02] blur-3xl pointer-events-none" 
+          className="hidden sm:block absolute -bottom-24 -left-24 w-64 h-64 rounded-full bg-white/[0.02] blur-3xl pointer-events-none" 
           aria-hidden="true"
         />
-
-        {/* Top Header: Brand Wordmark & Security Marker */}
-        <div className="relative z-10 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#C5A880]/80 shadow-[0_0_8px_#C5A880]" />
-            <h2 className="text-xs sm:text-sm font-semibold tracking-[0.22em] uppercase text-neutral-200 font-sans">
-              GOGUMA CARD STUDIO
-            </h2>
-          </div>
-          <div className="flex items-center gap-1.5 text-[11px] text-[#C5A880]/80 font-mono tracking-tight">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Local-First</span>
-          </div>
-        </div>
 
         {/* Center Hero: Subtitle & Value Proposition */}
         <div className="relative z-10 my-auto text-center space-y-3 py-2">
@@ -76,11 +61,6 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
               <span>샘플 둘러보기</span>
             </button>
           </div>
-
-          {/* Micro Footnote */}
-          <p className="text-[11px] text-neutral-500 text-center tracking-tight leading-none pt-1">
-            데이터는 기본적으로 사용자의 기기 브라우저에만 암호화 저장됩니다.
-          </p>
         </div>
       </div>
     </div>
