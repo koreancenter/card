@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Lock, Delete, X, KeyRound, AlertCircle, RefreshCw, Fingerprint, Check } from 'lucide-react';
+import { Delete, X, AlertCircle, Fingerprint, Check } from 'lucide-react';
 import { verifyPin, setAppPin, clearAppPin, isPinSet } from '../utils/pinLock';
 import { 
   isBiometricSupported, 
@@ -290,19 +290,8 @@ export const PinLockModal: React.FC<PinLockModalProps> = ({
           </button>
         )}
 
-        {/* Lock Icon */}
-        <div className="w-13 h-13 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-[#C5A880] shadow-inner">
-          {mode === 'change' ? (
-            <RefreshCw className="w-6 h-6 text-[#C5A880]" />
-          ) : mode === 'setup' ? (
-            <KeyRound className="w-6 h-6 text-[#C5A880]" />
-          ) : (
-            <Lock className="w-6 h-6 text-[#C5A880]" />
-          )}
-        </div>
-
         {/* Header Text */}
-        <h3 className="text-lg font-bold text-white mb-1 tracking-tight text-center">
+        <h3 className="text-lg font-bold text-white mb-1 tracking-tight text-center mt-1">
           {title}
         </h3>
         <p className="text-xs text-white/60 mb-5 text-center max-w-[240px] leading-relaxed">

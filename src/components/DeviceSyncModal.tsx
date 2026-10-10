@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import QRCode from "qrcode";
-import { Copy, Check, X, Smartphone } from "lucide-react";
+import { Copy, Check, X } from "lucide-react";
 import { getOrCreateSyncId } from "../utils/syncWallet";
 
 interface DeviceSyncModalProps {
@@ -40,16 +40,12 @@ export const DeviceSyncModal: React.FC<DeviceSyncModalProps> = ({ isOpen, onClos
       <div className="bg-[#16181D] border border-white/10 rounded-2xl p-6 w-full max-w-sm text-center relative shadow-2xl">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white/50 hover:text-white transition"
+          className="absolute top-4 right-4 text-white/50 hover:text-white transition cursor-pointer"
         >
           <X size={20} />
         </button>
 
-        <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4 text-[#C5A880]">
-          <Smartphone size={24} />
-        </div>
-
-        <h3 className="text-lg font-bold text-white mb-1">기기 연결 (보관함 동기화)</h3>
+        <h3 className="text-lg font-bold text-white mb-1 mt-1">기기 연결 (보관함 동기화)</h3>
         <p className="text-xs text-white/60 mb-5">
           스마트폰 기본 카메라로 QR 코드를 스캔하면<br />가입 없이 현재 보관함이 그대로 연결됩니다.
         </p>
