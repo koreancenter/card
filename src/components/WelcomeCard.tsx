@@ -27,9 +27,9 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
         />
 
         {/* Center Hero: Subtitle & Value Proposition */}
-        <div className="relative z-10 my-auto text-center space-y-3 py-2">
-          <p className="text-base sm:text-lg font-medium text-neutral-100 tracking-tight leading-snug text-balance">
-            회원가입 없이 브라우저에 안전히 보관되는<br className="hidden sm:inline" /> 로컬 퍼스트 디지털 명함
+        <div className="relative z-10 my-auto text-center space-y-3 py-2 h-[76px]">
+          <p className="text-base sm:text-lg font-medium text-neutral-100 tracking-tight leading-snug text-balance -mt-[13px] h-[35px]">
+            로컬 퍼스트 디지털 명함
           </p>
           <div className="flex items-center justify-center gap-2 text-xs text-neutral-400">
             <span>개인정보 비수집</span>
@@ -41,12 +41,12 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
         </div>
 
         {/* Action Controls: Primary CTA & Secondary Sample Preview */}
-        <div className="relative z-10 flex flex-col items-center gap-3">
+        <div className="relative z-10 flex flex-col items-center gap-3 w-full">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 w-full">
             {/* Primary CTA Button */}
             <button
               onClick={onCreateFirstCard}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#C5A880] hover:bg-[#D6B991] text-neutral-950 font-bold text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-[#C5A880]/15 hover:shadow-[#C5A880]/30 flex items-center justify-center gap-2 cursor-pointer active:scale-95 whitespace-nowrap"
+              className="w-full max-w-[260px] px-5 py-2.5 rounded-full bg-[#C5A880] hover:bg-[#D6B991] text-neutral-950 font-bold text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-[#C5A880]/15 hover:shadow-[#C5A880]/30 flex items-center justify-center gap-2 cursor-pointer active:scale-95 whitespace-nowrap"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>첫 명함 만들기</span>
@@ -55,7 +55,7 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
             {/* Secondary Text Button */}
             <button
               onClick={onExploreSample}
-              className="w-full sm:w-auto px-4 py-2 rounded-xl text-neutral-300 hover:text-white hover:bg-white/5 transition-colors duration-200 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 cursor-pointer underline-offset-4 hover:underline whitespace-nowrap"
+              className="w-auto px-4 py-2 rounded-full text-neutral-300 hover:text-white hover:bg-white/5 transition-colors duration-200 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 cursor-pointer underline-offset-4 hover:underline whitespace-nowrap"
             >
               <Eye className="w-3.5 h-3.5 text-[#C5A880]" />
               <span>샘플 둘러보기</span>
