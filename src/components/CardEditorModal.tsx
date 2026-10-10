@@ -10,7 +10,7 @@ import {
 } from '../types/card';
 import { LAYOUT_PRESETS } from '../constants/templates';
 import { 
-  X, Check, Globe, Copy, CheckCircle2, RotateCcw,
+  X, Check, RotateCcw,
   Palette, Camera, Code2
 } from 'lucide-react';
 import { BusinessCardFront } from './BusinessCardFront';
@@ -147,7 +147,6 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
 
   // Preview Face
   const [previewFace, setPreviewFace] = useState<'front' | 'back'>('front');
-  const [copiedUrl, setCopiedUrl] = useState<boolean>(false);
 
   // Sync state whenever card or isOpen changes
   useEffect(() => {
@@ -155,6 +154,16 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
       const mode: CardCreationMode = 
         card.creation_mode || (card.isPhotoCard ? 'photo' : card.html_front ? 'custom_html' : 'template');
       setCreationMode(mode);
+
+      const initialAddressEn = 
+        card.data.address_en || 
+        card.details?.address_en || 
+        card.data.details?.address_en || 
+        (card.data.addressLines && card.data.addressLines.length > 0 ? card.data.addressLines.join(', ') : '');
+      const cleanAddressEn = 
+        initialAddressEn.includes('77 Cheongdam-ro') && (initialAddressEn.includes('06015') || initialAddressEn.includes('Republic of Korea'))
+          ? '' 
+          : initialAddressEn;
 
       const initialData: CardData = {
         ...CARD_DATA,
@@ -168,8 +177,16 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
         phone: card.data.phone || CARD_DATA.phone,
         email: card.data.email || CARD_DATA.email,
         addressKr: card.data.addressKr || CARD_DATA.addressKr,
+        address_en: cleanAddressEn,
+        addressLines: cleanAddressEn ? [cleanAddressEn] : (card.data.addressLines || []),
         website: card.data.website || CARD_DATA.website,
-        websiteDisplay: card.data.websiteDisplay || CARD_DATA.websiteDisplay
+        websiteDisplay: card.data.websiteDisplay || CARD_DATA.websiteDisplay,
+        details: {
+          ...card.details,
+          show_address: card.card_features?.show_address ?? true,
+          show_en_name: card.card_features?.show_en_name ?? true,
+          address_en: cleanAddressEn
+        }
       };
       setFormData(initialData);
       setTheme(card.theme || 'sumi_ink');
@@ -199,6 +216,16 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
   const handleFormFieldChange = (field: keyof CardData, value: string) => {
     setFormData(prev => {
       const updated = { ...prev, [field]: value };
+      if (field === 'address_en') {
+        updated.address_en = value;
+        updated.details = {
+          ...updated.details,
+          show_address: features.show_address ?? true,
+          show_en_name: features.show_en_name ?? true,
+          address_en: value
+        };
+        updated.addressLines = value ? [value] : [];
+      }
       if (field === 'phone') {
         const raw = value.replace(/[^0-9+]/g, '');
         updated.phoneRaw = raw;
@@ -220,19 +247,24 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
     : `https://${APP_BASE_DOMAIN}/${cleanSlug}`;
   const effectiveDisplayUrl = cleanCustomDomain || `${APP_BASE_DOMAIN}/${cleanSlug}`;
 
-  const copyDisplayUrl = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(effectiveUrl);
-      setCopiedUrl(true);
-      setTimeout(() => setCopiedUrl(false), 2000);
-    }
-  };
-
   const handleSave = () => {
+    const finalAddressEn = formData.address_en ?? formData.details?.address_en ?? '';
     const finalData: CardData = {
       ...formData,
+      address_en: finalAddressEn,
+      addressLines: finalAddressEn ? [finalAddressEn] : (formData.addressLines || []),
       website: effectiveUrl,
-      websiteDisplay: effectiveDisplayUrl
+      websiteDisplay: effectiveDisplayUrl,
+      details: {
+        ...formData.details,
+        en_name: formData.nameKr,
+        sub_org: formData.subOrg,
+        address: formData.addressKr,
+        address_en: finalAddressEn,
+        slogan: formData.backTagline,
+        show_address: features.show_address ?? true,
+        show_en_name: features.show_en_name ?? true
+      }
     };
 
     const isPhotoMode = creationMode === 'photo';
@@ -261,6 +293,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
         en_name: formData.nameKr,
         sub_org: formData.subOrg,
         address: formData.addressKr,
+        address_en: finalAddressEn,
         slogan: formData.backTagline,
         show_address: features.show_address ?? true,
         show_en_name: features.show_en_name ?? true
@@ -376,11 +409,11 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
               setLayoutType('editorial_minimal');
               setCreationMode('template');
             }}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white/40 hover:text-[#C5A880] hover:bg-white/5 border border-transparent hover:border-[#C5A880]/30 transition-all text-xs cursor-pointer shrink-0"
-            title="기본 샘플 데이터 복원"
+            className="p-1.5 rounded-lg text-white/30 hover:text-white/80 hover:bg-white/5 transition-all cursor-pointer shrink-0"
+            title="샘플 데이터 복원"
+            aria-label="샘플 데이터 복원"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-[#C5A880]" />
-            <span>샘플 복원</span>
+            <RotateCcw className="w-4 h-4 text-white/30 hover:text-white/80" />
           </button>
         </div>
 
@@ -444,76 +477,125 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
 
           </div>
 
-          {/* ================= RIGHT PANEL: LIVE HERO PREVIEW ================= */}
-          <div className="order-1 lg:order-2 col-span-12 lg:col-span-7 h-auto lg:h-full flex flex-col items-center justify-between bg-black/30 border-b lg:border-b-0 lg:border-l border-white/5 p-6 sm:p-8 lg:p-10 relative overflow-hidden">
-            
-            {/* Gallery Top Bar */}
-            <div className="w-full flex items-center justify-between pb-2 shrink-0">
-              <div className="flex items-center gap-2 font-mono text-[11px] text-white/50">
-                <span>{layoutType === 'vertical_atelier' && creationMode === 'template' ? '50 × 80 mm' : '90 × 50 mm (ISO/KR)'}</span>
-                <span className="text-white/20">·</span>
-                <span className="text-[#C5A880] font-sans font-medium">
-                  {creationMode === 'template' 
-                    ? LAYOUT_PRESETS.find(p => p.id === layoutType)?.name 
-                    : creationMode === 'photo' 
-                      ? '실물 명함 사진 렌더링 (900×540)' 
-                      : '커스텀 Tailwind 엔진 (1.586:1)'}
-                </span>
-              </div>
+          {/* ================= RIGHT PANEL: PURE GALLERY EXHIBITION ================= */}
+          <div className="order-1 lg:order-2 col-span-12 lg:col-span-7 h-auto lg:h-full flex items-center justify-center bg-black/40 border-b lg:border-b-0 lg:border-l border-white/5 p-6 sm:p-10 lg:p-12 relative overflow-hidden select-none">
+            {/* Pure Ambient Atmosphere Glow */}
+            <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/[0.03] via-transparent to-transparent" />
 
-              {/* Front / Back Toggle */}
-              <div className="flex items-center p-0.5 rounded-xl bg-white/5 border border-white/10 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setPreviewFace('front')}
-                  className={`px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${
-                    previewFace === 'front' 
-                      ? 'bg-[#C5A880] text-black font-bold shadow-sm' 
-                      : 'text-white/50 hover:text-white'
-                  }`}
-                >
-                  앞면
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPreviewFace('back')}
-                  className={`px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${
-                    previewFace === 'back' 
-                      ? 'bg-[#C5A880] text-black font-bold shadow-sm' 
-                      : 'text-white/50 hover:text-white'
-                  }`}
-                >
-                  뒷면
-                </button>
-              </div>
-            </div>
-
-            {/* Dead-center Hero Card Canvas */}
-            <div className="flex-1 flex items-center justify-center w-full py-6 sm:py-8 lg:py-10 px-2 sm:px-6">
+            {/* Prominently Centered Luxury Card Object Floating on Sumi Ink Canvas */}
+            <div 
+              className={`${
+                layoutType === 'vertical_atelier' && creationMode === 'template'
+                  ? 'w-full max-w-[280px] sm:max-w-[320px] aspect-[5/8]' 
+                  : 'w-full max-w-[500px] aspect-[1.586/1]'
+              } transition-all duration-300 relative [perspective:1200px] cursor-pointer group`}
+              onClick={() => setPreviewFace(prev => (prev === 'front' ? 'back' : 'front'))}
+              title="클릭하여 앞/뒷면 회전 (Click to flip)"
+            >
               <div 
-                className={`w-full ${
-                  layoutType === 'vertical_atelier' && creationMode === 'template'
-                    ? 'max-w-[220px] sm:max-w-[245px] aspect-[5/8]' 
-                    : 'max-w-[340px] sm:max-w-[390px] lg:max-w-[420px] aspect-[1.586/1]'
-                } transition-all duration-300 relative group flex items-center justify-center`}
+                className={`w-full h-full relative rounded-2xl transition-transform duration-500 ease-out [transform-style:preserve-3d] group-hover:scale-[1.015] shadow-[0_28px_65px_-15px_rgba(0,0,0,0.9),0_15px_30px_-8px_rgba(0,0,0,0.6),0_45px_95px_-20px_rgba(0,0,0,0.98)] ${
+                  previewFace === 'back' ? '[transform:rotateY(180deg)]' : '[transform:rotateY(0deg)]'
+                }`}
               >
-                {/* 3D Soft Diffusion Shadow */}
-                <div className="w-full h-full rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.012] shadow-[0_24px_55px_-12px_rgba(0,0,0,0.85),0_12px_24px_-6px_rgba(0,0,0,0.5),0_40px_85px_-15px_rgba(0,0,0,0.95)]">
-                  
-                  {/* MODE 1: TEMPLATE BASED CARD */}
+                {/* FRONT FACE */}
+                <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-2xl overflow-hidden bg-[#0A0B0E]">
                   {creationMode === 'template' && (
-                    previewFace === 'front' ? (
-                      <BusinessCardFront 
-                        data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
-                        theme={theme}
-                        layout_type={layoutType}
-                        card_features={features}
-                        isPrintPreview={false} 
-                        hideBorder={true}
+                    <BusinessCardFront 
+                      data={{ 
+                        ...formData, 
+                        address_en: formData.address_en ?? formData.details?.address_en,
+                        website: effectiveUrl, 
+                        websiteDisplay: effectiveDisplayUrl 
+                      }} 
+                      theme={theme}
+                      layout_type={layoutType}
+                      card_features={features}
+                      isPrintPreview={false} 
+                      hideBorder={true}
+                    />
+                  )}
+                  {creationMode === 'photo' && (
+                    frontImageUrl ? (
+                      <div className="relative w-full h-full">
+                        <img
+                          src={frontImageUrl}
+                          alt={formData.name || '실물 명함 사진 앞면'}
+                          className="w-full h-full object-cover rounded-2xl"
+                        />
+                        <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
+                          <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-[#C5A880] tracking-wider uppercase shadow-sm">
+                            PHOTO ARCHIVE
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-neutral-400 bg-neutral-900/60">
+                        <Camera className="w-8 h-8 text-[#C5A880]/60 mb-2" />
+                        <p className="text-xs font-semibold text-white">등록된 명함 사진이 없습니다</p>
+                        <p className="text-[10px] text-neutral-500 mt-1">좌측 패널에서 사진을 업로드해 주세요</p>
+                      </div>
+                    )
+                  )}
+                  {creationMode === 'custom_html' && (
+                    htmlFront ? (
+                      <div 
+                        className="w-full h-full overflow-hidden rounded-2xl"
+                        dangerouslySetInnerHTML={{ 
+                          __html: htmlFront
+                            .replace(/^```html\s*/i, '')
+                            .replace(/^```\s*/i, '')
+                            .replace(/\s*```$/i, '')
+                            .trim() 
+                        }} 
                       />
                     ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-neutral-400 bg-neutral-900/60">
+                        <Code2 className="w-8 h-8 text-[#C5A880]/60 mb-2" />
+                        <p className="text-xs font-semibold text-white">HTML 코드가 비어 있습니다</p>
+                        <p className="text-[10px] text-neutral-500 mt-1">좌측 에디터에 Tailwind HTML 코드를 입력하세요</p>
+                      </div>
+                    )
+                  )}
+                </div>
+
+                {/* BACK FACE */}
+                <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-2xl overflow-hidden bg-[#0A0B0E]">
+                  {creationMode === 'template' && (
+                    <BusinessCardBack 
+                      data={{ 
+                        ...formData, 
+                        address_en: formData.address_en ?? formData.details?.address_en,
+                        website: effectiveUrl, 
+                        websiteDisplay: effectiveDisplayUrl 
+                      }} 
+                      theme={theme}
+                      layout_type={layoutType}
+                      isPrintPreview={false} 
+                      hideBorder={true}
+                    />
+                  )}
+                  {creationMode === 'photo' && (
+                    backImageUrl ? (
+                      <div className="relative w-full h-full">
+                        <img
+                          src={backImageUrl}
+                          alt="실물 명함 사진 뒷면"
+                          className="w-full h-full object-cover rounded-2xl"
+                        />
+                        <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
+                          <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-[#C5A880] tracking-wider uppercase shadow-sm">
+                            BACK PHOTO
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
                       <BusinessCardBack 
-                        data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
+                        data={{ 
+                          ...formData, 
+                          address_en: formData.address_en ?? formData.details?.address_en,
+                          website: effectiveUrl, 
+                          websiteDisplay: effectiveDisplayUrl 
+                        }} 
                         theme={theme}
                         layout_type={layoutType}
                         isPrintPreview={false} 
@@ -521,136 +603,42 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                       />
                     )
                   )}
-
-                  {/* MODE 2: PHYSICAL CARD PHOTO ARCHIVING */}
-                  {creationMode === 'photo' && (
-                    <div className="relative w-full h-full aspect-[1.586/1] bg-[#0A0B0E] border border-white/10 rounded-2xl overflow-hidden select-none">
-                      {previewFace === 'front' ? (
-                        frontImageUrl ? (
-                          <>
-                            <img
-                              src={frontImageUrl}
-                              alt={formData.name || '실물 명함 사진 앞면'}
-                              className="w-full h-full object-cover rounded-2xl"
-                            />
-                            <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
-                              <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-[#C5A880] tracking-wider uppercase shadow-sm">
-                                PHOTO ARCHIVE
-                              </span>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-neutral-400 bg-neutral-900/60">
-                            <Camera className="w-8 h-8 text-[#C5A880]/60 mb-2" />
-                            <p className="text-xs font-semibold text-white">등록된 명함 사진이 없습니다</p>
-                            <p className="text-[10px] text-neutral-500 mt-1">좌측 패널에서 사진을 업로드해 주세요</p>
-                          </div>
-                        )
-                      ) : (
-                        backImageUrl ? (
-                          <>
-                            <img
-                              src={backImageUrl}
-                              alt="실물 명함 사진 뒷면"
-                              className="w-full h-full object-cover rounded-2xl"
-                            />
-                            <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
-                              <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-[#C5A880] tracking-wider uppercase shadow-sm">
-                                BACK PHOTO
-                              </span>
-                            </div>
-                          </>
-                        ) : (
-                          <BusinessCardBack 
-                            data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
-                            theme={theme}
-                            layout_type={layoutType}
-                            isPrintPreview={false} 
-                            hideBorder={true}
-                          />
-                        )
-                      )}
-                    </div>
-                  )}
-
-                  {/* MODE 3: CUSTOM HTML / TAILWIND INJECTION */}
                   {creationMode === 'custom_html' && (
-                    <div className="relative w-full h-full aspect-[1.586/1] bg-[#0A0B0E] border border-white/10 rounded-2xl overflow-hidden select-none">
-                      {previewFace === 'front' ? (
-                        htmlFront ? (
-                          <div 
-                            className="w-full h-full overflow-hidden rounded-2xl"
-                            dangerouslySetInnerHTML={{ 
-                              __html: htmlFront
-                                .replace(/^```html\s*/i, '')
-                                .replace(/^```\s*/i, '')
-                                .replace(/\s*```$/i, '')
-                                .trim() 
-                            }} 
-                          />
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-neutral-400 bg-neutral-900/60">
-                            <Code2 className="w-8 h-8 text-[#C5A880]/60 mb-2" />
-                            <p className="text-xs font-semibold text-white">HTML 코드가 비어 있습니다</p>
-                            <p className="text-[10px] text-neutral-500 mt-1">좌측 에디터에 Tailwind HTML 코드를 입력하세요</p>
-                          </div>
-                        )
-                      ) : (
-                        htmlBack ? (
-                          <div 
-                            className="w-full h-full overflow-hidden rounded-2xl"
-                            dangerouslySetInnerHTML={{ 
-                              __html: htmlBack
-                                .replace(/^```html\s*/i, '')
-                                .replace(/^```\s*/i, '')
-                                .replace(/\s*```$/i, '')
-                                .trim() 
-                            }} 
-                          />
-                        ) : (
-                          <BusinessCardBack 
-                            data={{ ...formData, website: effectiveUrl, websiteDisplay: effectiveDisplayUrl }} 
-                            theme={theme}
-                            layout_type={layoutType}
-                            isPrintPreview={false} 
-                            hideBorder={true}
-                          />
-                        )
-                      )}
-                    </div>
+                    htmlBack ? (
+                      <div 
+                        className="w-full h-full overflow-hidden rounded-2xl"
+                        dangerouslySetInnerHTML={{ 
+                          __html: htmlBack
+                            .replace(/^```html\s*/i, '')
+                            .replace(/^```\s*/i, '')
+                            .replace(/\s*```$/i, '')
+                            .trim() 
+                        }} 
+                      />
+                    ) : (
+                      <BusinessCardBack 
+                        data={{ 
+                          ...formData, 
+                          address_en: formData.address_en ?? formData.details?.address_en,
+                          website: effectiveUrl, 
+                          websiteDisplay: effectiveDisplayUrl 
+                        }} 
+                        theme={theme}
+                        layout_type={layoutType}
+                        isPrintPreview={false} 
+                        hideBorder={true}
+                      />
+                    )
                   )}
-
                 </div>
               </div>
             </div>
-
-            {/* Footer Status & URL Link */}
-            <div className="w-full pt-3 shrink-0 flex items-center justify-between text-[11px] text-white/40 border-t border-white/5 font-mono">
-              <div className="flex items-center gap-2 truncate max-w-[280px] sm:max-w-[360px]">
-                <Globe className="w-3.5 h-3.5 text-[#C5A880] shrink-0" />
-                <span className="truncate text-white/60">{effectiveDisplayUrl}</span>
-                <button
-                  type="button"
-                  onClick={copyDisplayUrl}
-                  className="text-white/40 hover:text-[#C5A880] transition-colors ml-1 cursor-pointer"
-                  title="URL 복사"
-                  aria-label="URL 복사"
-                >
-                  {copiedUrl ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                </button>
-              </div>
-
-              <div className="flex items-center gap-2 text-[10px] text-white/30 font-sans">
-                <span>3D 실시간 렌더링</span>
-              </div>
-            </div>
-
           </div>
 
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 border-t border-white/10 bg-[#0B0C10] flex items-center justify-between shrink-0">
+        <div className="px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] border-t border-white/10 bg-[#0B0C10] flex items-center justify-between shrink-0">
           <button
             type="button"
             onClick={onClose}

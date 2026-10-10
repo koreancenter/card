@@ -6,11 +6,10 @@ import {
   X, 
   Copy, 
   Check, 
-  Download, 
-  Printer, 
   UserPlus, 
   Share2, 
-  FileCode 
+  Printer, 
+  FileCode2 
 } from 'lucide-react';
 
 interface ShareModalProps {
@@ -44,7 +43,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
       width: 400,
       margin: 1.5,
       color: {
-        dark: '#0B0C10',
+        dark: '#16181D',
         light: '#F7F5F0'
       },
       errorCorrectionLevel: 'M'
@@ -98,146 +97,165 @@ export const ShareModal: React.FC<ShareModalProps> = ({
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
       onClick={onClose}
     >
+      {/* Modal Surface: Deep Sumi Ink matte canvas */}
       <div 
-        className="relative w-full max-w-sm rounded-3xl bg-[#121318] border border-white/10 text-neutral-100 shadow-2xl p-6 sm:p-7 flex flex-col items-center"
+        className="relative bg-[#0B0C10]/95 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 max-w-[420px] w-full shadow-2xl flex flex-col items-center"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
+        {/* Minimal, airy close button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 text-white/40 hover:text-white rounded-full hover:bg-white/5 transition-colors cursor-pointer"
+          className="absolute top-6 right-6 text-white/30 hover:text-[#C5A880] transition cursor-pointer p-1"
           title="닫기"
           aria-label="닫기"
         >
-          <X className="w-5 h-5" />
+          <X className="w-5 h-5 stroke-[1.5]" />
         </button>
 
-        {/* Header */}
-        <div className="text-center mb-4">
-          <span className="text-[10px] font-mono tracking-widest text-[#C5A880] uppercase block mb-1">
+        {/* 1. Header: Minimalist Name & Org header */}
+        <div className="text-center mb-5">
+          <span className="text-[10px] font-mono tracking-widest text-[#C5A880] uppercase block mb-1.5">
             DIGITAL CARD SHARING
           </span>
-          <h3 className="text-base font-semibold text-white tracking-tight">
-            {data.name} {data.title && <span className="text-neutral-400 font-normal">· {data.title}</span>}
+          <h3 className="text-base font-medium text-white tracking-tight">
+            {data.name} {data.title && <span className="text-white/40 font-normal">· {data.title}</span>}
           </h3>
-          <p className="text-xs text-neutral-400 mt-0.5 truncate max-w-[260px]">
-            {data.organization}
-          </p>
+          {data.organization && (
+            <p className="text-xs text-white/40 mt-0.5 truncate max-w-[280px]">
+              {data.organization}
+            </p>
+          )}
         </div>
 
-        {/* Minimalist QR Mode Toggle on Dark Surface */}
-        <div className="flex items-center gap-1.5 mb-3 px-1 py-0.5">
+        {/* Tab Switcher: Wide letter-spacing, champagne brass active indicator */}
+        <div className="flex items-center justify-center gap-6 mb-4 text-xs tracking-widest">
           <button
+            type="button"
             onClick={() => setQrType('url')}
-            className={`px-3 py-1 text-xs font-medium transition-all relative cursor-pointer ${
-              qrType === 'url' ? 'text-[#C5A880]' : 'text-white/45 hover:text-white/70'
+            className={`transition cursor-pointer pb-1 ${
+              qrType === 'url'
+                ? 'text-[#C5A880] border-b border-[#C5A880] font-medium'
+                : 'text-white/40 hover:text-white/70 border-b border-transparent'
             }`}
           >
-            <span>웹 링크 QR</span>
-            {qrType === 'url' && (
-              <span className="absolute bottom-0 inset-x-2.5 h-[1.5px] bg-[#C5A880] rounded-full" />
-            )}
+            웹 링크 QR
           </button>
-          <span className="text-white/15 text-xs font-light">|</span>
+          <span className="text-white/10 select-none">|</span>
           <button
+            type="button"
             onClick={() => setQrType('vcard')}
-            className={`px-3 py-1 text-xs font-medium transition-all relative cursor-pointer ${
-              qrType === 'vcard' ? 'text-[#C5A880]' : 'text-white/45 hover:text-white/70'
+            className={`transition cursor-pointer pb-1 ${
+              qrType === 'vcard'
+                ? 'text-[#C5A880] border-b border-[#C5A880] font-medium'
+                : 'text-white/40 hover:text-white/70 border-b border-transparent'
             }`}
           >
-            <span>연락처 저장 QR</span>
-            {qrType === 'vcard' && (
-              <span className="absolute bottom-0 inset-x-2.5 h-[1.5px] bg-[#C5A880] rounded-full" />
-            )}
+            연락처 저장 QR
           </button>
         </div>
 
-        {/* Refined Warm Fine-Paper QR Code Container */}
-        <div className="relative p-5 rounded-3xl bg-[#F7F5F0] border border-white/10 shadow-[0_16px_36px_rgba(0,0,0,0.45)] mb-4 flex flex-col items-center justify-center">
+        {/* 2. QR Code Canvas: Fine Paper + Champagne Brass inner border */}
+        <div className="relative p-5 rounded-2xl bg-[#F7F5F0] border border-[#C5A880]/30 shadow-inner mb-6 flex flex-col items-center justify-center">
           {dataUrl ? (
             <img 
               src={dataUrl} 
               alt="Digital Card QR" 
-              className="w-44 h-44 object-contain rounded-xl"
+              className="w-44 h-44 object-contain"
             />
           ) : (
-            <div className="w-44 h-44 flex items-center justify-center text-neutral-400 text-xs">
+            <div className="w-44 h-44 flex items-center justify-center text-neutral-400 text-xs font-mono">
               QR 생성 중...
             </div>
           )}
         </div>
 
-        {/* Streamlined Deep Matte Share URL Box */}
-        <div className="w-full bg-[#0B0C10] border border-white/10 rounded-xl px-4 py-3 flex items-center justify-between gap-2 mb-4">
-          <span className="text-xs font-mono text-white/80 truncate select-all">
+        {/* 3. URL Row: Monospace URL with text copy link */}
+        <div className="w-full flex items-center justify-between gap-3 border-b border-white/10 pb-3 mb-6">
+          <span className="font-mono text-xs text-white/70 truncate select-all">
             {displayHost}
           </span>
           <button
+            type="button"
             onClick={handleCopyLink}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#C5A880]/15 hover:bg-[#C5A880]/25 active:bg-[#C5A880]/30 border border-[#C5A880]/30 text-[#C5A880] text-xs font-medium transition-all cursor-pointer shrink-0"
+            className="text-[#C5A880] hover:text-[#E2CFB4] font-medium text-xs transition flex items-center gap-1.5 cursor-pointer shrink-0"
             title="링크 복사"
           >
-            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? '복사됨' : '복사'}</span>
+            {copied ? (
+              <>
+                <Check className="w-3.5 h-3.5" />
+                <span>복사됨</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5" />
+                <span>복사</span>
+              </>
+            )}
           </button>
         </div>
 
-        {/* Primary Direct Actions (Split into 2 Main Luxury Buttons) */}
-        <div className="w-full grid grid-cols-2 gap-2.5 mb-3.5">
+        {/* 4. Bottom: Unified Minimalist Floating Action Dock matching studio canvas */}
+        <div 
+          className="bg-white/[0.03] border border-white/10 rounded-full px-5 py-2.5 flex items-center justify-center gap-4 shadow-xl backdrop-blur-md"
+          role="toolbar"
+          aria-label="명함 빠른 작업 도크"
+        >
+          {/* Action 1: Add to Contacts (.vcf) */}
           <button
+            type="button"
             onClick={() => downloadVCard(data)}
-            className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] active:scale-[0.98] border border-white/10 text-white/90 text-xs font-medium transition-all cursor-pointer shadow-sm group"
-            title="연락처 파일 다운로드"
+            className="text-white/60 hover:text-[#C5A880] transition transform hover:scale-110 p-1.5 cursor-pointer rounded-full hover:bg-white/5 flex items-center justify-center"
+            title="연락처(.vcf) 저장"
+            aria-label="연락처(.vcf) 저장"
           >
-            <UserPlus className="w-4 h-4 text-[#C5A880] transition-transform group-hover:scale-105" />
-            <span>연락처(.vcf) 저장</span>
+            <UserPlus className="w-4 h-4" />
           </button>
 
+          {/* Action 2: Share Card Link / Web Share */}
           <button
+            type="button"
             onClick={handleNativeShare}
-            className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] active:scale-[0.98] border border-white/10 text-white/90 text-xs font-medium transition-all cursor-pointer shadow-sm group"
-            title="시스템 공유 창 열기"
+            className="text-white/60 hover:text-[#C5A880] transition transform hover:scale-110 p-1.5 cursor-pointer rounded-full hover:bg-white/5 flex items-center justify-center"
+            title="명함 링크 공유"
+            aria-label="명함 링크 공유"
           >
-            <Share2 className="w-4 h-4 text-[#C5A880] transition-transform group-hover:scale-105" />
-            <span>명함 바로 공유</span>
+            <Share2 className="w-4 h-4" />
           </button>
-        </div>
 
-        {/* Export & Pro Tools (Subtle bottom row) */}
-        <div className="w-full pt-3 border-t border-white/5 flex items-center justify-center gap-4 text-xs">
-          {onOpenPrint && (
-            <button
-              onClick={() => {
-                onClose();
-                onOpenPrint();
-              }}
-              className="flex items-center gap-1.5 text-white/60 hover:text-white text-[11px] font-medium transition-colors cursor-pointer py-1 px-2 rounded-lg hover:bg-white/5"
-            >
-              <Printer className="w-3.5 h-3.5 text-white/40" />
-              <span>인쇄 / PDF 출력</span>
-            </button>
-          )}
+          {/* 1px Vertical Divider */}
+          <div className="h-4 w-[1px] bg-white/10" />
 
-          {onOpenExport ? (
-            <button
-              onClick={() => {
-                onClose();
+          {/* Action 3: Open Print / PDF Modal */}
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              onOpenPrint?.();
+            }}
+            className="text-white/60 hover:text-[#C5A880] transition transform hover:scale-110 p-1.5 cursor-pointer rounded-full hover:bg-white/5 flex items-center justify-center"
+            title="인쇄 및 고해상도 PDF"
+            aria-label="인쇄 및 고해상도 PDF"
+          >
+            <Printer className="w-4 h-4" />
+          </button>
+
+          {/* Action 4: Open Standalone HTML Modal (or download QR if not configured) */}
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              if (onOpenExport) {
                 onOpenExport();
-              }}
-              className="flex items-center gap-1.5 text-white/60 hover:text-white text-[11px] font-medium transition-colors cursor-pointer py-1 px-2 rounded-lg hover:bg-white/5"
-            >
-              <FileCode className="w-3.5 h-3.5 text-white/40" />
-              <span>독립 HTML 배포</span>
-            </button>
-          ) : (
-            <button
-              onClick={handleDownloadQr}
-              className="flex items-center gap-1.5 text-white/60 hover:text-white text-[11px] font-medium transition-colors cursor-pointer py-1 px-2 rounded-lg hover:bg-white/5"
-            >
-              <Download className="w-3.5 h-3.5 text-white/40" />
-              <span>QR 이미지 저장</span>
-            </button>
-          )}
+              } else {
+                handleDownloadQr();
+              }
+            }}
+            className="text-white/60 hover:text-[#C5A880] transition transform hover:scale-110 p-1.5 cursor-pointer rounded-full hover:bg-white/5 flex items-center justify-center"
+            title="독립 HTML 파일 배포"
+            aria-label="독립 HTML 파일 배포"
+          >
+            <FileCode2 className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>

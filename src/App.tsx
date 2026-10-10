@@ -23,7 +23,7 @@ import { LazyPinSetupModal } from './components/LazyPinSetupModal';
 import { LegalModal, LegalDocType } from './components/LegalModal';
 import { ResetDataModal } from './components/ResetDataModal';
 import { SAMPLE_CARDS, clearAllLocalData } from './utils/initialCards';
-import { APP_BASE_DOMAIN, resolveCardFromLocation, getCardShareUrl } from './utils/domain';
+import { APP_BASE_DOMAIN, resolveCardFromLocation, getCardShareUrl, getRouteSlug, isPublicSlugRoute } from './utils/domain';
 import { pullWalletFromEdge, pushWalletToEdge } from './utils/syncWallet';
 import { PinLockModal, PinModalMode } from './components/PinLockModal';
 import { BiometricsSettingModal } from './components/BiometricsSettingModal';
@@ -41,11 +41,14 @@ import {
   Fingerprint,
   Settings,
   Plus,
-  LogOut
+  LogOut,
+  FileText,
+  RotateCcw
 } from 'lucide-react';
 
 export default function App() {
   const [cards, setCards] = useState<StoredCard[]>(() => loadUserCards());
+  const [publicCard, setPublicCard] = useState<StoredCard | null>(null);
   const [isSamplePreview, setIsSamplePreview] = useState<boolean>(false);
   const [activeCardId, setActiveCardId] = useState<string>(() => {
     const loaded = loadUserCards();
@@ -153,24 +156,109 @@ export default function App() {
   // URL query parameter (?card=...), Pathname (/mrpark), & Custom Domain smart routing
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (cards.length === 0) return;
 
     try {
-      const matched = resolveCardFromLocation(cards);
+      const slug = getRouteSlug();
+      const isSlug = isPublicSlugRoute();
+
+      // Attempt to resolve card from user's cards or fallback sample cards
+      const matched = resolveCardFromLocation(cards, SAMPLE_CARDS);
       if (matched) {
         setActiveCardId(matched.id);
+        if (isSlug && !cards.some(c => c.id === matched.id)) {
+          setPublicCard(matched);
+        }
         setActiveTab('my-card');
+      } else if (slug) {
+        // Try fetching remote card from API edge if not locally cached
+        fetch(`/api/cards?slug=${encodeURIComponent(slug)}`)
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (data && data.card) {
+              setPublicCard(data.card);
+              setActiveCardId(data.card.id);
+              setActiveTab('my-card');
+            }
+          })
+          .catch(() => {});
       }
     } catch (e) {
       console.error('URL routing error', e);
     }
   }, [cards]);
 
-  const activeCard: StoredCard | undefined = cards.length > 0
-    ? (cards.find(c => c.id === activeCardId) || cards[0])
-    : (isSamplePreview 
-        ? SAMPLE_CARDS[0] 
-        : undefined);
+  const activeCard: StoredCard | undefined = 
+    publicCard ||
+    (cards.length > 0
+      ? (cards.find(c => c.id === activeCardId) || cards[0])
+      : (isPublicSlugRoute() 
+          ? (resolveCardFromLocation(cards, SAMPLE_CARDS) || undefined)
+          : (isSamplePreview ? SAMPLE_CARDS[0] : undefined)));
+
+  // Ownership & Public Viewer Detection
+  const checkCardOwnership = (cardToCheck: StoredCard | undefined): boolean => {
+    if (!cardToCheck) return true;
+    if (typeof window === 'undefined') return true;
+
+    try {
+      const raw = localStorage.getItem('my_cards') || localStorage.getItem('user_cards');
+      const localCards: StoredCard[] = raw ? JSON.parse(raw) : [];
+
+      // Extract all owner_keys from locally saved cards that belong to this user
+      const localOwnerKeys = localCards
+        .filter(c => c.isMyCard)
+        .map(c => c.owner_key)
+        .filter((k): k is string => Boolean(k));
+
+      // 1. Check if currentCard.owner_key matches any key stored in localStorage.getItem("my_cards")
+      if (cardToCheck.owner_key && localOwnerKeys.includes(cardToCheck.owner_key)) {
+        return true;
+      }
+
+      // 2. Check if currentCard is locally stored in my_cards with isMyCard: true
+      const isLocallyOwned = localCards.some(c => c.isMyCard && c.id === cardToCheck.id);
+      if (isLocallyOwned) {
+        return true;
+      }
+
+      // 3. Or check if the user arrived via a public card slug route without ownership credentials
+      const slugRouteActive = isPublicSlugRoute();
+      if (slugRouteActive) {
+        return false;
+      }
+
+      // 4. In studio mode (root URL without public slug):
+      // If user has no cards yet, they are in the studio to create their card
+      if (localCards.length === 0) {
+        return true;
+      }
+
+      return Boolean(cardToCheck.isMyCard);
+    } catch (e) {
+      console.error('Error checking card ownership', e);
+      return !isPublicSlugRoute();
+    }
+  };
+
+  const [isOwner, setIsOwner] = useState<boolean>(() => {
+    const initialResolved = resolveCardFromLocation(loadUserCards(), SAMPLE_CARDS);
+    return checkCardOwnership(initialResolved || undefined);
+  });
+
+  // Re-evaluate ownership whenever activeCard or cards change
+  useEffect(() => {
+    setIsOwner(checkCardOwnership(activeCard));
+  }, [activeCard, cards]);
+
+  const handleCreateMyOwnCard = () => {
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/');
+    }
+    setPublicCard(null);
+    setIsOwner(true);
+    setActiveTab('my-card');
+    handleOpenCreateModal();
+  };
 
   const myCards = cards.filter(c => c.isMyCard);
 
@@ -211,6 +299,7 @@ export default function App() {
         isMyCard: true,
         isDefault: cards.length === 0,
         slug: 'master',
+        owner_key: `key_${Date.now()}`,
         theme: activeCard?.theme || 'sumi_ink',
         layout_type: 'editorial_minimal',
         card_features: {
@@ -242,6 +331,7 @@ export default function App() {
         isMyCard: true,
         isDefault: false,
         slug: `${sourceCard.slug || 'card'}-copy`,
+        owner_key: `key_${Date.now()}`,
         theme: sourceCard.theme,
         category: sourceCard.category,
         createdAt: new Date().toISOString().split('T')[0],
@@ -390,134 +480,222 @@ export default function App() {
       {/* SCREEN UI CONTAINER */}
       <div 
         id="screen-app-container" 
-        className="min-h-screen bg-[#0B0C10] text-neutral-100 flex flex-col justify-between selection:bg-neutral-100 selection:text-neutral-950 font-sans"
+        className="min-h-screen bg-[#0B0C10] text-neutral-100 flex flex-col justify-between selection:bg-neutral-100 selection:text-neutral-950 font-sans pl-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)]"
       >
         {/* Top Minimalist Luxury Header */}
-        <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#0B0C10]/90 backdrop-blur-xl px-4 sm:px-8 py-3 flex items-center justify-between">
-          
-          {/* Institutional Wordmark */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            <span className="text-xs sm:text-sm font-semibold tracking-[0.25em] uppercase text-white font-sans">
-              GOGUMA <span className="text-neutral-400 font-light hidden sm:inline">CARD STUDIO</span>
-            </span>
-          </div>
+        <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#0B0C10]/90 backdrop-blur-xl px-4 sm:px-8 py-3.5 pt-[calc(0.75rem+env(safe-area-inset-top,0px))] pl-[calc(1rem+env(safe-area-inset-left,0px))] pr-[calc(1rem+env(safe-area-inset-right,0px))] flex items-center justify-between main-app-header">
+          {!isOwner ? (
+            /* Public Visitor Header: Muted Brand Watermark Only */
+            <>
+              <div className="w-full flex items-center justify-center py-0.5 header-brand-mark">
+                <span className="text-xs text-white/30 tracking-widest uppercase font-medium select-none font-sans">
+                  GOGUMA CARD STUDIO
+                </span>
+              </div>
+              <div className="hidden header-landscape-mini items-center bg-[#121318]/90 backdrop-blur-md border border-white/10 rounded-full px-3 py-1 shadow-2xl">
+                <span className="text-[10px] font-semibold text-[#C5A880] tracking-widest uppercase">GOGUMA</span>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Left Spacer for Header Balance */}
+              <div className="flex-1 flex items-center justify-start header-full-nav" />
 
-          {/* Center Navigation: Segmented Switcher (내 명함 vs 보관함) */}
-          <nav className="flex items-center p-1 bg-[#121318] rounded-2xl border border-white/5 shadow-inner">
-            <button
-              onClick={() => {
-                setActiveTab('my-card');
-                const defaultCard = myCards.find(c => c.isDefault) || myCards[0];
-                if (defaultCard) setActiveCardId(defaultCard.id);
-              }}
-              className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'my-card'
-                  ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
-                  : 'text-neutral-400 hover:text-neutral-200'
-              }`}
-            >
-              <CreditCard className="w-3.5 h-3.5" />
-              <span>내 명함</span>
-            </button>
-
-            <button
-              onClick={() => {
-                requireUnlock(() => {
-                  setActiveTab('vault');
-                });
-              }}
-              className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'vault'
-                  ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
-                  : 'text-neutral-400 hover:text-neutral-200'
-              }`}
-            >
-              <FolderArchive className="w-3.5 h-3.5" />
-              <span>명함 보관함</span>
-              {isPinConfigured && isLocked && (
-                <Lock className="w-3 h-3 text-[#C5A880]" />
-              )}
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-black/40 border border-white/5 text-neutral-400">
-                {cards.length}
-              </span>
-            </button>
-          </nav>
-
-          {/* Right Header: Minimal Security Lock & Consolidated Settings */}
-          <div className="flex items-center gap-1.5 sm:gap-2 min-h-[32px] relative" ref={settingsMenuRef}>
-            {/* If PIN configured: Minimalist Lock icon for instant lock */}
-            {isPinConfigured && (
-              <button
-                onClick={() => {
-                  lockApp();
-                  showToast('화면이 보안 잠금되었습니다.');
-                }}
-                className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer active:scale-95"
-                title="즉시 화면 잠금 (Lock Screen)"
-                aria-label="화면 잠금"
-              >
-                <Lock className="w-4 h-4 text-[#C5A880]" />
-              </button>
-            )}
-
-            {/* Consolidated Settings Popover Trigger */}
-            <div className="relative">
-              <button
-                onClick={() => setIsSettingsMenuOpen(!isSettingsMenuOpen)}
-                className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 border border-white/5 transition-all cursor-pointer active:scale-95"
-                title="보안 및 기기 설정"
-                aria-label="설정 메뉴"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
-
-              {isSettingsMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#121318] border border-white/10 shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-xs">
+              {/* Compressed Mini Icon in Landscape Mode */}
+              <div className="hidden header-landscape-mini items-center gap-1 bg-[#121318]/90 backdrop-blur-md border border-white/10 rounded-full p-1 shadow-2xl">
+                <button
+                  onClick={() => {
+                    if (activeTab === 'my-card') {
+                      requireUnlock(() => setActiveTab('vault'));
+                    } else {
+                      setActiveTab('my-card');
+                    }
+                  }}
+                  className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  title={activeTab === 'my-card' ? '보관함으로 전환' : '내 명함으로 전환'}
+                  aria-label="화면 전환"
+                >
+                  {activeTab === 'my-card' ? <FolderArchive className="w-3.5 h-3.5 text-[#C5A880]" /> : <CreditCard className="w-3.5 h-3.5 text-[#C5A880]" />}
+                </button>
+                {isPinConfigured && (
                   <button
                     onClick={() => {
-                      setIsSettingsMenuOpen(false);
-                      setPinModalMode(isPinConfigured ? 'change' : 'setup');
-                      setIsConfigModalOpen(true);
+                      lockApp();
+                      showToast('화면이 보안 잠금되었습니다.');
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
+                    className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                    title="즉시 화면 잠금"
+                    aria-label="화면 잠금"
                   >
                     <Lock className="w-3.5 h-3.5 text-[#C5A880]" />
-                    <span>{isPinConfigured ? 'PIN 번호 변경 / 관리' : '4자리 PIN 보안 설정'}</span>
                   </button>
+                )}
+                <button
+                  onClick={() => setIsSettingsMenuOpen(prev => !prev)}
+                  className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  title="설정"
+                  aria-label="설정"
+                >
+                  <Settings className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
+              {/* Center Navigation: Switcher (내 명함 vs 보관함) */}
+              <nav className="flex items-center gap-1 sm:gap-1.5 header-full-nav">
+                <button
+                  onClick={() => {
+                    setActiveTab('my-card');
+                    const defaultCard = myCards.find(c => c.isDefault) || myCards[0];
+                    if (defaultCard) setActiveCardId(defaultCard.id);
+                  }}
+                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    activeTab === 'my-card'
+                      ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
+                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5'
+                  }`}
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  <span>내 명함</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    requireUnlock(() => {
+                      setActiveTab('vault');
+                    });
+                  }}
+                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    activeTab === 'vault'
+                      ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
+                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5'
+                  }`}
+                >
+                  <FolderArchive className="w-3.5 h-3.5" />
+                  <span>명함 보관함</span>
+                  {isPinConfigured && isLocked && (
+                    <Lock className="w-3 h-3 text-[#C5A880]" />
+                  )}
+                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-white/5 border border-white/5 text-neutral-400">
+                    {cards.length}
+                  </span>
+                </button>
+              </nav>
+
+              {/* Right Header: Minimal Security Lock & Consolidated Settings */}
+              <div className="flex-1 flex items-center justify-end gap-1.5 sm:gap-2 min-h-[32px] relative header-full-nav" ref={settingsMenuRef}>
+                {/* If PIN configured: Minimalist Lock icon for instant lock */}
+                {isPinConfigured && (
                   <button
                     onClick={() => {
-                      setIsSettingsMenuOpen(false);
-                      setIsBiometricsModalOpen(true);
+                      lockApp();
+                      showToast('화면이 보안 잠금되었습니다.');
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
+                    className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer active:scale-95"
+                    title="즉시 화면 잠금 (Lock Screen)"
+                    aria-label="화면 잠금"
                   >
-                    <Fingerprint className="w-3.5 h-3.5 text-[#C5A880]" />
-                    <span>생체 인증 (Face ID / 지문)</span>
+                    <Lock className="w-4 h-4 text-[#C5A880]" />
                   </button>
+                )}
 
-                  <div className="my-1 border-t border-white/5" />
-
+                {/* Consolidated Settings Popover Trigger */}
+                <div className="relative">
                   <button
-                    onClick={() => {
-                      setIsSettingsMenuOpen(false);
-                      setIsSyncModalOpen(true);
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
+                    onClick={() => setIsSettingsMenuOpen(!isSettingsMenuOpen)}
+                    className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 border border-white/5 transition-all cursor-pointer active:scale-95"
+                    title="보안 및 기기 설정"
+                    aria-label="설정 메뉴"
                   >
-                    <Smartphone className="w-3.5 h-3.5 text-[#C5A880]" />
-                    <span>기기 연결 및 동기화</span>
+                    <Settings className="w-4 h-4" />
                   </button>
+
+                  {isSettingsMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#121318] border border-white/10 shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-xs">
+                      <button
+                        onClick={() => {
+                          setIsSettingsMenuOpen(false);
+                          setPinModalMode(isPinConfigured ? 'change' : 'setup');
+                          setIsConfigModalOpen(true);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
+                      >
+                        <Lock className="w-3.5 h-3.5 text-[#C5A880]" />
+                        <span>{isPinConfigured ? 'PIN 번호 변경 / 관리' : '4자리 PIN 보안 설정'}</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setIsSettingsMenuOpen(false);
+                          setIsBiometricsModalOpen(true);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
+                      >
+                        <Fingerprint className="w-3.5 h-3.5 text-[#C5A880]" />
+                        <span>생체 인증 (Face ID / 지문)</span>
+                      </button>
+
+                      <div className="my-1 border-t border-white/5" />
+
+                      <button
+                        onClick={() => {
+                          setIsSettingsMenuOpen(false);
+                          setIsSyncModalOpen(true);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
+                      >
+                        <Smartphone className="w-3.5 h-3.5 text-[#C5A880]" />
+                        <span>기기 연결 및 동기화</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            </>
+          )}
         </header>
 
         {/* Main Showcase Viewport */}
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-5 sm:py-7 max-w-6xl mx-auto w-full">
+        <main className="flex-1 flex flex-col items-center justify-center px-4 py-4 sm:py-6 max-w-6xl mx-auto w-full">
           
-          {activeTab === 'my-card' ? (
+          {!isOwner && activeCard ? (
+            /* ================= PUBLIC RECIPIENT VISITOR VIEW MODE ================= */
+            <div className="w-full flex flex-col items-center animate-in fade-in duration-300">
+              <div className="w-full max-w-[540px]">
+                <CardContainer 
+                  data={activeCard.data} 
+                  theme={activeCard.theme} 
+                  layout_type={activeCard.layout_type}
+                  card_features={activeCard.card_features}
+                  isPhotoCard={activeCard.isPhotoCard || activeCard.creation_mode === 'photo'}
+                  photoUrl={activeCard.scannedImage || activeCard.front_image_url}
+                  backPhotoUrl={activeCard.scannedImageBack || activeCard.back_image_url}
+                  html_front={activeCard.html_front}
+                  html_back={activeCard.html_back}
+                  isFlipped={isFlipped}
+                  onFlip={() => setIsFlipped(prev => !prev)}
+                  onOpenShare={handleShare}
+                  isOwner={false}
+                  cardUrl={getCardShareUrl(activeCard)}
+                  onShowToast={showToast}
+                />
+              </div>
+
+              {/* Subtle Viral Footnote */}
+              <div className="mt-8 mb-2 text-center">
+                <a
+                  href="/"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleCreateMyOwnCard();
+                  }}
+                  className="inline-flex items-center gap-2 text-xs text-[#C5A880]/80 hover:text-[#d6b991] transition-all tracking-wide py-2.5 px-5 rounded-full border border-[#C5A880]/20 hover:border-[#C5A880]/40 hover:bg-white/[0.02] active:scale-95 group cursor-pointer shadow-lg"
+                >
+                  <span>나만의 럭셔리 디지털 명함 만들기</span>
+                  <span className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 font-sans">↗</span>
+                </a>
+              </div>
+            </div>
+          ) : activeTab === 'my-card' ? (
             /* ================= VIEW 1: LUXURY CARD SHOWCASE & CAROUSEL ================= */
             <div className="w-full flex flex-col items-center">
               {cards.length === 0 && !isSamplePreview ? (
@@ -703,51 +881,103 @@ export default function App() {
 
         </main>
 
-        {/* Discreet Minimalist Footer with Legal Disclosures & Local Data Reset */}
-        <footer className="border-t border-white/5 py-6 px-4 text-center text-neutral-400 font-sans text-xs">
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[12px] mb-2.5">
-            <button
-              onClick={() => {
-                setLegalDocType('privacy');
-                setIsLegalModalOpen(true);
-              }}
-              className="text-neutral-400 hover:text-neutral-200 transition-colors cursor-pointer"
-            >
-              개인정보처리방침
-            </button>
-            <span aria-hidden="true" className="text-neutral-700">·</span>
-            <button
-              onClick={() => {
-                setLegalDocType('terms');
-                setIsLegalModalOpen(true);
-              }}
-              className="text-neutral-400 hover:text-neutral-200 transition-colors cursor-pointer"
-            >
-              서비스 이용약관
-            </button>
-            <span aria-hidden="true" className="text-neutral-700">·</span>
-            <button
-              onClick={() => setIsResetModalOpen(true)}
-              className="text-neutral-400 hover:text-rose-400 transition-colors cursor-pointer"
-            >
-              로컬 데이터 초기화
-            </button>
-          </div>
-          <p className="text-[11px] text-neutral-500">
-            © {new Date().getFullYear()} GOGUMA CARD STUDIO · 회원가입 없는 로컬 퍼스트 아키텍처
-          </p>
-        </footer>
+        {/* Footer */}
+        {isOwner ? (
+          <footer className="border-t border-white/5 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
+            <div className="max-w-xl mx-auto flex flex-col items-center justify-center text-center">
+              {/* Luxury Legal Action Buttons (Icon-Only with Tooltips) */}
+              <div className="flex items-center justify-center gap-2.5 sm:gap-3 mb-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLegalDocType('privacy');
+                    setIsLegalModalOpen(true);
+                  }}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[#C5A880]/60 flex items-center justify-center text-[#C5A880] hover:text-[#d6b991] transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.2)] active:scale-95 group"
+                  title="개인정보처리방침"
+                  aria-label="개인정보처리방침"
+                >
+                  <ShieldCheck className="w-4 h-4 text-[#C5A880] group-hover:scale-110 transition-transform duration-200" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLegalDocType('terms');
+                    setIsLegalModalOpen(true);
+                  }}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[#C5A880]/60 flex items-center justify-center text-[#C5A880] hover:text-[#d6b991] transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.2)] active:scale-95 group"
+                  title="서비스 이용약관"
+                  aria-label="서비스 이용약관"
+                >
+                  <FileText className="w-4 h-4 text-[#C5A880] group-hover:scale-110 transition-transform duration-200" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsResetModalOpen(true)}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-rose-500/[0.08] border border-white/10 hover:border-rose-500/40 flex items-center justify-center text-neutral-400 hover:text-rose-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(244,63,94,0.15)] active:scale-95 group"
+                  title="로컬 데이터 초기화"
+                  aria-label="로컬 데이터 초기화"
+                >
+                  <RotateCcw className="w-4 h-4 text-neutral-400 group-hover:text-rose-400 group-hover:rotate-[-45deg] transition-all duration-200" />
+                </button>
+              </div>
+
+              {/* Centered Brand Copyright */}
+              <p className="text-[11px] text-neutral-500 text-center tracking-wide font-sans">
+                © {new Date().getFullYear()} GOGUMA CARD STUDIO
+              </p>
+            </div>
+          </footer>
+        ) : (
+          <footer className="border-t border-white/5 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
+            <div className="max-w-xl mx-auto flex flex-col items-center justify-center text-center">
+              <div className="flex items-center justify-center gap-2.5 sm:gap-3 mb-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLegalDocType('privacy');
+                    setIsLegalModalOpen(true);
+                  }}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[#C5A880]/60 flex items-center justify-center text-[#C5A880] hover:text-[#d6b991] transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.2)] active:scale-95 group"
+                  title="개인정보처리방침"
+                  aria-label="개인정보처리방침"
+                >
+                  <ShieldCheck className="w-4 h-4 text-[#C5A880] group-hover:scale-110 transition-transform duration-200" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLegalDocType('terms');
+                    setIsLegalModalOpen(true);
+                  }}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[#C5A880]/60 flex items-center justify-center text-[#C5A880] hover:text-[#d6b991] transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(197,168,128,0.2)] active:scale-95 group"
+                  title="서비스 이용약관"
+                  aria-label="서비스 이용약관"
+                >
+                  <FileText className="w-4 h-4 text-[#C5A880] group-hover:scale-110 transition-transform duration-200" />
+                </button>
+              </div>
+
+              <p className="text-[11px] text-neutral-600 text-center tracking-wide font-sans">
+                © {new Date().getFullYear()} GOGUMA CARD STUDIO
+              </p>
+            </div>
+          </footer>
+        )}
 
         {/* Toast Notification */}
         {toastMessage && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-neutral-900 border border-neutral-700/80 text-white text-xs font-medium shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-neutral-900 border border-neutral-700/80 text-white text-xs font-medium shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
             <Check className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>{toastMessage}</span>
           </div>
         )}
 
-        {/* Modals */}
-        {activeCard && (
+        {/* Modals (Owner Mode Only) */}
+        {isOwner && activeCard && (
           <>
             <ShareModal
               isOpen={isShareModalOpen}
