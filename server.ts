@@ -58,7 +58,24 @@ app.post('/api/sync', (req, res) => {
   return res.json({ success: true, syncId, count: cards.length });
 });
 
-// 2. Card Resolution & Fetch Endpoints (/api/cards)
+// 2. Card Resolution & Fetch Endpoints (/api/resolve & /api/cards)
+app.get('/api/resolve', (req, res) => {
+  const slug = ((req.query.slug as string) || '').toLowerCase();
+  const host = ((req.query.host as string) || req.headers.host || '').toLowerCase().replace(/:\d+$/, '');
+
+  if (slug) {
+    const card = cardStore[`slug:${slug}`] || Object.values(cardStore).find(c => c?.slug?.toLowerCase() === slug || c?.id?.toLowerCase() === slug);
+    if (card) return res.json({ success: true, card, matchType: 'slug' });
+  }
+
+  if (host && host !== 'card.goguma.app' && !host.includes('localhost') && !host.includes('127.0.0.1')) {
+    const card = Object.values(cardStore).find(c => c?.customDomain && c.customDomain.toLowerCase() === host);
+    if (card) return res.json({ success: true, card, matchType: 'custom_domain' });
+  }
+
+  return res.status(404).json({ success: false, notFound: true, message: 'Card not found' });
+});
+
 app.get('/api/cards', (req, res) => {
   const slug = req.query.slug as string;
   const domain = req.query.domain as string;
