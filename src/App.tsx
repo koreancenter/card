@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { PrintConfig, StoredCard } from './types/card';
 import { loadUserCards, saveUserCards, loadStoredCards, saveStoredCards } from './utils/initialCards';
 import { CardContainer } from './components/CardContainer';
-import { MyCardsCarousel } from './components/MyCardsCarousel';
+import { CardNavigator } from './components/CardNavigator';
 import { PrintSheet } from './components/PrintSheet';
 import { VaultView } from './components/VaultView';
 import { WelcomeCard } from './components/WelcomeCard';
@@ -736,7 +736,7 @@ export default function App() {
                 </div>
               ) : (
                 /* Apple Wallet-Style Luxury Horizontal Card Carousel Deck with Ghost Add Card Slot */
-                <MyCardsCarousel
+                <CardNavigator
                   cards={myCards}
                   activeCardId={activeCard.id}
                   onSelectCard={handleSelectMyCard}
@@ -750,6 +750,7 @@ export default function App() {
                     setActiveCardId(cardToShare.id);
                     modals.openShare();
                   }}
+                  mode="carousel"
                 />
               )}
             </div>

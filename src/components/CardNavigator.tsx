@@ -7,25 +7,40 @@ import {
   Plus, 
   ChevronLeft, 
   ChevronRight, 
-  RefreshCw 
+  RefreshCw,
+  LayoutGrid,
+  CreditCard,
+  Check
 } from 'lucide-react';
 
-interface MyCardsCarouselProps {
+export type CardNavigationMode = 'carousel' | 'switcher';
+
+export interface CardNavigatorProps {
   cards: StoredCard[];
   activeCardId: string;
   onSelectCard: (id: string) => void;
   onCreateNewCard: () => void;
   onOpenEdit?: (card: StoredCard) => void;
   onOpenShare: (card: StoredCard) => void;
+  mode?: CardNavigationMode;
+  onModeChange?: (mode: CardNavigationMode) => void;
+  allowModeToggle?: boolean;
 }
 
-export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
+/**
+ * Unified Card Navigation Component
+ * Consolidates carousel 3D presentation deck and switcher thumbnail navigation into a singular versatile component.
+ */
+export const CardNavigator: React.FC<CardNavigatorProps> = ({
   cards,
   activeCardId,
   onSelectCard,
   onCreateNewCard,
   onOpenEdit,
   onOpenShare,
+  mode = 'carousel',
+  onModeChange,
+  allowModeToggle = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -41,8 +56,8 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
   const [dragOffset, setDragOffset] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
-  // Subtle tactile haptic vibration feedback for mobile devices (Vibration API)
-  const triggerTactileHaptic = () => {
+  // Tactile haptic vibration feedback for mobile devices (Vibration API)
+  const triggerTactileHaptic = useCallback(() => {
     if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       try {
         navigator.vibrate(5);
@@ -50,9 +65,92 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
         // Silently ignore if restricted
       }
     }
+  }, []);
+
+  // Sync currentIndex when activeCardId changes externally
+  useEffect(() => {
+    const idx = cards.findIndex(c => c.id === activeCardId);
+    if (idx >= 0 && idx !== currentIndex) {
+      setCurrentIndex(idx);
+      setIsFlipped(false);
+    }
+  }, [activeCardId, cards, currentIndex]);
+
+  const goToSlide = useCallback((newIndex: number) => {
+    const bounded = Math.max(0, Math.min(newIndex, totalSlides - 1));
+    setCurrentIndex(bounded);
+    setIsFlipped(false);
+    setDragOffset(0);
+
+    if (bounded < cards.length) {
+      onSelectCard(cards[bounded].id);
+    }
+  }, [totalSlides, cards, onSelectCard]);
+
+  // Touch and Drag handling for carousel mode
+  const startXRef = useRef<number | null>(null);
+  const isMovedRef = useRef<boolean>(false);
+
+  const handlePointerDown = (clientX: number) => {
+    if (mode !== 'carousel') return;
+    startXRef.current = clientX;
+    isMovedRef.current = false;
+    setIsDragging(true);
   };
 
-  // If no personal cards exist, immediately present the centered "새 명함 만들기" ghost card
+  const handlePointerMove = (clientX: number) => {
+    if (startXRef.current === null || mode !== 'carousel') return;
+    const diff = clientX - startXRef.current;
+    if (Math.abs(diff) > 4) {
+      isMovedRef.current = true;
+    }
+    // Resistance at bounds
+    if ((currentIndex === 0 && diff > 0) || (currentIndex === totalSlides - 1 && diff < 0)) {
+      setDragOffset(diff * 0.3);
+    } else {
+      setDragOffset(diff);
+    }
+  };
+
+  const handlePointerUp = () => {
+    if (startXRef.current === null || mode !== 'carousel') return;
+    const diff = dragOffset;
+    const threshold = 45;
+
+    if (diff < -threshold && currentIndex < totalSlides - 1) {
+      goToSlide(currentIndex + 1);
+    } else if (diff > threshold && currentIndex > 0) {
+      goToSlide(currentIndex - 1);
+    } else {
+      setDragOffset(0);
+    }
+
+    startXRef.current = null;
+    setIsDragging(false);
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goToSlide(currentIndex - 1);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        goToSlide(currentIndex + 1);
+      } else if (e.code === 'Space' && currentIndex < cards.length) {
+        e.preventDefault();
+        setIsFlipped(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, cards.length, goToSlide]);
+
+  // If no personal cards exist, immediately present the centered ghost card
   if (cards.length === 0) {
     return (
       <div className="w-full flex flex-col items-center justify-center py-8 px-4 animate-in fade-in duration-300">
@@ -80,95 +178,99 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
     );
   }
 
-  // Sync currentIndex when activeCardId changes externally
-  useEffect(() => {
-    const idx = cards.findIndex(c => c.id === activeCardId);
-    if (idx >= 0 && idx !== currentIndex) {
-      setCurrentIndex(idx);
-      setIsFlipped(false);
-    }
-  }, [activeCardId, cards]);
-
-  const goToSlide = useCallback((newIndex: number) => {
-    const bounded = Math.max(0, Math.min(newIndex, totalSlides - 1));
-    setCurrentIndex(bounded);
-    setIsFlipped(false);
-    setDragOffset(0);
-
-    if (bounded < cards.length) {
-      onSelectCard(cards[bounded].id);
-    }
-  }, [totalSlides, cards, onSelectCard]);
-
-  // Touch and Drag handling
-  const startXRef = useRef<number | null>(null);
-  const currentXRef = useRef<number | null>(null);
-  const isMovedRef = useRef<boolean>(false);
-
-  const handlePointerDown = (clientX: number) => {
-    startXRef.current = clientX;
-    currentXRef.current = clientX;
-    isMovedRef.current = false;
-    setIsDragging(true);
-  };
-
-  const handlePointerMove = (clientX: number) => {
-    if (startXRef.current === null) return;
-    const diff = clientX - startXRef.current;
-    if (Math.abs(diff) > 4) {
-      isMovedRef.current = true;
-    }
-    // Add resistance at bounds
-    if ((currentIndex === 0 && diff > 0) || (currentIndex === totalSlides - 1 && diff < 0)) {
-      setDragOffset(diff * 0.3);
-    } else {
-      setDragOffset(diff);
-    }
-  };
-
-  const handlePointerUp = () => {
-    if (startXRef.current === null) return;
-    const diff = dragOffset;
-    const threshold = 45; // pixels to trigger slide transition
-
-    if (diff < -threshold && currentIndex < totalSlides - 1) {
-      goToSlide(currentIndex + 1);
-    } else if (diff > threshold && currentIndex > 0) {
-      goToSlide(currentIndex - 1);
-    } else {
-      setDragOffset(0);
-    }
-
-    startXRef.current = null;
-    currentXRef.current = null;
-    setIsDragging(false);
-  };
-
-  // Keyboard navigation (ArrowLeft, ArrowRight, Space for flip)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        return;
-      }
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        goToSlide(currentIndex - 1);
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        goToSlide(currentIndex + 1);
-      } else if (e.code === 'Space' && currentIndex < cards.length) {
-        e.preventDefault();
-        setIsFlipped(prev => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, cards.length, goToSlide]);
-
   const activeCard = currentIndex < cards.length ? cards[currentIndex] : null;
 
+  // Render Mode 1: Compact/Grid Switcher Mode
+  if (mode === 'switcher') {
+    return (
+      <div className="w-full flex flex-col items-center select-none py-2 px-3 sm:px-6">
+        {allowModeToggle && onModeChange && (
+          <div className="w-full max-w-4xl flex justify-end mb-3">
+            <button
+              onClick={() => onModeChange('carousel')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs text-neutral-300 hover:text-white transition-all"
+            >
+              <CreditCard className="w-3.5 h-3.5 text-[#C5A880]" />
+              <span>3D 캐러셀 보기</span>
+            </button>
+          </div>
+        )}
+
+        <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          {cards.map((card, idx) => {
+            const isSelected = card.id === activeCardId;
+            return (
+              <div
+                key={card.id}
+                onClick={() => {
+                  triggerTactileHaptic();
+                  goToSlide(idx);
+                }}
+                className={`group relative p-3 rounded-2xl border transition-all cursor-pointer ${
+                  isSelected
+                    ? 'border-[#C5A880] bg-gradient-to-br from-[#C5A880]/15 to-white/[0.04] shadow-[0_8px_24px_rgba(197,168,128,0.2)]'
+                    : 'border-white/10 bg-white/[0.02] hover:border-white/25 hover:bg-white/[0.05]'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 truncate">
+                    <span className="text-xs font-bold text-white tracking-tight truncate">
+                      {card.data.name}
+                    </span>
+                    {card.data.nameKr && (
+                      <span className="text-[11px] text-neutral-400 truncate">
+                        ({card.data.nameKr})
+                      </span>
+                    )}
+                  </div>
+                  {isSelected && (
+                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#C5A880] text-black">
+                      <Check className="w-3 h-3 stroke-[3]" />
+                    </span>
+                  )}
+                </div>
+
+                <div className="text-[11px] text-neutral-400 truncate mb-1">
+                  {card.data.organization} {card.data.title && `· ${card.data.title}`}
+                </div>
+
+                <div className="text-[10px] font-mono text-[#C5A880]/80 truncate">
+                  {card.customDomain || `/${card.slug || card.id}`}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Add Card Card in Switcher */}
+          <div
+            onClick={onCreateNewCard}
+            className="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-[#C5A880]/30 hover:border-[#C5A880] bg-white/[0.01] hover:bg-white/[0.04] transition-all cursor-pointer group min-h-[96px]"
+          >
+            <Plus className="w-5 h-5 text-[#C5A880]/70 group-hover:text-[#C5A880] group-hover:scale-110 transition-all mb-1" />
+            <span className="text-xs font-medium text-neutral-300 group-hover:text-white">
+              새 명함 추가
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render Mode 2: Interactive 3D Perspective Carousel
   return (
     <div className="w-full flex flex-col items-center select-none overflow-hidden py-1 sm:py-3">
+      {allowModeToggle && onModeChange && (
+        <div className="w-full max-w-5xl flex justify-end px-4 mb-2">
+          <button
+            onClick={() => onModeChange('switcher')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs text-neutral-300 hover:text-white transition-all"
+          >
+            <LayoutGrid className="w-3.5 h-3.5 text-[#C5A880]" />
+            <span>목록 그리드 보기</span>
+          </button>
+        </div>
+      )}
+
       {/* 1. Carousel Viewport Container */}
       <div 
         ref={containerRef}
@@ -235,10 +337,10 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                   transform: isCenter ? 'scale(1)' : 'scale(0.92)',
                   opacity: isCenter ? 1 : 0.38,
                   transition: 'transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.45s ease',
-                  cursor: isCenter ? 'pointer' : 'pointer',
+                  cursor: 'pointer',
                   zIndex: isCenter ? 20 : 10,
                 }}
-                onClick={(e) => {
+                onClick={() => {
                   if (isMovedRef.current) return;
                   if (!isCenter) {
                     goToSlide(idx);
