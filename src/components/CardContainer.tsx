@@ -94,7 +94,13 @@ export const CardContainer: React.FC<CardContainerProps> = ({
     <motion.div 
       layout
       transition={{ layout: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } }}
-      className={`w-full ${isPortrait ? 'max-w-[340px] sm:max-w-[370px]' : 'max-w-[560px]'} mx-auto select-none flex flex-col items-center`}
+      style={{
+        maxWidth: isPortrait 
+          ? 'min(100%, 340px, calc((100dvh - 195px) * 5 / 8), calc((100vh - 195px) * 5 / 8))' 
+          : '560px',
+        width: '100%',
+      }}
+      className="mx-auto select-none flex flex-col items-center transition-all duration-300"
     >
       {/* 3D Tactile Card Canvas - Framer Motion flip with layout animation */}
       <motion.div 
@@ -119,6 +125,9 @@ export const CardContainer: React.FC<CardContainerProps> = ({
           style={{
             transformStyle: 'preserve-3d',
             WebkitTransformStyle: 'preserve-3d',
+            maxWidth: isPortrait 
+              ? 'min(100%, 340px, calc((100dvh - 195px) * 5 / 8), calc((100vh - 195px) * 5 / 8))' 
+              : '100%',
           }}
           className="relative w-full cursor-pointer group shadow-[0_24px_64px_rgba(0,0,0,0.6)] rounded-2xl transition-shadow duration-300 hover:shadow-[0_32px_80px_rgba(0,0,0,0.75)]"
         >
@@ -135,7 +144,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
           >
             <BusinessCardFront 
               data={data} 
-              theme={theme}
+              theme={theme} 
               layout_type={layout_type}
               card_features={card_features}
               orientation={orientation}
@@ -158,7 +167,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
           >
             <BusinessCardBack 
               data={data} 
-              theme={theme}
+              theme={theme} 
               layout_type={layout_type}
               orientation={orientation}
               backPhotoUrl={backPhotoUrl}
@@ -169,7 +178,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
       </motion.div>
 
       {/* Bottom Actions: Centered beneath Card */}
-      <motion.div layout className="w-full mt-4 px-1 flex justify-center">
+      <motion.div layout className="w-full mt-2.5 sm:mt-4 px-1 flex justify-center">
         <ActionButtons
           data={data}
           isOwner={isOwner}

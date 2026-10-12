@@ -91,7 +91,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
     <div 
       className={`relative w-full h-full select-none flex flex-col justify-between ${
         isPortrait
-          ? 'p-5 sm:p-7'
+          ? 'p-4 sm:p-6'
           : isPrintPreview
             ? 'p-3.5 sm:p-4'
             : 'p-3.5 sm:p-6 md:p-8'
@@ -110,7 +110,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
       />
 
       {/* Center Statement */}
-      <div className={`relative z-10 ${isPortrait ? 'my-auto py-3' : 'my-auto py-2'} text-center flex flex-col items-center justify-center space-y-1.5`}>
+      <div className={`relative z-10 ${isPortrait ? 'my-auto py-2' : 'my-auto py-2'} text-center flex flex-col items-center justify-center space-y-1 sm:space-y-1.5`}>
         <div className="space-y-0.5 sm:space-y-1">
           <h2 className={`text-sm sm:text-base md:text-lg font-bold tracking-tight ${themeStyles.textPrimary} break-keep whitespace-normal`}>
             {data.backTitle || '고구마 AI 스튜디오'}
@@ -133,7 +133,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
 
       {/* Bottom Area: Portrait has centered QR block; Landscape has row */}
       {isPortrait ? (
-        <div className={`relative z-10 flex flex-col items-center justify-center text-center space-y-2 pt-3 border-t ${themeStyles.accentHairline} mt-auto w-full`}>
+        <div className={`relative z-10 flex flex-col items-center justify-center text-center space-y-1.5 sm:space-y-2 pt-2 sm:pt-3 border-t ${themeStyles.accentHairline} mt-auto w-full`}>
           <a
             href={data.website}
             target="_blank"

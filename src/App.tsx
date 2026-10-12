@@ -480,10 +480,10 @@ export default function App() {
       {/* SCREEN UI CONTAINER */}
       <div 
         id="screen-app-container" 
-        className="min-h-screen bg-[#0B0C10] text-neutral-100 flex flex-col justify-between selection:bg-neutral-100 selection:text-neutral-950 font-sans pl-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)]"
+        className="min-h-[100dvh] bg-[#0B0C10] text-neutral-100 flex flex-col justify-between selection:bg-neutral-100 selection:text-neutral-950 font-sans pl-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)] overflow-x-hidden"
       >
         {/* Top Minimalist Luxury Header */}
-        <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#0B0C10]/90 backdrop-blur-xl px-4 sm:px-8 py-3.5 pt-[calc(0.75rem+env(safe-area-inset-top,0px))] pl-[calc(1rem+env(safe-area-inset-left,0px))] pr-[calc(1rem+env(safe-area-inset-right,0px))] flex items-center justify-between main-app-header">
+        <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#0B0C10]/90 backdrop-blur-xl px-4 sm:px-8 py-2.5 sm:py-3.5 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(0.75rem+env(safe-area-inset-top,0px))] pl-[calc(1rem+env(safe-area-inset-left,0px))] pr-[calc(1rem+env(safe-area-inset-right,0px))] flex items-center justify-between main-app-header">
           {!isOwner ? (
             /* Public Visitor Header: Muted Brand Watermark Only */
             <>
@@ -655,12 +655,12 @@ export default function App() {
         </header>
 
         {/* Main Showcase Viewport */}
-        <main className="flex-1 flex flex-col items-center justify-center px-4 py-4 sm:py-6 max-w-6xl mx-auto w-full">
+        <main className="flex-1 flex flex-col items-center justify-center px-3 sm:px-4 py-2 sm:py-6 max-w-6xl mx-auto w-full">
           
           {!isOwner && activeCard ? (
             /* ================= PUBLIC RECIPIENT VISITOR VIEW MODE ================= */
             <div className="w-full flex flex-col items-center animate-in fade-in duration-300">
-              <div className="w-full max-w-[540px]">
+              <div className="w-full max-w-[540px] flex justify-center">
                 <CardContainer 
                   data={activeCard.data} 
                   theme={activeCard.theme} 
@@ -709,7 +709,7 @@ export default function App() {
                 />
               ) : isSamplePreview && cards.length === 0 && activeCard ? (
                 /* TEMPORARY SHOWCASE SAMPLE PREVIEW MODE */
-                <div className="w-full flex flex-col items-center space-y-4">
+                <div className="w-full flex flex-col items-center space-y-2 sm:space-y-4">
                   {/* Luxury Minimalist Showcase Top Bar */}
                   <div className="w-full max-w-[540px] px-1 py-0.5 flex items-center justify-between text-xs animate-in fade-in duration-200">
                     {/* Left: Concise Mode Indicator */}
@@ -743,7 +743,7 @@ export default function App() {
                   </div>
 
                   {/* Interactive Card Canvas */}
-                  <div className="w-full max-w-[540px]">
+                  <div className="w-full max-w-[540px] flex justify-center">
                     <CardContainer 
                       data={activeCard.data} 
                       theme={activeCard.theme} 
@@ -772,7 +772,7 @@ export default function App() {
                 />
               ) : !activeCard.isMyCard ? (
                 /* Context Bar only if viewing someone else's card from the vault */
-                <div className="w-full flex flex-col items-center space-y-4">
+                <div className="w-full flex flex-col items-center space-y-2 sm:space-y-4">
                   <div className="flex items-center justify-between w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px] text-xs">
                     <button
                       onClick={() => setActiveTab('vault')}
@@ -786,7 +786,7 @@ export default function App() {
                     </span>
                   </div>
 
-                  <div className="w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px]">
+                  <div className="w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px] flex justify-center">
                     <CardContainer 
                       data={activeCard.data} 
                       theme={activeCard.theme} 
@@ -883,21 +883,21 @@ export default function App() {
 
         {/* Footer */}
         {isOwner ? (
-          <footer className="border-t border-white/5 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
+          <footer className="border-t border-white/5 py-2.5 sm:py-6 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
             <div className="max-w-xl mx-auto flex flex-col items-center justify-center text-center">
               {/* Luxury Legal Action Buttons (Icon-Only with Tooltips) */}
-              <div className="flex items-center justify-center gap-2.5 sm:gap-3 mb-3">
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1.5 sm:mb-3">
                 <button
                   type="button"
                   onClick={() => {
                     setLegalDocType('privacy');
                     setIsLegalModalOpen(true);
                   }}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
                   title="개인정보처리방침"
                   aria-label="개인정보처리방침"
                 >
-                  <ShieldCheck className="w-4 h-4 text-white group-hover:scale-110 transition-transform duration-200" />
+                  <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:scale-110 transition-transform duration-200" />
                 </button>
 
                 <button
@@ -906,45 +906,45 @@ export default function App() {
                     setLegalDocType('terms');
                     setIsLegalModalOpen(true);
                   }}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
                   title="서비스 이용약관"
                   aria-label="서비스 이용약관"
                 >
-                  <FileText className="w-4 h-4 text-white group-hover:scale-110 transition-transform duration-200" />
+                  <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:scale-110 transition-transform duration-200" />
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setIsResetModalOpen(true)}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-rose-500/[0.08] border border-white/10 hover:border-rose-500/40 flex items-center justify-center text-neutral-400 hover:text-rose-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(244,63,94,0.15)] active:scale-95 group"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-rose-500/[0.08] border border-white/10 hover:border-rose-500/40 flex items-center justify-center text-neutral-400 hover:text-rose-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(244,63,94,0.15)] active:scale-95 group"
                   title="로컬 데이터 초기화"
                   aria-label="로컬 데이터 초기화"
                 >
-                  <RotateCcw className="w-4 h-4 text-neutral-400 group-hover:text-rose-400 group-hover:rotate-[-45deg] transition-all duration-200" />
+                  <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-400 group-hover:text-rose-400 group-hover:rotate-[-45deg] transition-all duration-200" />
                 </button>
               </div>
 
               {/* Centered Brand Copyright */}
-              <p className="text-[11px] text-neutral-500 text-center tracking-wide font-sans">
+              <p className="text-[10px] sm:text-[11px] text-neutral-500 text-center tracking-wide font-sans">
                 © {new Date().getFullYear()} GOGUMA CARD STUDIO
               </p>
             </div>
           </footer>
         ) : (
-          <footer className="border-t border-white/5 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
+          <footer className="border-t border-white/5 py-2.5 sm:py-6 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
             <div className="max-w-xl mx-auto flex flex-col items-center justify-center text-center">
-              <div className="flex items-center justify-center gap-2.5 sm:gap-3 mb-3">
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1.5 sm:mb-3">
                 <button
                   type="button"
                   onClick={() => {
                     setLegalDocType('privacy');
                     setIsLegalModalOpen(true);
                   }}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
                   title="개인정보처리방침"
                   aria-label="개인정보처리방침"
                 >
-                  <ShieldCheck className="w-4 h-4 text-white group-hover:scale-110 transition-transform duration-200" />
+                  <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:scale-110 transition-transform duration-200" />
                 </button>
 
                 <button
@@ -953,15 +953,15 @@ export default function App() {
                     setLegalDocType('terms');
                     setIsLegalModalOpen(true);
                   }}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
                   title="서비스 이용약관"
                   aria-label="서비스 이용약관"
                 >
-                  <FileText className="w-4 h-4 text-white group-hover:scale-110 transition-transform duration-200" />
+                  <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:scale-110 transition-transform duration-200" />
                 </button>
               </div>
 
-              <p className="text-[11px] text-neutral-600 text-center tracking-wide font-sans">
+              <p className="text-[10px] sm:text-[11px] text-neutral-600 text-center tracking-wide font-sans">
                 © {new Date().getFullYear()} GOGUMA CARD STUDIO
               </p>
             </div>

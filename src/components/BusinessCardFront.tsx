@@ -160,7 +160,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
     return (
       <div 
         className={`relative w-full h-full select-none flex flex-col justify-between ${
-          isPortrait ? 'p-5 sm:p-7' : isPrintPreview ? 'p-3.5 sm:p-4' : 'p-4 sm:p-6 md:p-7'
+          isPortrait ? 'p-4 sm:p-6' : isPrintPreview ? 'p-3.5 sm:p-4' : 'p-4 sm:p-6 md:p-7'
         } ${themeStyles.cardBg} ${isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border}`} transition-colors duration-300 font-sans`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
@@ -381,7 +381,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
     return (
       <div 
         className={`relative w-full h-full select-none flex flex-col justify-between ${
-          isPortrait ? 'p-5 sm:p-7' : isPrintPreview ? 'p-3 sm:p-4' : 'p-4 sm:p-6 md:p-7'
+          isPortrait ? 'p-4 sm:p-6' : isPrintPreview ? 'p-3 sm:p-4' : 'p-4 sm:p-6 md:p-7'
         } ${themeStyles.cardBg} ${isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border}`} transition-colors duration-300 font-sans`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
@@ -475,7 +475,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
     return (
       <div 
         className={`relative w-full h-full select-none flex flex-col justify-between ${
-          isPortrait ? 'p-5 sm:p-7' : isPrintPreview ? 'p-3.5 sm:p-4' : 'p-4 sm:p-6 md:p-8'
+          isPortrait ? 'p-4 sm:p-6' : isPrintPreview ? 'p-3.5 sm:p-4' : 'p-4 sm:p-6 md:p-8'
         } ${themeStyles.cardBg} ${isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border}`} transition-colors duration-300 font-sans`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
@@ -555,7 +555,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
     <div 
       className={`relative w-full h-full select-none flex flex-col justify-between ${
         isPortrait
-          ? 'p-5 sm:p-7'
+          ? 'p-4 sm:p-6'
           : isPrintPreview
             ? 'p-3.5 sm:p-4'
             : 'p-3.5 sm:p-6 md:p-8'
@@ -585,10 +585,10 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
       </div>
 
       {/* Center Section: Name & Position */}
-      <div className={`relative z-10 ${isPortrait ? 'my-auto py-1.5 space-y-0.5' : isPrintPreview ? 'my-auto py-0.5' : 'my-auto py-1 space-y-0.5'}`}>
+      <div className={`relative z-10 ${isPortrait ? 'my-auto py-1 space-y-0.5' : isPrintPreview ? 'my-auto py-0.5' : 'my-auto py-1 space-y-0.5'}`}>
         <div className="space-y-0.5">
           <div className="flex items-baseline gap-2 flex-wrap">
-            <h1 className={`${isPortrait ? 'text-xl sm:text-2xl md:text-3xl' : isPrintPreview ? 'text-base sm:text-lg' : 'text-lg sm:text-xl md:text-2xl'} font-bold tracking-tight leading-tight ${themeStyles.textPrimary} truncate max-w-full`}>
+            <h1 className={`${isPortrait ? 'text-lg sm:text-2xl md:text-3xl' : isPrintPreview ? 'text-base sm:text-lg' : 'text-lg sm:text-xl md:text-2xl'} font-bold tracking-tight leading-tight ${themeStyles.textPrimary} truncate max-w-full`}>
               {data.name}
             </h1>
             {showEnName && data.nameKr && (
@@ -692,7 +692,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
 
         {/* Address */}
         {showAddress && (enAddress || data.addressKr) && (
-          <div className={`flex flex-col justify-end text-[8px] sm:text-[9px] leading-snug min-w-0 ${isPortrait ? 'pt-1 border-t border-neutral-800/40' : 'text-right sm:text-left pl-2'}`}>
+          <div className={`flex flex-col justify-end text-[8px] sm:text-[9px] leading-snug min-w-0 ${isPortrait ? `pt-1 border-t ${themeStyles.accentHairline}` : 'text-right sm:text-left pl-2'}`}>
             <div className="flex items-start gap-1 min-w-0">
               <MapPin className={`w-3 h-3 shrink-0 mt-0.5 ${themeStyles.textMuted}`} />
               <div className="min-w-0 flex-1">

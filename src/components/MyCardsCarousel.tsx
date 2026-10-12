@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { StoredCard } from '../types/card';
+import { StoredCard, CardOrientation } from '../types/card';
 import { BusinessCardFront } from './BusinessCardFront';
 import { BusinessCardBack } from './BusinessCardBack';
 import { ActionButtons } from './ActionButtons';
@@ -37,6 +37,7 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
   const initialIndex = Math.max(0, cards.findIndex(c => c.id === activeCardId));
   const [currentIndex, setCurrentIndex] = useState<number>(initialIndex >= 0 ? initialIndex : 0);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
+  const [orientation, setOrientation] = useState<CardOrientation>('landscape');
   const [dragOffset, setDragOffset] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
@@ -224,11 +225,12 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
           {cards.map((card, idx) => {
             const isCenter = idx === currentIndex;
             const isFlippedCard = isCenter && isFlipped;
+            const isCardPortrait = card.layout_type === 'vertical_atelier' || (isCenter && orientation === 'portrait');
 
             return (
               <div
                 key={card.id}
-                className="w-full shrink-0 flex items-center justify-center px-3 sm:px-8 transition-all duration-300"
+                className="w-full shrink-0 flex items-center justify-center px-2 sm:px-8 transition-all duration-300"
                 style={{
                   transform: isCenter ? 'scale(1)' : 'scale(0.92)',
                   opacity: isCenter ? 1 : 0.38,
@@ -246,7 +248,14 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                   }
                 }}
               >
-                <div className="w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px] [perspective:1400px] flex justify-center">
+                <div 
+                  className="w-full [perspective:1400px] flex justify-center transition-all duration-300"
+                  style={{
+                    maxWidth: isCardPortrait
+                      ? 'min(100%, 340px, calc((100dvh - 195px) * 5 / 8), calc((100vh - 195px) * 5 / 8))'
+                      : 'min(100%, 540px)',
+                  }}
+                >
                   {/* 3D Flip Card */}
                   <div
                     style={{
@@ -254,6 +263,9 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                       transformStyle: 'preserve-3d',
                       WebkitTransformStyle: 'preserve-3d',
                       transition: 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
+                      maxWidth: isCardPortrait
+                        ? 'min(100%, 340px, calc((100dvh - 195px) * 5 / 8), calc((100vh - 195px) * 5 / 8))'
+                        : '100%',
                     }}
                     className={`relative w-full rounded-2xl group transition-shadow duration-300 ${
                       isCenter 
@@ -292,7 +304,7 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                         theme={card.theme} 
                         layout_type={card.layout_type}
                         card_features={card.card_features}
-                        orientation={card.layout_type === 'vertical_atelier' ? 'portrait' : 'landscape'}
+                        orientation={isCardPortrait ? 'portrait' : 'landscape'}
                         isPhotoCard={card.isPhotoCard}
                         photoUrl={card.scannedImage || card.front_image_url}
                         html_front={card.html_front}
@@ -314,7 +326,7 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
                         data={card.data} 
                         theme={card.theme} 
                         layout_type={card.layout_type}
-                        orientation={card.layout_type === 'vertical_atelier' ? 'portrait' : 'landscape'}
+                        orientation={isCardPortrait ? 'portrait' : 'landscape'}
                         backPhotoUrl={card.scannedImageBack || card.back_image_url}
                         html_back={card.html_back}
                       />
@@ -372,6 +384,8 @@ export const MyCardsCarousel: React.FC<MyCardsCarouselProps> = ({
             onOpenEdit={() => onOpenEdit && onOpenEdit(activeCard)}
             onOpenShare={() => onOpenShare(activeCard)}
             isPhotoCard={activeCard.isPhotoCard}
+            orientation={activeCard.layout_type === 'vertical_atelier' ? 'portrait' : orientation}
+            onToggleOrientation={activeCard.layout_type !== 'vertical_atelier' ? () => setOrientation(prev => prev === 'portrait' ? 'landscape' : 'portrait') : undefined}
           />
         )}
       </div>
