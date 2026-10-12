@@ -3,31 +3,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import { CardTheme, PrintConfig, StoredCard } from './types/card';
+import React, { useState, useEffect } from 'react';
+import { PrintConfig, StoredCard } from './types/card';
 import { loadUserCards, saveUserCards, loadStoredCards, saveStoredCards } from './utils/initialCards';
 import { CardContainer } from './components/CardContainer';
 import { MyCardsCarousel } from './components/MyCardsCarousel';
-import { MyCardSwitcher } from './components/MyCardSwitcher';
-import { ShareModal } from './components/ShareModal';
-import { QrModal } from './components/QrModal';
-import { PrintModal } from './components/PrintModal';
 import { PrintSheet } from './components/PrintSheet';
-import { ExportModal } from './components/ExportModal';
-import { PhotoArchiveModal } from './components/PhotoArchiveModal';
-import { CardEditorModal } from './components/CardEditorModal';
 import { VaultView } from './components/VaultView';
-import { DeviceSyncModal } from './components/DeviceSyncModal';
 import { WelcomeCard } from './components/WelcomeCard';
-import { LazyPinSetupModal } from './components/LazyPinSetupModal';
-import { LegalModal, LegalDocType } from './components/LegalModal';
-import { ResetDataModal } from './components/ResetDataModal';
+import { AppModals } from './components/AppModals';
 import { SAMPLE_CARDS, clearAllLocalData } from './utils/initialCards';
 import { APP_BASE_DOMAIN, resolveCardFromLocation, getCardShareUrl, getRouteSlug, isPublicSlugRoute } from './utils/domain';
 import { pullWalletFromEdge, pushWalletToEdge } from './utils/syncWallet';
-import { PinLockModal, PinModalMode } from './components/PinLockModal';
-import { BiometricsSettingModal } from './components/BiometricsSettingModal';
 import { useAutoLock } from './hooks/useAutoLock';
+import { useModalState } from './hooks/useModalState';
 import { CARD_DATA } from './utils/vcard';
 import { verifyBiometric } from './utils/biometrics';
 import { 
@@ -58,44 +47,12 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<'my-card' | 'vault'>('my-card');
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
-  
-  // Modals state
-  const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
-  const [isQrOpen, setIsQrOpen] = useState<boolean>(false);
-  const [isPrintOpen, setIsPrintOpen] = useState<boolean>(false);
-  const [isExportOpen, setIsExportOpen] = useState<boolean>(false);
-  const [isScanOpen, setIsScanOpen] = useState<boolean>(false);
-  const [isEditorOpen, setIsEditorOpen] = useState<boolean>(false);
-  const [isCreatingCard, setIsCreatingCard] = useState<boolean>(false);
-  const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
-  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState<boolean>(false);
-  const [isLazyPinModalOpen, setIsLazyPinModalOpen] = useState<boolean>(false);
-  const [isLegalModalOpen, setIsLegalModalOpen] = useState<boolean>(false);
-  const [legalDocType, setLegalDocType] = useState<LegalDocType>('privacy');
-  const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
-  const settingsMenuRef = useRef<HTMLDivElement>(null);
-  const [editingCard, setEditingCard] = useState<StoredCard | null>(null);
 
-  // Close settings popover on click outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (settingsMenuRef.current && !settingsMenuRef.current.contains(e.target as Node)) {
-        setIsSettingsMenuOpen(false);
-      }
-    };
-    if (isSettingsMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isSettingsMenuOpen]);
+  // Centralized Lightweight Modal Manager Hook
+  const modals = useModalState();
 
   // Local-First 4-Digit PIN App Lock with Auto-Lock (Manual, Visibility, Idle 5m)
-  const { isLocked, setIsLocked, lockApp, unlockApp, isPinConfigured, refreshPinStatus } = useAutoLock();
-  const [isConfigModalOpen, setIsConfigModalOpen] = useState<boolean>(false);
-  const [isBiometricsModalOpen, setIsBiometricsModalOpen] = useState<boolean>(false);
-  const [pinModalMode, setPinModalMode] = useState<PinModalMode>('setup');
+  const { isLocked, lockApp, unlockApp, isPinConfigured, refreshPinStatus } = useAutoLock();
 
   const requireUnlock = (action: () => void) => {
     if (isPinConfigured && isLocked) {
@@ -321,34 +278,7 @@ export default function App() {
           websiteDisplay: `${APP_BASE_DOMAIN}/master`
         }
       };
-      setEditingCard(newCardTemplate);
-      setIsCreatingCard(true);
-      setIsEditorOpen(true);
-    });
-  };
-
-  // Duplicate Current Card as Template (Protected by PIN if locked)
-  const handleDuplicateMyCard = (sourceCard: StoredCard) => {
-    requireUnlock(() => {
-      const newCardTemplate: StoredCard = {
-        id: `my-card-${Date.now()}`,
-        isMyCard: true,
-        isDefault: false,
-        slug: `${sourceCard.slug || 'card'}-copy`,
-        owner_key: `key_${Date.now()}`,
-        theme: sourceCard.theme,
-        category: sourceCard.category,
-        createdAt: new Date().toISOString().split('T')[0],
-        notes: `${sourceCard.data.organization} 복제 프로필`,
-        data: {
-          ...sourceCard.data,
-          title: `${sourceCard.data.title}`,
-          titleKr: `${sourceCard.data.titleKr}`
-        }
-      };
-      setEditingCard(newCardTemplate);
-      setIsCreatingCard(true);
-      setIsEditorOpen(true);
+      modals.openEditor(newCardTemplate, true);
     });
   };
 
@@ -427,15 +357,15 @@ export default function App() {
 
     if (savedCard.isMyCard) {
       setActiveTab('my-card');
-      showToast(isCreatingCard ? '새로운 내 명함이 생성되었습니다.' : '내 명함 정보가 수정되었습니다.');
+      showToast(modals.isCreatingCard ? '새로운 내 명함이 생성되었습니다.' : '내 명함 정보가 수정되었습니다.');
     } else {
       showToast(`'${savedCard.data.name}' 명함이 보관함에 등록되었습니다.`);
     }
 
-    // Trigger optional PIN protection prompt ("Lazy Setup") only after the user creates and saves their first card
+    // Trigger optional PIN protection prompt ("Lazy Setup") only after user creates and saves first card
     if (isFirstEverCard && !isPinConfigured && typeof window !== 'undefined' && localStorage.getItem('lazy_pin_dismissed') !== 'true') {
       setTimeout(() => {
-        setIsLazyPinModalOpen(true);
+        modals.openLazyPin();
       }, 450);
     }
   };
@@ -535,7 +465,7 @@ export default function App() {
                   </button>
                 )}
                 <button
-                  onClick={() => setIsSettingsMenuOpen(prev => !prev)}
+                  onClick={modals.toggleSettings}
                   className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                   title="설정"
                   aria-label="설정"
@@ -586,7 +516,7 @@ export default function App() {
               </nav>
 
               {/* Right Header: Minimal Security Lock & Consolidated Settings */}
-              <div className="flex-1 flex items-center justify-end gap-1.5 sm:gap-2 min-h-[32px] relative header-full-nav" ref={settingsMenuRef}>
+              <div className="flex-1 flex items-center justify-end gap-1.5 sm:gap-2 min-h-[32px] relative header-full-nav" ref={modals.settingsMenuRef}>
                 {/* If PIN configured: Minimalist Lock icon for instant lock */}
                 {isPinConfigured && (
                   <button
@@ -605,7 +535,7 @@ export default function App() {
                 {/* Consolidated Settings Popover Trigger */}
                 <div className="relative">
                   <button
-                    onClick={() => setIsSettingsMenuOpen(!isSettingsMenuOpen)}
+                    onClick={modals.toggleSettings}
                     className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 border border-white/5 transition-all cursor-pointer active:scale-95"
                     title="보안 및 기기 설정"
                     aria-label="설정 메뉴"
@@ -613,13 +543,12 @@ export default function App() {
                     <Settings className="w-4 h-4" />
                   </button>
 
-                  {isSettingsMenuOpen && (
+                  {modals.isSettingsOpen && (
                     <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#121318] border border-white/10 shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-xs">
                       <button
                         onClick={() => {
-                          setIsSettingsMenuOpen(false);
-                          setPinModalMode(isPinConfigured ? 'change' : 'setup');
-                          setIsConfigModalOpen(true);
+                          modals.closeSettings();
+                          modals.openPinConfig(isPinConfigured ? 'change' : 'setup');
                         }}
                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
                       >
@@ -629,8 +558,8 @@ export default function App() {
 
                       <button
                         onClick={() => {
-                          setIsSettingsMenuOpen(false);
-                          setIsBiometricsModalOpen(true);
+                          modals.closeSettings();
+                          modals.openBiometrics();
                         }}
                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
                       >
@@ -642,8 +571,8 @@ export default function App() {
 
                       <button
                         onClick={() => {
-                          setIsSettingsMenuOpen(false);
-                          setIsSyncModalOpen(true);
+                          modals.closeSettings();
+                          modals.openSync();
                         }}
                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
                       >
@@ -703,7 +632,7 @@ export default function App() {
             /* ================= VIEW 1: LUXURY CARD SHOWCASE & CAROUSEL ================= */
             <div className="w-full flex flex-col items-center">
               {cards.length === 0 && !isSamplePreview ? (
-                /* STEP 1: FIRST-TIME VISITOR LUXURY ONBOARDING STATE */
+                /* FIRST-TIME VISITOR LUXURY ONBOARDING STATE */
                 <WelcomeCard
                   onCreateFirstCard={handleOpenCreateModal}
                   onExploreSample={() => {
@@ -716,15 +645,12 @@ export default function App() {
                 <div className="w-full flex flex-col items-center space-y-2 sm:space-y-4">
                   {/* Luxury Minimalist Showcase Top Bar */}
                   <div className="w-full max-w-[540px] px-1 py-0.5 flex items-center justify-between text-xs animate-in fade-in duration-200">
-                    {/* Left: Concise Mode Indicator */}
                     <div className="flex items-center gap-1.5 text-xs text-white/50 font-normal">
                       <span className="text-white text-[8px] leading-none">●</span>
                       <span>샘플 모드</span>
                     </div>
 
-                    {/* Right: Minimalist Action Icons with Tooltips */}
                     <div className="flex items-center gap-1.5">
-                      {/* Create My Card Action */}
                       <button
                         onClick={handleOpenCreateModal}
                         className="p-1.5 rounded-lg text-white hover:text-neutral-200 hover:bg-white/5 transition-all cursor-pointer active:scale-90 flex items-center justify-center"
@@ -734,7 +660,6 @@ export default function App() {
                         <Plus className="w-4 h-4 stroke-[2.2]" />
                       </button>
 
-                      {/* Exit to Welcome Screen Action */}
                       <button
                         onClick={() => setIsSamplePreview(false)}
                         className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/5 transition-all cursor-pointer active:scale-90 flex items-center justify-center"
@@ -758,15 +683,12 @@ export default function App() {
                       backPhotoUrl={activeCard.scannedImageBack}
                       isFlipped={isFlipped}
                       onFlip={() => setIsFlipped(prev => !prev)}
-                      onOpenShare={() => setIsShareModalOpen(true)}
-                      onOpenEdit={() => {
-                        handleOpenCreateModal();
-                      }}
+                      onOpenShare={modals.openShare}
+                      onOpenEdit={handleOpenCreateModal}
                     />
                   </div>
                 </div>
               ) : !activeCard ? (
-                /* Fallback if no cards exist */
                 <WelcomeCard
                   onCreateFirstCard={handleOpenCreateModal}
                   onExploreSample={() => {
@@ -775,7 +697,7 @@ export default function App() {
                   }}
                 />
               ) : !activeCard.isMyCard ? (
-                /* Context Bar only if viewing someone else's card from the vault */
+                /* Context Bar only if viewing someone else's card from vault */
                 <div className="w-full flex flex-col items-center space-y-2 sm:space-y-4">
                   <div className="flex items-center justify-between w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px] text-xs">
                     <button
@@ -803,12 +725,10 @@ export default function App() {
                       html_back={activeCard.html_back}
                       isFlipped={isFlipped}
                       onFlip={() => setIsFlipped(prev => !prev)}
-                      onOpenShare={() => setIsShareModalOpen(true)}
+                      onOpenShare={modals.openShare}
                       onOpenEdit={() => {
                         requireUnlock(() => {
-                          setEditingCard(activeCard);
-                          setIsCreatingCard(false);
-                          setIsEditorOpen(true);
+                          modals.openEditor(activeCard, false);
                         });
                       }}
                     />
@@ -823,14 +743,12 @@ export default function App() {
                   onCreateNewCard={handleOpenCreateModal}
                   onOpenEdit={(cardToEdit) => {
                     requireUnlock(() => {
-                      setEditingCard(cardToEdit);
-                      setIsCreatingCard(false);
-                      setIsEditorOpen(true);
+                      modals.openEditor(cardToEdit, false);
                     });
                   }}
                   onOpenShare={(cardToShare) => {
                     setActiveCardId(cardToShare.id);
-                    setIsShareModalOpen(true);
+                    modals.openShare();
                   }}
                 />
               )}
@@ -849,9 +767,7 @@ export default function App() {
               }}
               onEditCard={(cardToEdit) => {
                 requireUnlock(() => {
-                  setEditingCard(cardToEdit);
-                  setIsCreatingCard(false);
-                  setIsEditorOpen(true);
+                  modals.openEditor(cardToEdit, false);
                 });
               }}
               onDeleteCard={(id) => {
@@ -861,20 +777,18 @@ export default function App() {
               }}
               onExportCard={(cardToExport) => {
                 setActiveCardId(cardToExport.id);
-                setIsExportOpen(true);
+                modals.openExport();
               }}
               onOpenScan={() => {
                 requireUnlock(() => {
-                  setIsScanOpen(true);
+                  modals.openScan();
                 });
               }}
-              onOpenSync={() => setIsSyncModalOpen(true)}
+              onOpenSync={modals.openSync}
               onOpenEditor={() => {
                 requireUnlock(() => {
                   if (activeCard) {
-                    setEditingCard(activeCard);
-                    setIsCreatingCard(false);
-                    setIsEditorOpen(true);
+                    modals.openEditor(activeCard, false);
                   } else {
                     handleOpenCreateModal();
                   }
@@ -893,10 +807,7 @@ export default function App() {
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1.5 sm:mb-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    setLegalDocType('privacy');
-                    setIsLegalModalOpen(true);
-                  }}
+                  onClick={() => modals.openLegal('privacy')}
                   className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
                   title="개인정보처리방침"
                   aria-label="개인정보처리방침"
@@ -906,10 +817,7 @@ export default function App() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setLegalDocType('terms');
-                    setIsLegalModalOpen(true);
-                  }}
+                  onClick={() => modals.openLegal('terms')}
                   className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
                   title="서비스 이용약관"
                   aria-label="서비스 이용약관"
@@ -919,7 +827,7 @@ export default function App() {
 
                 <button
                   type="button"
-                  onClick={() => setIsResetModalOpen(true)}
+                  onClick={modals.openReset}
                   className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-rose-500/[0.08] border border-white/10 hover:border-rose-500/40 flex items-center justify-center text-neutral-400 hover:text-rose-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(244,63,94,0.15)] active:scale-95 group"
                   title="로컬 데이터 초기화"
                   aria-label="로컬 데이터 초기화"
@@ -940,10 +848,7 @@ export default function App() {
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1.5 sm:mb-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    setLegalDocType('privacy');
-                    setIsLegalModalOpen(true);
-                  }}
+                  onClick={() => modals.openLegal('privacy')}
                   className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
                   title="개인정보처리방침"
                   aria-label="개인정보처리방침"
@@ -953,10 +858,7 @@ export default function App() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setLegalDocType('terms');
-                    setIsLegalModalOpen(true);
-                  }}
+                  onClick={() => modals.openLegal('terms')}
                   className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
                   title="서비스 이용약관"
                   aria-label="서비스 이용약관"
@@ -980,144 +882,23 @@ export default function App() {
           </div>
         )}
 
-        {/* Modals (Owner Mode Only) */}
-        {isOwner && activeCard && (
-          <>
-            <ShareModal
-              isOpen={isShareModalOpen}
-              onClose={() => setIsShareModalOpen(false)}
-              data={activeCard.data}
-              onOpenPrint={() => setIsPrintOpen(true)}
-              onOpenExport={() => setIsExportOpen(true)}
-            />
-
-            <QrModal
-              isOpen={isQrOpen}
-              onClose={() => setIsQrOpen(false)}
-              data={activeCard.data}
-            />
-
-            <PrintModal
-              isOpen={isPrintOpen}
-              onClose={() => setIsPrintOpen(false)}
-              data={activeCard.data}
-              config={printConfig}
-              onConfigChange={setPrintConfig}
-            />
-
-            <ExportModal
-              isOpen={isExportOpen}
-              onClose={() => setIsExportOpen(false)}
-              card={activeCard.data}
-              theme={activeCard.theme}
-            />
-          </>
-        )}
-
-        <PhotoArchiveModal
-          isOpen={isScanOpen}
-          onClose={() => setIsScanOpen(false)}
+        {/* Declarative Centralized Modals Container */}
+        <AppModals
+          modals={modals}
+          activeCard={activeCard}
+          isOwner={isOwner}
+          printConfig={printConfig}
+          setPrintConfig={setPrintConfig}
           onSaveCard={handleSaveCard}
-        />
-
-        <DeviceSyncModal
-          isOpen={isSyncModalOpen}
-          onClose={() => setIsSyncModalOpen(false)}
-        />
-
-        {/* Fullscreen Lock Screen Overlay when app is locked */}
-        <PinLockModal
-          isOpen={isLocked && isPinConfigured}
-          mode="unlock"
-          allowCancel={false}
-          onUnlock={() => {
-            unlockApp();
-            const decrypted = loadUserCards();
-            if (decrypted && decrypted.length > 0) {
-              setCards(decrypted);
-            }
-            showToast('보안 잠금이 해제되었습니다.');
-          }}
+          onConfirmReset={handleConfirmReset}
+          isLocked={isLocked}
+          isPinConfigured={isPinConfigured}
+          unlockApp={unlockApp}
+          refreshPinStatus={refreshPinStatus}
+          setCards={setCards}
+          showToast={showToast}
           onBiometricUnlock={handleBiometricUnlock}
         />
-
-        {/* PIN Configuration Modal (Setup / Change / Disable) */}
-        <PinLockModal
-          isOpen={isConfigModalOpen}
-          mode={pinModalMode}
-          allowCancel={true}
-          onClose={() => setIsConfigModalOpen(false)}
-          onSuccess={() => {
-            refreshPinStatus();
-            const decrypted = loadUserCards();
-            if (decrypted && decrypted.length > 0) {
-              setCards(decrypted);
-            }
-            showToast(pinModalMode === 'setup' ? '4자리 PIN 잠금이 설정되었습니다.' : 'PIN 번호가 성공적으로 변경되었습니다.');
-          }}
-        />
-
-        {/* Dedicated Register Biometrics UI Setting Modal */}
-        <BiometricsSettingModal
-          isOpen={isBiometricsModalOpen}
-          onClose={() => setIsBiometricsModalOpen(false)}
-          onOpenPinSetup={() => {
-            setPinModalMode(isPinConfigured ? 'change' : 'setup');
-            setIsConfigModalOpen(true);
-          }}
-          onStatusChange={() => {
-            refreshPinStatus();
-          }}
-        />
-
-        {/* Lazy PIN Setup Modal (triggers only after user creates and saves first card) */}
-        <LazyPinSetupModal
-          isOpen={isLazyPinModalOpen}
-          onClose={() => {
-            if (typeof window !== 'undefined') {
-              localStorage.setItem('lazy_pin_dismissed', 'true');
-            }
-            setIsLazyPinModalOpen(false);
-            showToast('설정 메뉴에서 언제든 4자리 PIN을 설정할 수 있습니다.');
-          }}
-          onProceedSetup={() => {
-            if (typeof window !== 'undefined') {
-              localStorage.setItem('lazy_pin_dismissed', 'true');
-            }
-            setIsLazyPinModalOpen(false);
-            setPinModalMode('setup');
-            setIsConfigModalOpen(true);
-          }}
-        />
-
-        {/* Legal Disclosures Modal (Privacy Policy & Terms of Service) */}
-        <LegalModal
-          isOpen={isLegalModalOpen}
-          initialDoc={legalDocType}
-          onClose={() => setIsLegalModalOpen(false)}
-        />
-
-        {/* Local Data Reset Confirmation Modal */}
-        <ResetDataModal
-          isOpen={isResetModalOpen}
-          onClose={() => setIsResetModalOpen(false)}
-          onConfirmReset={handleConfirmReset}
-        />
-
-        {editingCard && (
-          <CardEditorModal
-            isOpen={isEditorOpen}
-            onClose={() => {
-              setIsEditorOpen(false);
-              setEditingCard(null);
-              setIsCreatingCard(false);
-            }}
-            card={editingCard}
-            onSave={handleSaveCard}
-            isMyCardMode={editingCard.isMyCard || isCreatingCard}
-            isCreating={isCreatingCard}
-          />
-        )}
 
       </div>
 

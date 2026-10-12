@@ -6,6 +6,7 @@ import {
   Download, Eye, RotateCcw, ExternalLink, Calendar, Tag
 } from 'lucide-react';
 import { BusinessCardFront } from './BusinessCardFront';
+import { cropAndCompressCardImage } from '../utils/imageProcess';
 
 export interface PhotoArchiveModalProps {
   isOpen: boolean;
@@ -230,69 +231,25 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
   }
 
   // CAPTURE / ARCHIVE INPUT MODE: Client-side canvas compression (WebP) & Quick Manual Contact Input (Name + Phone)
-  const processImageToCardRatio = (file: File, slot: 'front' | 'back') => {
+  const processImageToCardRatio = async (file: File, slot: 'front' | 'back') => {
     setIsProcessing(true);
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          setIsProcessing(false);
-          return;
-        }
-
-        // Standard Business Card Ratio 90mm x 50mm = 9:5 (1.8 ratio)
-        const targetWidth = 1080;
-        const targetHeight = 600;
-        canvas.width = targetWidth;
-        canvas.height = targetHeight;
-
-        const imgWidth = img.naturalWidth;
-        const imgHeight = img.naturalHeight;
-        const targetRatio = targetWidth / targetHeight; // 1.8
-        const imgRatio = imgWidth / imgHeight;
-
-        let srcX = 0;
-        let srcY = 0;
-        let srcW = imgWidth;
-        let srcH = imgHeight;
-
-        if (imgRatio > targetRatio) {
-          srcW = imgHeight * targetRatio;
-          srcX = (imgWidth - srcW) / 2;
-        } else {
-          srcH = imgWidth / targetRatio;
-          srcY = (imgHeight - srcH) / 2;
-        }
-
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, targetWidth, targetHeight);
-
-        // Client-side WebP compression (fallback to jpeg if needed)
-        try {
-          const webpDataUrl = canvas.toDataURL('image/webp', 0.88);
-          if (slot === 'front') {
-            setFrontPhoto(webpDataUrl);
-          } else {
-            setBackPhoto(webpDataUrl);
-          }
-        } catch {
-          const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.88);
-          if (slot === 'front') {
-            setFrontPhoto(jpegDataUrl);
-          } else {
-            setBackPhoto(jpegDataUrl);
-          }
-        }
-        setIsProcessing(false);
-      };
-      img.src = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+    try {
+      const result = await cropAndCompressCardImage(file, {
+        targetWidth: 1080,
+        targetHeight: 600,
+        quality: 0.88,
+        format: 'image/webp'
+      });
+      if (slot === 'front') {
+        setFrontPhoto(result.dataUrl);
+      } else {
+        setBackPhoto(result.dataUrl);
+      }
+    } catch (err) {
+      console.error('Photo archiving error:', err);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

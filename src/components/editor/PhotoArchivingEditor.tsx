@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Camera, Upload, Trash2, Zap, Sparkles, Check, Globe } from 'lucide-react';
 import { CardData } from '../../types/card';
 import { APP_BASE_DOMAIN } from '../../utils/domain';
+import { cropAndCompressCardImage, formatByteSize, ImageCompressionResult } from '../../utils/imageProcess';
 
 interface PhotoArchivingEditorProps {
   frontImageUrl?: string;
@@ -14,12 +15,6 @@ interface PhotoArchivingEditorProps {
   onChangeSlug: (slug: string) => void;
   notes: string;
   onChangeNotes: (val: string) => void;
-}
-
-interface CompressionStats {
-  originalBytes: number;
-  compressedBytes: number;
-  ratio: number;
 }
 
 export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
@@ -36,95 +31,24 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
 }) => {
   const frontInputRef = useRef<HTMLInputElement>(null);
   const backInputRef = useRef<HTMLInputElement>(null);
-  const [frontStats, setFrontStats] = useState<CompressionStats | null>(null);
+  const [frontStats, setFrontStats] = useState<ImageCompressionResult | null>(null);
   const [isDraggingFront, setIsDraggingFront] = useState<boolean>(false);
   const [isCompressing, setIsCompressing] = useState<boolean>(false);
-
-  // Automatically compress and rescale to 900×540 aspect ratio via HTML Canvas export to image/webp
-  const compressTo900x540 = (file: File): Promise<{ dataUrl: string; stats: CompressionStats }> => {
-    return new Promise((resolve, reject) => {
-      const originalBytes = file.size;
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          // Standard business card resolution: 900 × 540 (aspect ratio 5:3 / 1.667 or 1.586 scaled)
-          const targetWidth = 900;
-          const targetHeight = 540;
-
-          const canvas = document.createElement('canvas');
-          canvas.width = targetWidth;
-          canvas.height = targetHeight;
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            reject(new Error('Canvas context not available'));
-            return;
-          }
-
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = 'high';
-
-          // Crop and fill to precisely fit 900x540 without stretching
-          const imgAspect = img.width / img.height;
-          const targetAspect = targetWidth / targetHeight;
-          let drawWidth = targetWidth;
-          let drawHeight = targetHeight;
-          let offsetX = 0;
-          let offsetY = 0;
-
-          if (imgAspect > targetAspect) {
-            drawWidth = targetHeight * imgAspect;
-            offsetX = (targetWidth - drawWidth) / 2;
-          } else {
-            drawHeight = targetWidth / imgAspect;
-            offsetY = (targetHeight - drawHeight) / 2;
-          }
-
-          // Background fill for clean matte card
-          ctx.fillStyle = '#0B0C10';
-          ctx.fillRect(0, 0, targetWidth, targetHeight);
-          ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-
-          // Export to image/webp (fallback to jpeg if not supported)
-          let compressedUrl = canvas.toDataURL('image/webp', 0.88);
-          if (!compressedUrl.startsWith('data:image/webp')) {
-            compressedUrl = canvas.toDataURL('image/jpeg', 0.88);
-          }
-
-          const base64Length = compressedUrl.length - (compressedUrl.indexOf(',') + 1);
-          const compressedBytes = Math.round((base64Length * 3) / 4);
-          const ratio = originalBytes > 0 
-            ? Math.max(0, Math.round(((originalBytes - compressedBytes) / originalBytes) * 100))
-            : 0;
-
-          resolve({
-            dataUrl: compressedUrl,
-            stats: {
-              originalBytes,
-              compressedBytes,
-              ratio
-            }
-          });
-        };
-        img.onerror = () => reject(new Error('Failed to load image into Canvas'));
-        img.src = e.target?.result as string;
-      };
-
-      reader.onerror = () => reject(new Error('FileReader error'));
-      reader.readAsDataURL(file);
-    });
-  };
 
   const processFile = async (file: File) => {
     if (!file.type.startsWith('image/')) return;
     setIsCompressing(true);
     try {
-      const { dataUrl, stats } = await compressTo900x540(file);
-      onChangeFrontImage(dataUrl);
-      setFrontStats(stats);
+      const result = await cropAndCompressCardImage(file, {
+        targetWidth: 900,
+        targetHeight: 540,
+        quality: 0.88,
+        format: 'image/webp'
+      });
+      onChangeFrontImage(result.dataUrl);
+      setFrontStats(result);
     } catch (err) {
-      console.error('Canvas compression error:', err);
+      console.error('Image compression error:', err);
     } finally {
       setIsCompressing(false);
     }
@@ -155,18 +79,15 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
     if (file) processFile(file);
   };
 
-  const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-  };
-
   const handleLoadSample = () => {
     onChangeFrontImage('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80');
     setFrontStats({
+      dataUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
       originalBytes: 1540000,
       compressedBytes: 124000,
-      ratio: 92
+      ratio: 92,
+      width: 900,
+      height: 540
     });
     if (!cardData.name || cardData.name === 'PARK, GIHONG') {
       onChangeCardData('name', 'Dr. Michael Harrison');
@@ -273,7 +194,7 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
           <div className="px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 font-mono flex items-center justify-between animate-in fade-in duration-200">
             <span className="flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5 shrink-0" />
-              <span>{formatFileSize(frontStats.originalBytes)} → {formatFileSize(frontStats.compressedBytes)}</span>
+              <span>{formatByteSize(frontStats.originalBytes)} → {formatByteSize(frontStats.compressedBytes)}</span>
               <span className="text-[10px] text-emerald-500">(Canvas 900×540 WebP)</span>
             </span>
             <span className="font-bold">{frontStats.ratio}% 용량 절감</span>
