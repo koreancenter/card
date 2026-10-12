@@ -17,7 +17,7 @@ export interface BaseCard {
 export interface TemplateCard extends BaseCard {
   creation_mode: 'template';
   layout_type: 'editorial_minimal' | 'monogram_executive' | 'vertical_atelier' | 'swiss_typo_bold' | 'warm_organic';
-  theme_preset: 'sumi_ink' | 'warm_paper' | 'deep_forest' | 'classic_navy';
+  theme_preset: 'pure_white' | 'sumi_ink' | 'warm_paper' | 'deep_forest' | 'classic_navy';
   details: {
     en_name?: string;
     sub_org?: string;
@@ -44,8 +44,9 @@ export interface PhotoCard extends BaseCard {
 export type BusinessCard = TemplateCard | CustomHtmlCard | PhotoCard;
 
 export type ThemePreset =
+  | 'pure_white'   // Luxury Pure White (#FFFFFF), crisp monochrome black text (#111111)
   | 'sumi_ink'     // Deep matte ink canvas (#0B0C10), warm ivory text (#F8F4EB), champagne brass accent (#C5A880)
-  | 'warm_paper'   // Subtle fine paper ivory (#F8F4EB), deep charcoal text (#1F2023), deep wine primary accent (#6B1D42)
+  | 'warm_paper'   // Subtle fine paper ivory (#F8F4EB), deep charcoal text (#1F2023), luxury monochrome accent (#111111)
   | 'deep_forest'  // Muted dark forest emerald (#0D1F18), off-white typography, warm antique bronze details (#C2A478)
   | 'classic_navy'; // Midnight indigo (#0A1128), silver-white typography, platinum border hints (#D0D9E8)
 
@@ -56,8 +57,9 @@ export type LegacyTheme =
   | 'navy'       // 4. Midnight Diplomatic Navy
   | 'emerald'    // 5. Deep Forest Evergreen
   | 'sand'       // 6. Warm Travertine Cashmere
-  | 'burgundy'   // 7. Imperial Burgundy
-  | 'slate';     // 8. Nordic Mineral Slate
+  | 'burgundy'   // 7. Luxury Pure White (replaces legacy Burgundy)
+  | 'pure_white' // 8. Luxury Pure White
+  | 'slate';     // 9. Nordic Mineral Slate
 
 export type CardTheme = ThemePreset | LegacyTheme;
 

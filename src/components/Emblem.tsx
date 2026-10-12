@@ -12,15 +12,18 @@ export const Emblem: React.FC<EmblemProps> = ({
   size = 40,
   theme = 'obsidian' 
 }) => {
-  const isLight = theme === 'cotton' || theme === 'sand';
+  const isLight = theme === 'cotton' || theme === 'sand' || theme === 'warm_paper' || theme === 'burgundy' || (theme as string) === 'pure_white';
   
   // Refined palette mapping per theme
   let strokeColor = '#f5f5f5';
   let accentColor = '#a3a3a3';
 
-  if (theme === 'cotton') {
-    strokeColor = '#171717';
-    accentColor = '#737373';
+  if (theme === 'cotton' || theme === 'burgundy' || (theme as string) === 'pure_white') {
+    strokeColor = '#111111';
+    accentColor = '#525252';
+  } else if (theme === 'warm_paper') {
+    strokeColor = '#1F2023';
+    accentColor = '#666666';
   } else if (theme === 'sand') {
     strokeColor = '#27231f';
     accentColor = '#85796e';
@@ -30,9 +33,6 @@ export const Emblem: React.FC<EmblemProps> = ({
   } else if (theme === 'emerald') {
     strokeColor = '#f0fdf4';
     accentColor = '#d4af37'; // Champagne gold
-  } else if (theme === 'burgundy') {
-    strokeColor = '#fff1f2';
-    accentColor = '#e2b1b8';
   } else if (theme === 'slate') {
     strokeColor = '#f1f5f9';
     accentColor = '#94a3b8';

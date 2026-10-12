@@ -36,7 +36,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   onShowToast,
 }) => {
   const phoneTarget = data.phoneRaw || data.phone?.replace(/[^0-9+]/g, '');
-  const iconButtonClass = "w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-white/60 hover:text-[#C5A880] hover:bg-white/10 active:scale-95 transition-all duration-200 cursor-pointer";
+  const iconButtonClass = "w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 active:scale-95 transition-all duration-200 cursor-pointer";
 
   // Direct recipient action: download .vcf contact directly without modal
   const handleDownloadContact = () => {

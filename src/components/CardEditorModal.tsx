@@ -38,6 +38,13 @@ export const THEME_OPTIONS: {
   accent: string;
 }[] = [
   {
+    id: 'pure_white',
+    name: '럭셔리 퓨어 화이트',
+    description: '순백 프리미엄 & 모노크롬 블랙',
+    dotColor: '#FFFFFF',
+    accent: '#000000'
+  },
+  {
     id: 'sumi_ink',
     name: '수묵 인크',
     description: '깊은 먹색 매트 & 샴페인 황동',
@@ -47,9 +54,9 @@ export const THEME_OPTIONS: {
   {
     id: 'warm_paper',
     name: '웜 페이퍼',
-    description: '파인아트 코튼 & 딥 와인',
+    description: '파인아트 코튼 & 모노크롬 블랙',
     dotColor: '#F8F4EB',
-    accent: '#6B1D42'
+    accent: '#111111'
   },
   {
     id: 'deep_forest',
@@ -81,10 +88,10 @@ export const THEME_OPTIONS: {
   },
   {
     id: 'burgundy',
-    name: '임페리얼 버건디',
-    description: '벨벳 와인 & 로즈골드',
-    dotColor: '#15070B',
-    accent: '#E6A5B8'
+    name: '럭셔리 퓨어 화이트',
+    description: '순백 매트 코튼 & 하이콘트라스트 블랙',
+    dotColor: '#FFFFFF',
+    accent: '#000000'
   },
   {
     id: 'titanium',
@@ -110,7 +117,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
 
   // Template Mode states
   const [templateSubTab, setTemplateSubTab] = useState<'visual_atelier' | 'identity_profile'>('visual_atelier');
-  const [theme, setTheme] = useState<CardTheme>(card.theme || 'sumi_ink');
+  const [theme, setTheme] = useState<CardTheme>(card.theme || 'pure_white');
   const [layoutType, setLayoutType] = useState<CardLayoutType>(card.layout_type || 'editorial_minimal');
   const [features, setFeatures] = useState<CardFeatures>({
     show_en_name: card.card_features?.show_en_name ?? true,
@@ -189,7 +196,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
         }
       };
       setFormData(initialData);
-      setTheme(card.theme || 'sumi_ink');
+      setTheme(card.theme || 'pure_white');
       setLayoutType(card.layout_type || 'editorial_minimal');
       setFeatures({
         show_en_name: card.card_features?.show_en_name ?? true,
@@ -405,7 +412,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
             onClick={() => {
               setFormData({ ...CARD_DATA });
               setSlug('master');
-              setTheme('sumi_ink');
+              setTheme('pure_white');
               setLayoutType('editorial_minimal');
               setCreationMode('template');
             }}

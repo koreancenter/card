@@ -16,7 +16,7 @@ interface BusinessCardBackProps {
 
 export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
   data,
-  theme = 'sumi_ink',
+  theme = 'pure_white',
   layout_type = 'editorial_minimal',
   orientation = 'landscape',
   isPrintPreview = false,
@@ -59,7 +59,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
           className="w-full h-full object-cover rounded-2xl"
         />
         <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
-          <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-[#C5A880] tracking-wider uppercase shadow-sm">
+          <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-white tracking-wider uppercase shadow-sm">
             BACK PHOTO
           </span>
         </div>
@@ -74,7 +74,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
       type: 'svg',
       margin: 0,
       color: {
-        dark: isLight ? '#1F2023' : '#F8F4EB',
+        dark: isLight ? '#111111' : '#F8F4EB',
         light: '#00000000'
       },
       errorCorrectionLevel: 'M'
@@ -83,7 +83,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
         setQrSvg(svgString);
       })
       .catch((err) => {
-        console.error('Error generating QR', err);
+        console.warn('Notice generating QR', err);
       });
   }, [theme, isLight, data.website]);
 
@@ -112,11 +112,11 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
       {/* Center Statement */}
       <div className={`relative z-10 ${isPortrait ? 'my-auto py-3' : 'my-auto py-2'} text-center flex flex-col items-center justify-center space-y-1.5`}>
         <div className="space-y-0.5 sm:space-y-1">
-          <h2 className="text-sm sm:text-base md:text-lg font-bold tracking-tight text-white break-keep whitespace-normal">
+          <h2 className={`text-sm sm:text-base md:text-lg font-bold tracking-tight ${themeStyles.textPrimary} break-keep whitespace-normal`}>
             {data.backTitle || '고구마 AI 스튜디오'}
           </h2>
           <p 
-            className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#C5A880]"
+            className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest ${themeStyles.tagline}`}
           >
             {data.backSubtitle || 'GOGUMA AI STUDIO'}
           </p>
@@ -133,7 +133,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
 
       {/* Bottom Area: Portrait has centered QR block; Landscape has row */}
       {isPortrait ? (
-        <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-2 pt-3 border-t border-white/10 mt-auto w-full">
+        <div className={`relative z-10 flex flex-col items-center justify-center text-center space-y-2 pt-3 border-t ${themeStyles.accentHairline} mt-auto w-full`}>
           <a
             href={data.website}
             target="_blank"
@@ -144,7 +144,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
           >
             {qrSvg && (
               <div 
-                className="w-11 h-11 p-1 rounded-lg bg-white/95 border border-white/10 flex items-center justify-center shrink-0 shadow-md [&>svg]:w-full [&>svg]:h-full mb-1"
+                className={`w-11 h-11 p-1 rounded-lg ${isLight ? 'bg-neutral-100/90 border-neutral-200' : 'bg-white/95 border-white/10'} border flex items-center justify-center shrink-0 shadow-md [&>svg]:w-full [&>svg]:h-full mb-1`}
                 dangerouslySetInnerHTML={{ __html: qrSvg }}
                 title="디지털 명함 바로가기 QR 코드"
               />
@@ -163,7 +163,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
         </div>
       ) : (
         /* Landscape bottom bar */
-        <div className="relative z-10 flex items-end justify-between w-full pt-3 border-t border-white/10 mt-auto">
+        <div className={`relative z-10 flex items-end justify-between w-full pt-3 border-t ${themeStyles.accentHairline} mt-auto`}>
           <a 
             href={data.website}
             target="_blank"
@@ -174,7 +174,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
           >
             {qrSvg && (
               <div 
-                className="w-9 h-9 p-0.5 rounded-lg bg-white/95 border border-white/10 flex items-center justify-center shrink-0 shadow-sm [&>svg]:w-full [&>svg]:h-full"
+                className={`w-9 h-9 p-0.5 rounded-lg ${isLight ? 'bg-neutral-100/90 border-neutral-200' : 'bg-white/95 border-white/10'} border flex items-center justify-center shrink-0 shadow-sm [&>svg]:w-full [&>svg]:h-full`}
                 dangerouslySetInnerHTML={{ __html: qrSvg }}
                 title="디지털 명함 바로가기 QR 코드"
               />

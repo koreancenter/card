@@ -14,11 +14,11 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
     <div className="w-full max-w-[540px] mx-auto select-none flex flex-col items-center">
       {/* 3D-Style Luxury Business Card Surface (Responsive: Seamless on mobile, Framed card on desktop) */}
       <div 
-        className="w-full relative bg-transparent sm:bg-[#16181D] border-0 sm:border sm:border-white/10 sm:rounded-2xl sm:shadow-[0_24px_64px_rgba(0,0,0,0.6)] sm:hover:border-[#C5A880]/40 sm:hover:shadow-[0_32px_80px_rgba(0,0,0,0.75)] transition-all duration-300 p-2 py-6 sm:p-9 flex flex-col justify-between overflow-hidden group aspect-auto sm:aspect-[1.586/1] sm:min-h-[340px]"
+        className="w-full relative bg-transparent sm:bg-[#16181D] border-0 sm:border sm:border-white/10 sm:rounded-2xl sm:shadow-[0_24px_64px_rgba(0,0,0,0.6)] sm:hover:border-white/20 sm:hover:shadow-[0_32px_80px_rgba(0,0,0,0.75)] transition-all duration-300 p-2 py-6 sm:p-9 flex flex-col justify-between overflow-hidden group aspect-auto sm:aspect-[1.586/1] sm:min-h-[340px]"
       >
         {/* Subtle Luxury Ambient Glow & Watermark Geometry */}
         <div 
-          className="hidden sm:block absolute -top-24 -right-24 w-64 h-64 rounded-full bg-[#C5A880]/5 blur-3xl pointer-events-none group-hover:bg-[#C5A880]/10 transition-colors duration-500" 
+          className="hidden sm:block absolute -top-24 -right-24 w-64 h-64 rounded-full bg-white/[0.03] blur-3xl pointer-events-none group-hover:bg-white/[0.06] transition-colors duration-500" 
           aria-hidden="true"
         />
         <div 
@@ -46,7 +46,7 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
             {/* Primary CTA Button */}
             <button
               onClick={onCreateFirstCard}
-              className="w-full max-w-[260px] px-5 py-2.5 rounded-full bg-[#C5A880] hover:bg-[#D6B991] text-neutral-950 font-bold text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-[#C5A880]/15 hover:shadow-[#C5A880]/30 flex items-center justify-center gap-2 cursor-pointer active:scale-95 whitespace-nowrap"
+              className="w-full max-w-[260px] px-5 py-2.5 rounded-full bg-white hover:bg-neutral-200 text-neutral-950 font-bold text-xs sm:text-sm transition-all duration-200 shadow-lg shadow-white/10 hover:shadow-white/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95 whitespace-nowrap"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>첫 명함 만들기</span>
@@ -57,7 +57,7 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
               onClick={onExploreSample}
               className="w-auto px-4 py-2 rounded-full text-neutral-300 hover:text-white hover:bg-white/5 transition-colors duration-200 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 cursor-pointer underline-offset-4 hover:underline whitespace-nowrap"
             >
-              <Eye className="w-3.5 h-3.5 text-[#C5A880]" />
+              <Eye className="w-3.5 h-3.5 text-white" />
               <span>샘플 둘러보기</span>
             </button>
           </div>

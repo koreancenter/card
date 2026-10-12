@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CardData, CardTheme, CardOrientation, CardLayoutType, CardFeatures } from '../types/card';
+import { resolveThemeStyles } from '../constants/templates';
 import { BusinessCardFront } from './BusinessCardFront';
 import { BusinessCardBack } from './BusinessCardBack';
 import { ActionButtons } from './ActionButtons';
@@ -130,7 +131,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
               transformStyle: 'preserve-3d',
               WebkitTransformStyle: 'preserve-3d',
             }}
-            className="w-full h-full rounded-2xl overflow-hidden ring-1 ring-white/10"
+            className={`w-full h-full rounded-2xl overflow-hidden ring-1 ${resolveThemeStyles(theme).isLight ? 'ring-black/[0.08]' : 'ring-white/10'}`}
           >
             <BusinessCardFront 
               data={data} 
@@ -153,7 +154,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
               transformStyle: 'preserve-3d',
               WebkitTransformStyle: 'preserve-3d',
             }}
-            className="absolute inset-0 w-full h-full rounded-2xl overflow-hidden ring-1 ring-white/10"
+            className={`absolute inset-0 w-full h-full rounded-2xl overflow-hidden ring-1 ${resolveThemeStyles(theme).isLight ? 'ring-black/[0.08]' : 'ring-white/10'}`}
           >
             <BusinessCardBack 
               data={data} 

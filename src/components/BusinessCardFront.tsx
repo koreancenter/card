@@ -18,7 +18,7 @@ interface BusinessCardFrontProps {
 
 export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
   data,
-  theme = 'sumi_ink',
+  theme = 'pure_white',
   layout_type = 'editorial_minimal',
   card_features,
   orientation = 'landscape',

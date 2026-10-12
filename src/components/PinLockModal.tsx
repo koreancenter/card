@@ -319,10 +319,10 @@ export const PinLockModal: React.FC<PinLockModalProps> = ({
               type="button"
               onClick={triggerBiometricUnlock}
               disabled={isAuthenticatingBio}
-              className="w-full mb-5 py-2.5 px-4 rounded-2xl bg-[#C5A880]/15 hover:bg-[#C5A880]/25 active:bg-[#C5A880]/35 border border-[#C5A880]/40 hover:border-[#C5A880]/70 text-[#C5A880] text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm active:scale-98"
+              className="w-full mb-5 py-2.5 px-4 rounded-2xl bg-white/10 hover:bg-white/15 active:bg-white/20 border border-white/20 hover:border-white/40 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm active:scale-98"
             >
-              <Fingerprint className="w-4 h-4 text-[#C5A880] animate-pulse shrink-0" />
-              <span>Use Biometrics ({biometricLabel})</span>
+              <Fingerprint className="w-4 h-4 text-white animate-pulse shrink-0" />
+              <span>생체 인증으로 잠금 해제 ({biometricLabel})</span>
             </button>
           )
         )}
@@ -338,7 +338,7 @@ export const PinLockModal: React.FC<PinLockModalProps> = ({
                   isError
                     ? 'bg-rose-500 ring-4 ring-rose-500/20'
                     : isFilled
-                      ? 'bg-[#C5A880] ring-4 ring-[#C5A880]/20 scale-110 shadow-lg shadow-[#C5A880]/20'
+                      ? 'bg-white ring-4 ring-white/20 scale-110 shadow-lg shadow-white/20'
                       : 'bg-white/10 border border-white/20'
                 }`}
               />
@@ -398,7 +398,7 @@ export const PinLockModal: React.FC<PinLockModalProps> = ({
           <div className="w-full mt-2 pt-3 border-t border-white/10 flex flex-col items-center">
             <div className="flex items-center justify-between w-full text-xs mb-2 px-1">
               <span className="text-white/70 flex items-center gap-1.5 font-medium">
-                <Fingerprint className="w-3.5 h-3.5 text-[#C5A880]" />
+                <Fingerprint className="w-3.5 h-3.5 text-white" />
                 <span>{biometricLabel} 연동</span>
               </span>
               {biometricRegistered ? (
@@ -423,10 +423,10 @@ export const PinLockModal: React.FC<PinLockModalProps> = ({
                 type="button"
                 onClick={handleRegisterBiometric}
                 disabled={isAuthenticatingBio}
-                className="w-full py-2 px-3 rounded-xl bg-[#C5A880]/10 hover:bg-[#C5A880]/20 border border-[#C5A880]/30 hover:border-[#C5A880]/50 text-[#C5A880] text-xs font-semibold transition-all cursor-pointer active:scale-98 flex items-center justify-center gap-1.5"
+                className="w-full py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-white text-xs font-semibold transition-all cursor-pointer active:scale-98 flex items-center justify-center gap-1.5"
               >
                 <Fingerprint className="w-3.5 h-3.5" />
-                <span>Register Biometrics ({biometricLabel})</span>
+                <span>생체 인증 등록 ({biometricLabel})</span>
               </button>
             )}
           </div>

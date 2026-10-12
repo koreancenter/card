@@ -1,7 +1,7 @@
 import { CardData, CardTheme } from '../types/card';
 import { generateVCard } from './vcard';
 
-export function generateStandaloneHtml(data: CardData, theme: CardTheme = 'sand'): string {
+export function generateStandaloneHtml(data: CardData, theme: CardTheme = 'pure_white'): string {
   const vcardString = generateVCard(data);
   const vcardEncoded = encodeURIComponent(vcardString);
   const pageTitle = `${data.name} (${data.nameKr}) — ${data.organization}`;
@@ -10,8 +10,9 @@ export function generateStandaloneHtml(data: CardData, theme: CardTheme = 'sand'
 
   // Theme color maps for inline generation
   const themeColors: Record<string, { bg: string; text: string; textSec: string; border: string; accent: string }> = {
+    pure_white: { bg: '#FFFFFF', text: '#111111', textSec: '#525252', border: '#E5E5E5', accent: '#000000' },
     sumi_ink: { bg: '#0B0C10', text: '#F8F4EB', textSec: '#C5BEB3', border: '#262420', accent: '#C5A880' },
-    warm_paper: { bg: '#F8F4EB', text: '#1F2023', textSec: '#4F4C47', border: '#DFD7C7', accent: '#6B1D42' },
+    warm_paper: { bg: '#F8F4EB', text: '#1F2023', textSec: '#4F4C47', border: '#DFD7C7', accent: '#111111' },
     deep_forest: { bg: '#0D1F18', text: '#F4F7F4', textSec: '#AEC2B4', border: '#1C362A', accent: '#C2A478' },
     classic_navy: { bg: '#0A1128', text: '#F0F4FC', textSec: '#A8BADB', border: '#1E2C52', accent: '#D0D9E8' },
     sand: { bg: '#f8f6f0', text: '#191614', textSec: '#484037', border: '#ded7cb', accent: '#d97706' },
@@ -20,11 +21,11 @@ export function generateStandaloneHtml(data: CardData, theme: CardTheme = 'sand'
     titanium: { bg: '#18181b', text: '#f4f4f5', textSec: '#a1a1aa', border: '#3f3f46', accent: '#71717a' },
     navy: { bg: '#080e1a', text: '#f8fafc', textSec: '#94a3b8', border: '#1e293b', accent: '#38bdf8' },
     emerald: { bg: '#08140e', text: '#f0fdf4', textSec: '#86efac', border: '#14532d', accent: '#4ade80' },
-    burgundy: { bg: '#15070b', text: '#fff1f2', textSec: '#fecdd3', border: '#881337', accent: '#fb7185' },
+    burgundy: { bg: '#FFFFFF', text: '#111111', textSec: '#525252', border: '#E5E5E5', accent: '#000000' },
     slate: { bg: '#10151f', text: '#f1f5f9', textSec: '#94a3b8', border: '#334155', accent: '#64748b' }
   };
 
-  const selectedTheme = themeColors[theme] || themeColors.sumi_ink;
+  const selectedTheme = themeColors[theme] || themeColors.pure_white;
 
   return `<!DOCTYPE html>
 <html lang="ko" class="dark">

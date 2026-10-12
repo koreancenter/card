@@ -17,7 +17,8 @@ import {
   getBiometricLabel,
   getBiometricSecurityThresholdStatus,
   SECURITY_THRESHOLD_DAYS,
-  BiometricSecurityThresholdStatus
+  BiometricSecurityThresholdStatus,
+  isIframe
 } from '../utils/biometrics';
 import { isPinSet } from '../utils/pinLock';
 
@@ -165,7 +166,7 @@ export const BiometricsSettingModal: React.FC<BiometricsSettingModalProps> = ({
             ) : statusMessage.type === 'error' ? (
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-400 mt-0.5" />
             ) : (
-              <ShieldCheck className="w-4 h-4 shrink-0 text-[#C5A880] mt-0.5" />
+              <ShieldCheck className="w-4 h-4 shrink-0 text-white mt-0.5" />
             )}
             <span className="leading-relaxed">{statusMessage.text}</span>
           </div>
@@ -191,7 +192,7 @@ export const BiometricsSettingModal: React.FC<BiometricsSettingModalProps> = ({
             <div>
               <span className="text-[11px] text-neutral-500 block mb-0.5">PIN 재인증 유효 기간</span>
               <span className={`text-xs font-semibold ${
-                thresholdStatus?.isExpired ? 'text-rose-400' : 'text-[#C5A880]'
+                thresholdStatus?.isExpired ? 'text-rose-400' : 'text-neutral-100'
               }`}>
                 {thresholdStatus?.isExpired 
                   ? '만료됨 (PIN 인증 필요)' 
@@ -222,7 +223,9 @@ export const BiometricsSettingModal: React.FC<BiometricsSettingModalProps> = ({
           </div>
           <p className="text-[11px] text-neutral-400 leading-relaxed pt-0.5">
             {isSupported
-              ? '브라우저 및 기기의 보안 엔클레이브를 활용할 수 있습니다.'
+              ? isIframe()
+                ? '보안 격리 가상 크레덴셜 지원 (미리보기 최적화 · 독립 창에서는 기기 하드웨어 생체 센서와 직접 연동)'
+                : '브라우저 및 기기의 보안 엔클레이브를 활용할 수 있습니다.'
               : '현재 브라우저 또는 환경에서 플랫폼 생체 인증 센서가 감지되지 않았습니다. HTTPS 및 지원 브라우저를 확인하세요.'}
           </p>
         </div>
@@ -268,7 +271,7 @@ export const BiometricsSettingModal: React.FC<BiometricsSettingModalProps> = ({
                 type="button"
                 onClick={handleRegister}
                 disabled={isLoading}
-                className="w-full py-3 px-4 rounded-xl bg-[#C5A880] hover:bg-[#d6b991] active:bg-[#b0936b] text-neutral-950 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#C5A880]/15 active:scale-98"
+                className="w-full py-3 px-4 rounded-xl bg-white hover:bg-neutral-200 active:bg-neutral-300 text-neutral-950 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-white/10 active:scale-98"
               >
                 <span>{isLoading ? '인증 진행 중...' : '생체 인증 등록'}</span>
               </button>
@@ -290,7 +293,7 @@ export const BiometricsSettingModal: React.FC<BiometricsSettingModalProps> = ({
                 onClose();
                 onOpenPinSetup();
               }}
-              className="text-xs text-[#C5A880] hover:underline font-medium flex items-center gap-1 shrink-0 ml-2 cursor-pointer"
+              className="text-xs text-white hover:underline font-medium flex items-center gap-1 shrink-0 ml-2 cursor-pointer"
             >
               <span>{hasPin ? 'PIN 변경' : 'PIN 설정'}</span>
               <ArrowRight className="w-3 h-3" />

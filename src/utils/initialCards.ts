@@ -10,7 +10,7 @@ export const INITIAL_CARDS: StoredCard[] = [
     owner_key: 'owner_master_sample',
     customDomain: 'card.goguma.app/master',
     category: 'AI·기술',
-    theme: 'sumi_ink',
+    theme: 'pure_white',
     layout_type: 'editorial_minimal',
     card_features: {
       show_en_name: true,
@@ -194,6 +194,7 @@ export function loadUserCards(): StoredCard[] {
             owner_key: c.owner_key || 'owner_master_sample',
             customDomain: 'card.goguma.app/master',
             category: 'AI·기술',
+            theme: 'pure_white',
             data: {
               ...CARD_DATA,
               name: 'PARK, GIHONG',
@@ -207,7 +208,7 @@ export function loadUserCards(): StoredCard[] {
     }
     return [];
   } catch (e) {
-    console.error('Failed to load cards from storage', e);
+    console.warn('Notice loading cards from storage', e);
     return [];
   }
 }
@@ -228,7 +229,7 @@ export function saveUserCards(cards: StoredCard[]): void {
     localStorage.setItem(FALLBACK_STORAGE_KEY, JSON.stringify(cards));
     localStorage.setItem('saved_cards', JSON.stringify(cards));
   } catch (e) {
-    console.error('Failed to save cards to storage', e);
+    console.warn('Notice saving cards to storage', e);
   }
 }
 
@@ -253,6 +254,6 @@ export function clearAllLocalData(): void {
     localStorage.removeItem('lazy_pin_dismissed');
     sessionStorage.clear();
   } catch (e) {
-    console.error('Failed to reset local data', e);
+    console.warn('Notice resetting local data', e);
   }
 }

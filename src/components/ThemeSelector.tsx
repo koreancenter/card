@@ -16,15 +16,15 @@ export const THEMES: {
   accent: string;
   isCurated?: boolean;
 }[] = [
-  // 4 Curated Luxury Material Themes
+  // Curated Luxury Material Themes
+  { id: 'pure_white', label: '럭셔리 퓨어 화이트 (Pure White)', shortLabel: '화이트', previewClass: 'bg-[#FFFFFF] border-neutral-300', dotColor: '#FFFFFF', accent: '#000000', isCurated: true },
   { id: 'sumi_ink', label: '수묵 인크 (Sumi Ink)', shortLabel: '수묵', previewClass: 'bg-[#0B0C10] border-[#33312B]', dotColor: '#0B0C10', accent: '#C5A880', isCurated: true },
-  { id: 'warm_paper', label: '웜 페이퍼 (Fine Paper)', shortLabel: '웜 페이퍼', previewClass: 'bg-[#F8F4EB] border-[#D8D0C0]', dotColor: '#F8F4EB', accent: '#6B1D42', isCurated: true },
+  { id: 'warm_paper', label: '웜 페이퍼 (Fine Paper)', shortLabel: '웜 페이퍼', previewClass: 'bg-[#F8F4EB] border-[#D8D0C0]', dotColor: '#F8F4EB', accent: '#111111', isCurated: true },
   { id: 'deep_forest', label: '딥 포레스트 (Emerald)', shortLabel: '에메랄드', previewClass: 'bg-[#0D1F18] border-[#1C362A]', dotColor: '#0D1F18', accent: '#C2A478', isCurated: true },
   { id: 'classic_navy', label: '클래식 네이비 (Midnight)', shortLabel: '네이비', previewClass: 'bg-[#0A1128] border-[#1E2C52]', dotColor: '#0A1128', accent: '#D0D9E8', isCurated: true },
   // Classic Archivist Options
   { id: 'obsidian', label: '옵시디언 블랙', shortLabel: '블랙', previewClass: 'bg-[#0c0c0d] border-neutral-700', dotColor: '#0c0c0d', accent: '#C5A880' },
   { id: 'sand', label: '샌드 캐시미어', shortLabel: '샌드', previewClass: 'bg-[#f6f3ec] border-[#dfd8cb]', dotColor: '#f6f3ec', accent: '#544b40' },
-  { id: 'burgundy', label: '임페리얼 버건디', shortLabel: '버건디', previewClass: 'bg-[#15070b] border-rose-900/60', dotColor: '#15070b', accent: '#E6A5B8' },
   { id: 'titanium', label: '티타늄 그레이', shortLabel: '티타늄', previewClass: 'bg-[#18181b] border-zinc-600', dotColor: '#18181b', accent: '#A1A1AA' },
 ];
 

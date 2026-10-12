@@ -85,6 +85,24 @@ export interface ThemePresetDefinition {
 
 export const LUXURY_THEME_PRESETS: ThemePresetDefinition[] = [
   {
+    id: 'pure_white',
+    name: '럭셔리 퓨어 화이트 (Pure White)',
+    nameEn: 'Luxury Pure White & Monochrome Black',
+    description: '순백 프리미엄 캔버스(#FFFFFF)와 깊이 있는 블랙 텍스트, 모노크롬 정밀 디테일',
+    canvasBg: 'bg-[#FFFFFF]',
+    textPrimary: 'text-[#111111]',
+    textSecondary: 'text-[#4A4A4A]',
+    textMuted: 'text-[#737373]',
+    accent: '#000000',
+    accentName: '모노크롬 블랙 (#000000)',
+    borderClass: 'border-[#E5E5E5]',
+    hairlineClass: 'border-[#E5E5E5]',
+    hoverHighlight: 'hover:bg-[#F5F5F5]',
+    qrBg: 'bg-[#F5F5F5]',
+    dotColor: '#FFFFFF',
+    isLight: true
+  },
+  {
     id: 'sumi_ink',
     name: '수묵 인크 (Sumi Ink)',
     nameEn: 'Sumi Ink & Champagne Brass',
@@ -105,14 +123,14 @@ export const LUXURY_THEME_PRESETS: ThemePresetDefinition[] = [
   {
     id: 'warm_paper',
     name: '웜 페이퍼 (Warm Paper)',
-    nameEn: 'Fine Cotton Ivory & Deep Wine',
-    description: '파인아트 코튼 아이보리(#F8F4EB)와 딥 차콜 텍스트, 딥 와인 프라이머리 액센트',
+    nameEn: 'Fine Cotton Ivory & Monochrome',
+    description: '파인아트 코튼 아이보리(#F8F4EB)와 딥 차콜 텍스트, 럭셔리 모노크롬 액센트',
     canvasBg: 'bg-[#F8F4EB]',
     textPrimary: 'text-[#1F2023]',
     textSecondary: 'text-[#4F4C47]',
     textMuted: 'text-[#827D73]',
-    accent: '#6B1D42',
-    accentName: '딥 와인 (#6B1D42)',
+    accent: '#111111',
+    accentName: '모노크롬 블랙 (#111111)',
     borderClass: 'border-[#DFD7C7]',
     hairlineClass: 'border-[#DFD7C7]/90',
     hoverHighlight: 'hover:bg-[#ECE4D5]',
@@ -174,9 +192,26 @@ export interface ResolvedThemeStyle {
 }
 
 export function resolveThemeStyles(theme: CardTheme | undefined): ResolvedThemeStyle {
-  const t = theme || 'sumi_ink';
+  const t = theme || 'pure_white';
 
-  // Check 4 luxury presets first
+  // Check luxury presets
+  if (t === 'pure_white' || t === 'burgundy') {
+    return {
+      cardBg: 'bg-[#FFFFFF]',
+      border: 'border-[#E5E5E5] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.12),0_0_1px_1px_rgba(0,0,0,0.06)]',
+      textPrimary: 'text-[#111111]',
+      textSecondary: 'text-[#4A4A4A]',
+      textMuted: 'text-[#737373]',
+      accent: '#000000',
+      accentHairline: 'border-[#E5E5E5]',
+      tagline: 'text-[#111111]',
+      hoverHighlight: 'hover:bg-[#F5F5F5]',
+      sheen: 'from-black/[0.04] via-transparent to-transparent',
+      qrBg: 'bg-[#F5F5F5]',
+      isLight: true
+    };
+  }
+
   if (t === 'sumi_ink') {
     return {
       cardBg: 'bg-[#0B0C10]',
@@ -201,9 +236,9 @@ export function resolveThemeStyles(theme: CardTheme | undefined): ResolvedThemeS
       textPrimary: 'text-[#1F2023]',
       textSecondary: 'text-[#4F4C47]',
       textMuted: 'text-[#827D73]',
-      accent: '#6B1D42',
+      accent: '#111111',
       accentHairline: 'border-[#DFD7C7]',
-      tagline: 'text-[#6B1D42]',
+      tagline: 'text-[#1F2023]',
       hoverHighlight: 'hover:bg-[#ECE4D5]',
       sheen: 'from-white/70 via-transparent to-transparent',
       qrBg: 'bg-[#EFE8DC]',
@@ -263,37 +298,37 @@ export function resolveThemeStyles(theme: CardTheme | undefined): ResolvedThemeS
     };
   }
 
-  if (t === 'burgundy') {
+  if (t === 'burgundy' || (t as string) === 'pure_white') {
     return {
-      cardBg: 'bg-[#15070B]',
-      border: 'border-rose-950/80 ring-1 ring-rose-900/20 shadow-2xl',
-      textPrimary: 'text-rose-50',
-      textSecondary: 'text-rose-200/80',
-      textMuted: 'text-rose-400/60',
-      accent: '#E6A5B8',
-      accentHairline: 'border-rose-900/40',
-      tagline: 'text-rose-300',
-      hoverHighlight: 'hover:bg-rose-950/40',
-      sheen: 'from-rose-900/20 via-transparent to-transparent',
-      qrBg: 'bg-rose-950/80',
-      isLight: false
+      cardBg: 'bg-[#FFFFFF]',
+      border: 'border-[#E5E5E5] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.12),0_0_1px_1px_rgba(0,0,0,0.06)]',
+      textPrimary: 'text-[#111111]',
+      textSecondary: 'text-[#4A4A4A]',
+      textMuted: 'text-[#737373]',
+      accent: '#000000',
+      accentHairline: 'border-[#E5E5E5]',
+      tagline: 'text-[#111111]',
+      hoverHighlight: 'hover:bg-[#F5F5F5]',
+      sheen: 'from-black/[0.04] via-transparent to-transparent',
+      qrBg: 'bg-[#F5F5F5]',
+      isLight: true
     };
   }
 
-  // Default to sumi_ink
+  // Default to pure_white
   return {
-    cardBg: 'bg-[#0B0C10]',
-    border: 'border-[#262420] shadow-2xl',
-    textPrimary: 'text-[#F8F4EB]',
-    textSecondary: 'text-[#C5BEB3]',
-    textMuted: 'text-[#878072]',
-    accent: '#C5A880',
-    accentHairline: 'border-[#262420]/80',
-    tagline: 'text-[#C5A880]',
-    hoverHighlight: 'hover:bg-[#1E1F26]',
-    sheen: 'from-amber-200/10 via-transparent to-transparent',
-    qrBg: 'bg-[#15161D]',
-    isLight: false
+    cardBg: 'bg-[#FFFFFF]',
+    border: 'border-[#E5E5E5] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.12),0_0_1px_1px_rgba(0,0,0,0.06)]',
+    textPrimary: 'text-[#111111]',
+    textSecondary: 'text-[#4A4A4A]',
+    textMuted: 'text-[#737373]',
+    accent: '#000000',
+    accentHairline: 'border-[#E5E5E5]',
+    tagline: 'text-[#111111]',
+    hoverHighlight: 'hover:bg-[#F5F5F5]',
+    sheen: 'from-black/[0.04] via-transparent to-transparent',
+    qrBg: 'bg-[#F5F5F5]',
+    isLight: true
   };
 }
 
