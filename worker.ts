@@ -1,12 +1,21 @@
+/**
+ * Production Serverless Edge Worker for Korean Center Digital Card Studio
+ * Configured as the single authoritative serverless entry point via wrangler.toml (main = "worker.ts").
+ * Enforces Zero-Trust parameter binding on Cloudflare D1 with zero string concatenation.
+ */
+
 export interface Env {
   DB: any;
   R2?: any;
   ASSETS: { fetch: (request: Request) => Promise<Response> };
+  GEMINI_API_KEY?: string;
+  BASE_DOMAIN?: string;
 }
 
-// Static Prepared SQL Statements (Zero string concatenation)
+// Static Prepared SQL Statements (Strictly Zero String Concatenation)
 const SQL_SELECT_CARD_BY_DOMAIN = "SELECT * FROM cards WHERE custom_domain = ? LIMIT 1";
 const SQL_SELECT_CARD_BY_SLUG = "SELECT * FROM cards WHERE slug = ? LIMIT 1";
+const SQL_SELECT_RECENT_CARDS = "SELECT * FROM cards ORDER BY updated_at DESC LIMIT 50";
 const SQL_UPSERT_CARD = `
   INSERT INTO cards (id, slug, custom_domain, owner_key, theme, data, updated_at)
   VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
@@ -37,19 +46,32 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
-    // CORS 기본 헤더
-    const corsHeaders = {
+    // Standard CORS headers for client-side queries
+    const corsHeaders: Record<string, string> = {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
     };
 
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
     }
 
-    // 1. 단일 명함 조회: GET /api/resolve?slug=...
+    // 1. Health check & Architecture Diagnostic
+    if (url.pathname === "/api/health" && request.method === "GET") {
+      return new Response(
+        JSON.stringify({
+          status: "ok",
+          service: "Korean Center Card Studio",
+          runtime: "Cloudflare Edge Worker (Unified Serverless Entry Point)",
+          timestamp: new Date().toISOString(),
+        }),
+        { headers: corsHeaders }
+      );
+    }
+
+    // 2. Direct Card Resolution: GET /api/resolve?slug=...
     if (url.pathname === "/api/resolve" && request.method === "GET") {
       const rawSlug = url.searchParams.get("slug") || "";
       const rawHost = request.headers.get("host") || "";
@@ -57,22 +79,32 @@ export default {
       const host = sanitizeParam(rawHost.toLowerCase().replace(/:\d+$/, ""), 255);
 
       try {
-        let card = null;
+        let card: any = null;
 
-        // 자체 도메인(직원/대표자 전용)으로 접속한 경우 - Prepared statement with .bind()
-        if (host && !host.includes("card.goguma.app") && !host.includes("localhost") && !host.includes("127.0.0.1")) {
+        // Custom domain routing (host match) via bound prepared query
+        const baseDomain = env.BASE_DOMAIN || "card.goguma.app";
+        if (host && !host.includes(baseDomain) && !host.includes("localhost") && !host.includes("127.0.0.1")) {
           card = await env.DB.prepare(SQL_SELECT_CARD_BY_DOMAIN).bind(host).first();
         } 
-        // 기본 슬러그로 접속한 경우 - Prepared statement with .bind()
+        // Standard slug lookup via bound prepared query
         else if (slug) {
           card = await env.DB.prepare(SQL_SELECT_CARD_BY_SLUG).bind(slug).first();
         }
 
         if (!card) {
           return new Response(
-            JSON.stringify({ success: false, message: "Card not found" }),
+            JSON.stringify({ success: false, notFound: true, message: "Card not found" }),
             { status: 404, headers: corsHeaders }
           );
+        }
+
+        // Parse JSON data if stored as string in D1
+        if (typeof card.data === 'string') {
+          try {
+            card.data = JSON.parse(card.data);
+          } catch {
+            // Keep as string if parsing fails
+          }
         }
 
         return new Response(
@@ -87,7 +119,59 @@ export default {
       }
     }
 
-    // 2. 단일 명함 등록/수정: POST /api/cards
+    // 3. Card Query: GET /api/cards?slug=... or GET /api/cards?domain=...
+    if (url.pathname === "/api/cards" && request.method === "GET") {
+      const slug = sanitizeParam(url.searchParams.get("slug"), 100);
+      const domain = sanitizeParam(url.searchParams.get("domain"), 255);
+
+      try {
+        if (slug) {
+          const card: any = await env.DB.prepare(SQL_SELECT_CARD_BY_SLUG).bind(slug).first();
+          if (!card) {
+            return new Response(
+              JSON.stringify({ error: "Card not found for slug" }),
+              { status: 404, headers: corsHeaders }
+            );
+          }
+          if (typeof card.data === 'string') {
+            try { card.data = JSON.parse(card.data); } catch {}
+          }
+          return new Response(JSON.stringify({ card }), { headers: corsHeaders });
+        }
+
+        if (domain) {
+          const card: any = await env.DB.prepare(SQL_SELECT_CARD_BY_DOMAIN).bind(domain).first();
+          if (!card) {
+            return new Response(
+              JSON.stringify({ error: "Card not found for custom domain" }),
+              { status: 404, headers: corsHeaders }
+            );
+          }
+          if (typeof card.data === 'string') {
+            try { card.data = JSON.parse(card.data); } catch {}
+          }
+          return new Response(JSON.stringify({ card }), { headers: corsHeaders });
+        }
+
+        // Fetch recent cards collection
+        const { results = [] } = await env.DB.prepare(SQL_SELECT_RECENT_CARDS).all();
+        const cards = results.map((c: any) => {
+          if (typeof c.data === 'string') {
+            try { c.data = JSON.parse(c.data); } catch {}
+          }
+          return c;
+        });
+
+        return new Response(JSON.stringify({ cards }), { headers: corsHeaders });
+      } catch (err: any) {
+        return new Response(
+          JSON.stringify({ error: err.message || "Query failed" }),
+          { status: 500, headers: corsHeaders }
+        );
+      }
+    }
+
+    // 4. Card Upsert: POST /api/cards
     if (url.pathname === "/api/cards" && request.method === "POST") {
       try {
         const body: any = await request.json();
@@ -111,10 +195,9 @@ export default {
 
         const validDomain = sanitizeParam(custom_domain, 255);
         const validOwnerKey = sanitizeParam(owner_key, 128);
-        const validTheme = sanitizeParam(theme, 32) || "sand";
+        const validTheme = sanitizeParam(theme, 32) || "pure_white";
         const validData = typeof data === "string" ? data : JSON.stringify(data || {});
 
-        // Enforce strictly prepared statements via .prepare().bind()
         await env.DB.prepare(SQL_UPSERT_CARD).bind(
           validId,
           validSlug,
@@ -125,7 +208,7 @@ export default {
         ).run();
 
         return new Response(
-          JSON.stringify({ success: true }),
+          JSON.stringify({ success: true, id: validId, slug: validSlug }),
           { headers: corsHeaders }
         );
       } catch (err: any) {
@@ -136,7 +219,7 @@ export default {
       }
     }
 
-    // 3. 무계정 보관함 불러오기: GET /api/sync?id=sync_xxxx
+    // 5. Cross-Device Anonymous Sync: GET /api/sync?id=sync_xxxx
     if (url.pathname === "/api/sync" && request.method === "GET") {
       const rawSyncId = url.searchParams.get("id") || "";
       if (!rawSyncId || !/^[a-zA-Z0-9_\-]{3,64}$/.test(rawSyncId)) {
@@ -149,12 +232,12 @@ export default {
       const syncId = rawSyncId.trim();
 
       try {
-        // Enforce strictly prepared statements via .prepare().bind()
         const wallet: any = await env.DB.prepare(SQL_SELECT_WALLET).bind(syncId).first();
 
         return new Response(
           JSON.stringify({
             success: true,
+            syncId,
             cards: wallet && wallet.cards_json ? JSON.parse(wallet.cards_json) : []
           }),
           { headers: corsHeaders }
@@ -167,7 +250,7 @@ export default {
       }
     }
 
-    // 4. 무계정 보관함 백업/저장: POST /api/sync
+    // 6. Cross-Device Anonymous Sync: POST /api/sync
     if (url.pathname === "/api/sync" && request.method === "POST") {
       try {
         const body: any = await request.json();
@@ -182,11 +265,10 @@ export default {
 
         const cardsJson = JSON.stringify(cards);
 
-        // Enforce strictly prepared statements via .prepare().bind()
         await env.DB.prepare(SQL_UPSERT_WALLET).bind(syncId.trim(), cardsJson).run();
 
         return new Response(
-          JSON.stringify({ success: true }),
+          JSON.stringify({ success: true, syncId, count: cards.length }),
           { headers: corsHeaders }
         );
       } catch (err: any) {
@@ -197,7 +279,35 @@ export default {
       }
     }
 
-    // 5. 정적 파일(SPA) 서빙
-    return env.ASSETS.fetch(request);
+    // 7. Local Photo Scan Confirmation Endpoint: POST /api/scan-card
+    if (url.pathname === "/api/scan-card" && request.method === "POST") {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          localOnly: true,
+          message: "Zero-AI Local Photo Archiving Active: 카드 사진이 브라우저 로컬 저장소에 안전하게 보관되었습니다."
+        }),
+        { headers: corsHeaders }
+      );
+    }
+
+    // 8. Custom HTML / Tailwind Generator Fallback: POST /api/generate-card-html
+    if (url.pathname === "/api/generate-card-html" && request.method === "POST") {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          fallback: true,
+          message: "Custom HTML template presets are served client-side."
+        }),
+        { headers: corsHeaders }
+      );
+    }
+
+    // 9. Static Asset Fallback (Vite Single Page App)
+    if (env.ASSETS && typeof env.ASSETS.fetch === "function") {
+      return env.ASSETS.fetch(request);
+    }
+
+    return new Response("Not Found", { status: 404 });
   }
 };
