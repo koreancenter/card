@@ -105,11 +105,15 @@ export default function App() {
     }
   };
 
-  // Optional Biometric Unlock handler
+  // Optional Biometric Unlock handler with automatic cryptographic vault rehydration
   const handleBiometricUnlock = async () => {
     const res = await verifyBiometric();
     if (res.success) {
       unlockApp();
+      const decrypted = loadUserCards();
+      if (decrypted && decrypted.length > 0) {
+        setCards(decrypted);
+      }
       showToast('생체 인증(Biometrics)으로 잠금이 해제되었습니다.');
     } else if (res.error && !res.error.includes('취소')) {
       showToast(res.error);
@@ -1028,6 +1032,10 @@ export default function App() {
           allowCancel={false}
           onUnlock={() => {
             unlockApp();
+            const decrypted = loadUserCards();
+            if (decrypted && decrypted.length > 0) {
+              setCards(decrypted);
+            }
             showToast('보안 잠금이 해제되었습니다.');
           }}
           onBiometricUnlock={handleBiometricUnlock}
@@ -1041,6 +1049,10 @@ export default function App() {
           onClose={() => setIsConfigModalOpen(false)}
           onSuccess={() => {
             refreshPinStatus();
+            const decrypted = loadUserCards();
+            if (decrypted && decrypted.length > 0) {
+              setCards(decrypted);
+            }
             showToast(pinModalMode === 'setup' ? '4자리 PIN 잠금이 설정되었습니다.' : 'PIN 번호가 성공적으로 변경되었습니다.');
           }}
         />

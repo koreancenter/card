@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Copy, Check, Sparkles, Code, RefreshCw, Wand2 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Copy, Check, Sparkles, Code, RefreshCw, Wand2, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { CardData } from '../../types/card';
+import { sanitizeCardHtml, detectUnsafePatterns } from '../../utils/sanitizer';
 
 interface CustomHtmlEditorProps {
   htmlFront: string;
@@ -121,21 +122,26 @@ export const CustomHtmlEditor: React.FC<CustomHtmlEditorProps> = ({
       });
       const data = await res.json();
       if (data.success && data.html) {
-        onChangeFront(data.html);
-        setAiStatus('✓ AI 생성 코드가 앞면에 자동 적용되었습니다.');
+        const sanitizedAiHtml = sanitizeCardHtml(data.html);
+        onChangeFront(sanitizedAiHtml);
+        setAiStatus('✓ AI 생성 코드가 검증 및 새니타이즈되어 안전하게 적용되었습니다.');
       } else {
-        onChangeFront(DEFAULT_LUXURY_HTML_FRONT);
-        onChangeBack(DEFAULT_LUXURY_HTML_BACK);
+        onChangeFront(sanitizeCardHtml(DEFAULT_LUXURY_HTML_FRONT));
+        onChangeBack(sanitizeCardHtml(DEFAULT_LUXURY_HTML_BACK));
         setAiStatus('✓ 콰이어트 럭셔리 마스터 코드가 적용되었습니다.');
       }
     } catch {
-      onChangeFront(DEFAULT_LUXURY_HTML_FRONT);
+      onChangeFront(sanitizeCardHtml(DEFAULT_LUXURY_HTML_FRONT));
       setAiStatus('✓ 기본 콰이어트 럭셔리 코드가 적용되었습니다.');
     } finally {
       setIsGeneratingAi(false);
       setTimeout(() => setAiStatus(null), 3500);
     }
   };
+
+  // Inspect current face HTML for unsafe tags
+  const currentHtml = activeFace === 'front' ? htmlFront : htmlBack;
+  const detectedUnsafe = useMemo(() => detectUnsafePatterns(currentHtml), [currentHtml]);
 
   return (
     <div className="space-y-5 animate-in fade-in duration-200">
@@ -251,6 +257,21 @@ export const CustomHtmlEditor: React.FC<CustomHtmlEditorProps> = ({
             />
           </div>
         )}
+
+        {/* Zero-Trust Security & Sanitization Status Pill */}
+        <div className="flex items-center justify-between pt-1">
+          {detectedUnsafe.length > 0 ? (
+            <div className="flex items-center gap-1.5 text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">
+              <AlertTriangle className="w-3 h-3 shrink-0 text-amber-400" />
+              <span>잠재적 위험 감지: {detectedUnsafe.join(', ')} (샌드박스 렌더러에서 완전 무력화됨)</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 text-[10px] text-emerald-400/90 font-mono">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Zero-Trust Sandboxed: DOMPurify 검증 및 스크립트 실행 완전 차단</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 3. Action Metadata Fields */}

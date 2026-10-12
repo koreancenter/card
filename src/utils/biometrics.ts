@@ -4,6 +4,12 @@ import {
   getLastPinVerifiedAt, 
   recordPinVerified 
 } from './pinLock';
+import {
+  unlockVaultWithBiometrics,
+  clearBiometricVault,
+  linkBiometricsToVault,
+  getActiveSessionPin
+} from './cryptoVault';
 
 const BIOMETRIC_CREDENTIAL_KEY = 'app_biometric_credential_id';
 const BIOMETRIC_MODE_KEY = 'app_biometric_mode';
@@ -244,6 +250,11 @@ export async function registerBiometric(): Promise<{ success: boolean; error?: s
       localStorage.setItem(BIOMETRIC_CREDENTIAL_KEY, credentialId);
       localStorage.setItem(BIOMETRIC_MODE_KEY, 'isolated-enclave');
 
+      const activePin = getActiveSessionPin();
+      if (activePin) {
+        await linkBiometricsToVault(activePin, credentialId);
+      }
+
       if (isPinSet() && !getLastPinVerifiedAt()) {
         recordPinVerified();
       }
@@ -297,6 +308,11 @@ export async function registerBiometric(): Promise<{ success: boolean; error?: s
     const rawIdBase64 = bufferToBase64Url(credential.rawId);
     localStorage.setItem(BIOMETRIC_CREDENTIAL_KEY, rawIdBase64);
     localStorage.setItem(BIOMETRIC_MODE_KEY, 'webauthn');
+
+    const activePin = getActiveSessionPin();
+    if (activePin) {
+      await linkBiometricsToVault(activePin, rawIdBase64);
+    }
 
     if (isPinSet() && !getLastPinVerifiedAt()) {
       recordPinVerified();
@@ -370,11 +386,25 @@ export async function verifyBiometric(): Promise<{
 
   const mode = localStorage.getItem(BIOMETRIC_MODE_KEY);
 
+  // Helper to unlock crypto vault and decrypt cards upon successful biometric verification
+  const unlockVaultOnSuccess = async () => {
+    setSessionLocked(false);
+    try {
+      const vaultKey = await unlockVaultWithBiometrics(storedRawId);
+      if (vaultKey) {
+        const { decryptStoredCards } = await import('./initialCards');
+        await decryptStoredCards(vaultKey);
+      }
+    } catch (e) {
+      console.warn('Biometric vault unlock notice:', e);
+    }
+  };
+
   // If created via local isolated enclave or in iframe with restricted permissions policy
   if (mode === 'isolated-enclave' || isPermissionsPolicyRestricted() || !window.PublicKeyCredential) {
     // Provide realistic brief verification feedback delay
     await new Promise((res) => setTimeout(res, 350));
-    setSessionLocked(false);
+    await unlockVaultOnSuccess();
     return { success: true };
   }
 
@@ -402,7 +432,7 @@ export async function verifyBiometric(): Promise<{
     })) as PublicKeyCredential | null;
 
     if (assertion) {
-      setSessionLocked(false);
+      await unlockVaultOnSuccess();
       return { success: true };
     }
 
@@ -414,7 +444,7 @@ export async function verifyBiometric(): Promise<{
       errorMsg.includes('publickey-credentials-get') || 
       (err.name === 'NotAllowedError' && errorMsg.includes('Permissions Policy'))
     ) {
-      setSessionLocked(false);
+      await unlockVaultOnSuccess();
       return { success: true };
     }
 
@@ -438,4 +468,5 @@ export function removeBiometric(): void {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(BIOMETRIC_CREDENTIAL_KEY);
   localStorage.removeItem(BIOMETRIC_MODE_KEY);
+  clearBiometricVault();
 }

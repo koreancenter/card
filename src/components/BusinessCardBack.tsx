@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { CardData, CardTheme, CardOrientation, CardLayoutType } from '../types/card';
 import { resolveThemeStyles } from '../constants/templates';
+import { SandboxedCardRenderer } from './SandboxedCardRenderer';
+import { sanitizeSvg } from '../utils/sanitizer';
 
 interface BusinessCardBackProps {
   data: CardData;
@@ -31,7 +33,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
   const isVerticalAtelier = layout_type === 'vertical_atelier';
   const isPortrait = isVerticalAtelier || orientation === 'portrait';
 
-  // Custom HTML / Tailwind Injection Back Face Rendering
+  // Custom HTML / Tailwind Injection Back Face Rendering with Sandboxed Zero-Trust Isolation
   if (html_back) {
     return (
       <div 
@@ -39,8 +41,13 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
           isPrintPreview || hideBorder ? 'border-0' : `border border-white/10 shadow-2xl`
         } bg-[#0A0B0E] transition-all duration-300`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
-        dangerouslySetInnerHTML={{ __html: html_back }}
-      />
+      >
+        <SandboxedCardRenderer
+          html={html_back}
+          isPortrait={isPortrait}
+          isPrintPreview={isPrintPreview}
+        />
+      </div>
     );
   }
 
@@ -80,7 +87,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
       errorCorrectionLevel: 'M'
     })
       .then((svgString) => {
-        setQrSvg(svgString);
+        setQrSvg(sanitizeSvg(svgString));
       })
       .catch((err) => {
         console.warn('Notice generating QR', err);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CardData, CardTheme, CardOrientation, CardLayoutType, CardFeatures } from '../types/card';
 import { resolveThemeStyles, generateMonogram } from '../constants/templates';
 import { Phone, Mail, Globe, MapPin, Check, Copy, ArrowUpRight } from 'lucide-react';
+import { SandboxedCardRenderer } from './SandboxedCardRenderer';
 
 interface BusinessCardFrontProps {
   data: CardData;
@@ -43,7 +44,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
   const isPortrait = isVerticalAtelier || orientation === 'portrait';
   const themeStyles = resolveThemeStyles(theme);
 
-  // Custom HTML / Tailwind Injection Face Rendering
+  // Custom HTML / Tailwind Injection Face Rendering with Sandboxed Zero-Trust Isolation
   if (html_front) {
     return (
       <div 
@@ -51,8 +52,13 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
           isPrintPreview || hideBorder ? 'border-0' : `border border-white/10 shadow-2xl`
         } bg-[#0A0B0E] transition-all duration-300`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
-        dangerouslySetInnerHTML={{ __html: html_front }}
-      />
+      >
+        <SandboxedCardRenderer
+          html={html_front}
+          isPortrait={isPortrait}
+          isPrintPreview={isPrintPreview}
+        />
+      </div>
     );
   }
 
