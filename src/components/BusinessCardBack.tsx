@@ -33,55 +33,13 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
   const isVerticalCard = isVerticalLayout(layout_type);
   const isPortrait = isVerticalCard || orientation === 'portrait';
 
-  // Custom HTML / Tailwind Injection Back Face Rendering with Sandboxed Zero-Trust Isolation
-  if (html_back) {
-    return (
-      <div 
-        className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
-          isPrintPreview || hideBorder ? 'border-0' : `border border-white/10 shadow-2xl`
-        } bg-[#0A0A0B] transition-all duration-300`}
-        style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
-      >
-        <SandboxedCardRenderer
-          html={html_back}
-          isPortrait={isPortrait}
-          isPrintPreview={isPrintPreview}
-        />
-      </div>
-    );
-  }
-
-  // If back photo is provided, render authentic back photo
-  if (backPhotoUrl) {
-    return (
-      <div 
-        className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
-          isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border} shadow-2xl`
-        } bg-[#0A0A0B] transition-all duration-300`}
-        style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
-      >
-        <img 
-          src={backPhotoUrl} 
-          alt="실물 명함 뒷면" 
-          className="w-full h-full object-cover rounded-2xl"
-        />
-        <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
-          <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-white tracking-wider uppercase shadow-sm">
-            BACK PHOTO
-          </span>
-        </div>
-      </div>
-    );
-  }
-
   useEffect(() => {
-    // Target domain for digital business card
     const targetUrl = data.website || 'https://card.goguma.app/master';
     QRCode.toString(targetUrl, {
       type: 'svg',
       margin: 0,
       color: {
-        dark: '#0A0A0B',
+        dark: '#1C1B1A',
         light: '#00000000'
       },
       errorCorrectionLevel: 'M'
@@ -94,116 +52,150 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
       });
   }, [theme, isLight, data.website]);
 
+  // Custom HTML / Tailwind Injection Back Face Rendering
+  if (html_back) {
+    return (
+      <div
+        className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
+          isPrintPreview || hideBorder ? 'border-0' : 'border border-white/10 shadow-2xl'
+        } bg-[#121214] transition-all duration-300`}
+        style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
+      >
+        <SandboxedCardRenderer
+          html={html_back}
+          isPortrait={isPortrait}
+          isPrintPreview={isPrintPreview}
+        />
+      </div>
+    );
+  }
+
+  // Authentic Physical Card Back Photo
+  if (backPhotoUrl) {
+    return (
+      <div
+        className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
+          isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border} shadow-2xl`
+        } bg-[#121214] transition-all duration-300`}
+        style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
+      >
+        <img
+          src={backPhotoUrl}
+          alt="명함 뒷면"
+          referrerPolicy="no-referrer"
+          className="w-full h-full object-cover rounded-2xl"
+        />
+      </div>
+    );
+  }
+
+  // Resolve clean Quiet Luxury Main Title & Sub-heading
+  const rawBackTitle = (data.backTitle || '').trim();
+  const isLegacyBackTitle = rawBackTitle === '고구마 AI 스튜디오' || rawBackTitle === 'GOGUMA AI STUDIO';
+  const mainTitle =
+    (!isLegacyBackTitle && rawBackTitle) ||
+    data.organization ||
+    'GOGUMA KNOWLEDGE OFFICE';
+
+  const rawBackSubtitle = (data.backSubtitle || '').trim();
+  const rawBackTagline = (data.backTagline || '').trim();
+  const isLegacySub =
+    rawBackSubtitle === 'GOGUMA AI STUDIO' || rawBackSubtitle === 'AI EXPERT GROUP';
+  const isLegacyTag =
+    rawBackTagline === 'AI EXPERT GROUP' || rawBackTagline === 'GOGUMA AI STUDIO';
+
+  const subHeading =
+    (!isLegacySub && rawBackSubtitle && rawBackSubtitle !== mainTitle
+      ? rawBackSubtitle
+      : !isLegacyTag && rawBackTagline && rawBackTagline !== mainTitle
+        ? rawBackTagline
+        : 'KOREAN CENTER GLOBAL NETWORK');
+
+  const rawAddressEn = (
+    data.address_en ||
+    data.details?.address_en ||
+    data.addressEn ||
+    (data.addressLines && data.addressLines.length > 0 ? data.addressLines.join(', ') : '')
+  ).trim();
+  const rawHq = (data.backHqAddress || '').trim();
+  const cleanHq = rawHq === 'Gangnam-gu, Seoul, Republic of Korea' ? '' : rawHq;
+  const hqAddress = rawAddressEn || cleanHq || data.addressKr || '152 Teheran-ro, Gangnam-gu, Seoul';
+
   return (
-    <div 
+    <div
       className={`relative w-full h-full select-none flex flex-col justify-between ${
         isPortrait
-          ? 'p-4 sm:p-6'
+          ? 'p-5 sm:p-6'
           : isPrintPreview
-            ? 'p-3.5 sm:p-4'
-            : 'p-3.5 sm:p-6 md:p-8'
+            ? 'p-4'
+            : 'p-4 sm:p-6 md:p-8'
       } ${themeStyles.cardBg} ${isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border} shadow-2xl`} transition-colors duration-300 font-sans`}
       style={{
         aspectRatio: isPortrait ? '5 / 8' : '9 / 5',
       }}
     >
       {/* Subtle fine art paper grain texture */}
-      <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.032] mix-blend-overlay"
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.028] mix-blend-overlay"
         style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)`,
+          backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)',
           backgroundSize: '14px 14px'
         }}
       />
 
-      {/* Center Statement */}
-      <div className={`relative z-10 ${isPortrait ? 'my-auto py-2' : 'my-auto py-2'} text-center flex flex-col items-center justify-center space-y-1 sm:space-y-1.5`}>
-        <div className="space-y-0.5 sm:space-y-1">
-          <h2 className={`text-sm sm:text-base md:text-lg font-bold tracking-tight ${themeStyles.textPrimary} break-keep whitespace-normal`}>
-            {data.backTitle || '고구마 AI 스튜디오'}
-          </h2>
-          <p 
-            className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest ${themeStyles.tagline}`}
-          >
-            {data.backSubtitle || 'GOGUMA AI STUDIO'}
+      {/* Center Statement: Main Title & Sub-Heading */}
+      <div className="relative z-10 my-auto py-2 text-center flex flex-col items-center justify-center space-y-1.5 sm:space-y-2 px-2">
+        <h2 className={`${isPortrait ? 'text-xs sm:text-sm' : 'text-sm sm:text-base md:text-[17px]'} font-semibold tracking-[0.16em] uppercase leading-snug ${themeStyles.textPrimary} break-keep`}>
+          {mainTitle}
+        </h2>
+        {subHeading && (
+          <p className={`text-[9px] sm:text-[10px] font-normal uppercase tracking-[0.24em] leading-relaxed ${themeStyles.textSecondary} break-keep`}>
+            {subHeading}
           </p>
-        </div>
-
-        {data.backTagline && (
-          <div className="pt-0.5">
-            <p className={`text-[9px] sm:text-[10px] font-semibold uppercase ${themeStyles.textSecondary} tracking-wider break-keep`}>
-              {data.backTagline}
-            </p>
-          </div>
         )}
       </div>
 
-      {/* Bottom Area: Portrait has centered QR block; Landscape has row */}
-      {isPortrait ? (
-        <div className={`relative z-10 flex flex-col items-center justify-center text-center space-y-1.5 sm:space-y-2 pt-2 sm:pt-3 border-t ${themeStyles.accentHairline} mt-auto w-full`}>
-          <a
-            href={data.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center group/qr hover:opacity-90 transition-opacity justify-center cursor-pointer"
-            title={`${data.websiteDisplay} 바로가기`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {qrSvg && (
-              <div 
-                className="w-11 h-11 p-1 rounded-lg bg-[#FAFAFA] border border-black/5 flex items-center justify-center shrink-0 shadow-sm [&>svg]:w-full [&>svg]:h-full mb-1"
-                dangerouslySetInnerHTML={{ __html: qrSvg }}
-                title="디지털 명함 바로가기 QR 코드"
-              />
-            )}
-            <p className={`font-mono text-[8px] ${themeStyles.textMuted}`}>SCAN TO CONNECT</p>
-            <p className={`font-medium text-[10px] sm:text-[11px] ${themeStyles.textSecondary} group-hover/qr:underline underline-offset-2 truncate max-w-[200px]`}>
-              {data.websiteDisplay}
-            </p>
-          </a>
-
-          {(data.address_en || data.backHqAddress || data.addressKr) && (
-            <p className={`text-[8px] sm:text-[9px] ${themeStyles.textMuted} truncate max-w-[220px]`}>
-              HQ · {data.address_en || data.backHqAddress || data.addressKr}
-            </p>
+      {/* Bottom Bar: QR Code Block cleanly at Bottom-Left, HQ Address at Bottom-Right */}
+      <div className={`relative z-10 flex items-end justify-between gap-3 w-full pt-3 sm:pt-3.5 border-t ${themeStyles.accentHairline} mt-auto`}>
+        {/* Bottom-Left: QR Code Block */}
+        <a
+          href={data.website}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-end gap-2.5 group/qr hover:opacity-85 transition-opacity min-w-0 shrink-0 cursor-pointer"
+          title={`${data.websiteDisplay} 바로가기`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {qrSvg && (
+            <div
+              className={`w-9 h-9 sm:w-10 sm:h-10 p-1.5 rounded-md bg-[#FAF8F4] border border-[#1C1B1A]/10 flex items-center justify-center shrink-0 [&>svg]:w-full [&>svg]:h-full`}
+              dangerouslySetInnerHTML={{ __html: qrSvg }}
+            />
           )}
-        </div>
-      ) : (
-        /* Landscape bottom bar */
-        <div className={`relative z-10 flex items-end justify-between w-full pt-3 border-t ${themeStyles.accentHairline} mt-auto`}>
-          <a 
-            href={data.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 group/qr hover:opacity-90 transition-opacity min-w-0 pr-2 cursor-pointer"
-            title={`${data.websiteDisplay} 바로가기`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {qrSvg && (
-              <div 
-                className="w-9 h-9 p-1 rounded-lg bg-[#FAFAFA] border border-black/5 flex items-center justify-center shrink-0 shadow-sm [&>svg]:w-full [&>svg]:h-full"
-                dangerouslySetInnerHTML={{ __html: qrSvg }}
-                title="디지털 명함 바로가기 QR 코드"
-              />
-            )}
-            <div className="text-left leading-tight min-w-0">
-              <p className={`font-mono text-[8px] ${themeStyles.textMuted}`}>SCAN TO CONNECT</p>
-              <p className={`font-medium text-[10px] sm:text-[11px] ${themeStyles.textSecondary} group-hover/qr:underline underline-offset-2 truncate max-w-[150px] sm:max-w-[200px]`}>
+          {!isPortrait && (
+            <div className="text-left leading-tight pb-0.5 min-w-0">
+              <p className={`font-mono text-[9.5px] sm:text-[10px] tracking-tight ${themeStyles.textSecondary} group-hover/qr:underline underline-offset-2 truncate max-w-[155px] sm:max-w-[195px]`}>
                 {data.websiteDisplay}
               </p>
             </div>
-          </a>
-
-          {(data.address_en || data.backHqAddress || data.addressKr) && (
-            <div className="text-right shrink-0">
-              <p className={`font-mono text-[8px] ${themeStyles.textMuted}`}>HQ</p>
-              <p className={`text-[8px] sm:text-[9px] ${themeStyles.textSecondary} truncate max-w-[150px] sm:max-w-[180px]`}>
-                {data.address_en || data.backHqAddress || data.addressKr}
-              </p>
-            </div>
           )}
+        </a>
+
+        {/* Bottom-Right: HQ Address */}
+        <div className="text-right min-w-0 pb-0.5">
+          {isPortrait && data.websiteDisplay && (
+            <p className={`font-mono text-[8.5px] tracking-tight ${themeStyles.textMuted} truncate max-w-[175px] mb-0.5`}>
+              {data.websiteDisplay}
+            </p>
+          )}
+          <p className={`text-[8.5px] sm:text-[9.5px] leading-snug ${themeStyles.textSecondary} truncate ${isPortrait ? 'max-w-[175px]' : 'max-w-[230px] sm:max-w-[260px]'}`}>
+            <span className={`font-mono text-[8px] tracking-[0.16em] uppercase ${themeStyles.textMuted} mr-2`}>
+              HQ
+            </span>
+            <span>{hqAddress}</span>
+          </p>
         </div>
-      )}
+      </div>
     </div>
   );
 };

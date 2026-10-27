@@ -17,7 +17,7 @@ export const THEMES: {
   isCurated?: boolean;
 }[] = [
   // Curated Luxury Material Themes
-  { id: 'pure_white', label: '매트 페이퍼 화이트 (Matte White)', shortLabel: '매트 화이트', previewClass: 'bg-[#FAFAFA] border-black/10', dotColor: '#FAFAFA', accent: '#0A0A0B', isCurated: true },
+  { id: 'pure_white', label: '샴페인 샌드 (Champagne Sand)', shortLabel: '샴페인 샌드', previewClass: 'bg-[#F5F2EC] border-[#1C1B1A]/15', dotColor: '#F5F2EC', accent: '#1C1B1A', isCurated: true },
   { id: 'sumi_ink', label: '수묵 블랙 (Sumi Black)', shortLabel: '수묵 블랙', previewClass: 'bg-[#0A0A0B] border-white/15', dotColor: '#0A0A0B', accent: '#FAFAFA', isCurated: true },
   { id: 'warm_paper', label: '파인 코튼 (Fine Cotton)', shortLabel: '파인 코튼', previewClass: 'bg-[#F5F5F4] border-black/10', dotColor: '#F5F5F4', accent: '#121214', isCurated: true },
   { id: 'deep_forest', label: '딥 포레스트 (Forest)', shortLabel: '포레스트', previewClass: 'bg-[#0D1914] border-white/15', dotColor: '#0D1914', accent: '#E4E4E7', isCurated: true },

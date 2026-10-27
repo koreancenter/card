@@ -9,17 +9,17 @@ export const INITIAL_CARDS: StoredCard[] = [
     slug: 'master',
     owner_key: 'owner_master_sample',
     customDomain: 'card.goguma.app/master',
-    category: 'AI·기술',
+    category: '글로벌 네트워크',
     theme: 'pure_white',
     layout_type: 'editorial_minimal',
     card_features: {
       show_en_name: true,
-      show_sub_org: false,
+      show_sub_org: true,
       show_address: true,
       monogram_text: 'PG'
     },
     createdAt: '2026-03-01',
-    notes: 'GOGUMA AI STUDIO 대표 마스터 샘플 명함',
+    notes: '고구마 지식 관리실 대표 마스터 샘플 명함',
     data: {
       ...CARD_DATA,
       website: 'https://card.goguma.app/master',
@@ -190,18 +190,23 @@ function enrichCard(c: StoredCard): StoredCard {
     ...c,
     owner_key: c.owner_key || (c.isMyCard ? `key_${c.id}` : undefined)
   };
-  if (c.id === 'sample-card-alexander-vance' || c.slug === 'vance' || c.id === 'sample-card-goguma-master' || c.slug === 'master') {
+  const isLegacyMasterSample =
+    c.id === 'sample-card-alexander-vance' ||
+    c.slug === 'vance' ||
+    ((c.id === 'sample-card-goguma-master' || c.slug === 'master') &&
+      (c.data?.organization === 'GOGUMA AI STUDIO' || c.data?.organizationKr === '고구마 AI 스튜디오'));
+
+  if (isLegacyMasterSample) {
     return {
       ...enriched,
       id: 'sample-card-goguma-master',
       slug: 'master',
       owner_key: c.owner_key || 'owner_master_sample',
       customDomain: 'card.goguma.app/master',
-      category: 'AI·기술',
-      theme: 'pure_white',
+      category: '글로벌 네트워크',
+      theme: c.theme || 'pure_white',
       data: {
         ...CARD_DATA,
-        name: 'PARK, GIHONG',
         website: 'https://card.goguma.app/master',
         websiteDisplay: 'card.goguma.app/master'
       }

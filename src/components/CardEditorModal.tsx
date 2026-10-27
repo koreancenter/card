@@ -37,10 +37,10 @@ export const THEME_OPTIONS: {
 }[] = [
   {
     id: 'pure_white',
-    name: '매트 페이퍼',
-    description: 'Matte Paper',
-    dotColor: '#F5F5F3',
-    accent: '#141416'
+    name: '샴페인 샌드',
+    description: 'Champagne Sand',
+    dotColor: '#F5F2EC',
+    accent: '#1C1B1A'
   },
   {
     id: 'warm_paper',

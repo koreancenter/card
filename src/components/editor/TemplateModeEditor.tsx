@@ -322,7 +322,7 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                   type="text"
                   value={formData.nameKr}
                   onChange={(e) => onChangeFormField('nameKr', e.target.value)}
-                  placeholder="박 기 홍"
+                  placeholder="박기홍"
                   className={INPUT_CLASS}
                 />
               </div>
@@ -363,7 +363,7 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                   type="text"
                   value={formData.organizationKr}
                   onChange={(e) => onChangeFormField('organizationKr', e.target.value)}
-                  placeholder="고구마 스튜디오"
+                  placeholder="고구마 지식 관리실"
                   className={INPUT_CLASS}
                 />
               </div>
@@ -373,7 +373,7 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                   type="text"
                   value={formData.organization}
                   onChange={(e) => onChangeFormField('organization', e.target.value)}
-                  placeholder="GOGUMA STUDIO"
+                  placeholder="GOGUMA KNOWLEDGE OFFICE"
                   className={INPUT_CLASS}
                 />
               </div>
@@ -386,7 +386,7 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                   type="text"
                   value={formData.titleKr}
                   onChange={(e) => onChangeFormField('titleKr', e.target.value)}
-                  placeholder="대표"
+                  placeholder="대표 마스터"
                   className={INPUT_CLASS}
                 />
               </div>
@@ -396,7 +396,7 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                   type="text"
                   value={formData.title}
                   onChange={(e) => onChangeFormField('title', e.target.value)}
-                  placeholder="Principal"
+                  placeholder="Principal Master"
                   className={INPUT_CLASS}
                 />
               </div>

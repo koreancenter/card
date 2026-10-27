@@ -44,7 +44,7 @@ export interface PhotoCard extends BaseCard {
 export type BusinessCard = TemplateCard | CustomHtmlCard | PhotoCard;
 
 export type ThemePreset =
-  | 'pure_white'   // Warm Matte Paper (#FAFAFA), crisp monochrome black text (#0A0A0B)
+  | 'pure_white'   // Warm Champagne Sand (#F5F2EC), deep warm charcoal text (#1C1B1A), muted text (#787571)
   | 'sumi_ink'     // Rich Dark Canvas (#0A0A0B), matte white text (#FAFAFA), platinum monochrome accent
   | 'warm_paper'   // Fine Cotton Paper (#F5F5F4), deep charcoal text (#18181B), monochrome black accent
   | 'deep_forest'  // Muted Dark Forest (#0D1F18), soft platinum typography (#F4F7F4)
@@ -52,12 +52,12 @@ export type ThemePreset =
 
 export type LegacyTheme =
   | 'obsidian'   // 1. Obsidian Charcoal (#121214)
-  | 'cotton'     // 2. Matte Paper White (#FAFAFA)
+  | 'cotton'     // 2. Warm Champagne Sand (#F5F2EC)
   | 'titanium'   // 3. Architectural Titanium (#18181B)
   | 'navy'       // 4. Midnight Diplomatic Navy
   | 'emerald'    // 5. Deep Forest Evergreen
   | 'sand'       // 6. Warm Stone Neutral
-  | 'pure_white' // 7. Luxury Matte Paper White
+  | 'pure_white' // 7. Warm Champagne Sand (#F5F2EC)
   | 'slate';     // 8. Nordic Mineral Slate
 
 export type CardTheme = ThemePreset | LegacyTheme;

@@ -72,20 +72,20 @@ export const LAYOUT_PRESETS: LayoutPresetDefinition[] = [
 export const LUXURY_THEME_PRESETS: ThemePresetDefinition[] = [
   {
     id: 'pure_white',
-    name: '매트 페이퍼 화이트 (Matte White)',
-    nameEn: 'Warm Matte Paper & Architectural Black',
-    description: '따뜻한 매트 페이퍼 표면(#FAFAFA)과 깊이 있는 블랙 활자, 섬세한 헤어라인 보더',
-    canvasBg: 'bg-[#FAFAFA]',
-    textPrimary: 'text-[#0A0A0B]',
-    textSecondary: 'text-zinc-600',
-    textMuted: 'text-neutral-500',
-    accent: '#0A0A0B',
-    accentName: '아키텍처럴 블랙 (#0A0A0B)',
-    borderClass: 'border-black/5',
-    hairlineClass: 'border-black/10',
-    hoverHighlight: 'hover:bg-black/5',
-    qrBg: 'bg-white',
-    dotColor: '#FAFAFA',
+    name: '샴페인 샌드 (Champagne Sand)',
+    nameEn: 'Warm Champagne Sand & Deep Warm Charcoal',
+    description: '따뜻한 매트 샴페인 샌드 지류(#F5F2EC)와 깊이 있는 웜 차콜 활자(#1C1B1A), 섬세한 헤어라인 보더',
+    canvasBg: 'bg-[#F5F2EC]',
+    textPrimary: 'text-[#1C1B1A]',
+    textSecondary: 'text-[#787571]',
+    textMuted: 'text-[#787571]',
+    accent: '#1C1B1A',
+    accentName: '딥 웜 차콜 (#1C1B1A)',
+    borderClass: 'border-[#1C1B1A]/10',
+    hairlineClass: 'border-[#1C1B1A]/10',
+    hoverHighlight: 'hover:bg-[#1C1B1A]/5',
+    qrBg: 'bg-[#FAF8F4]',
+    dotColor: '#F5F2EC',
     isLight: true
   },
   {
@@ -182,17 +182,17 @@ export function resolveThemeStyles(theme: CardTheme | undefined): ResolvedThemeS
 
   if (t === 'pure_white' || t === 'cotton') {
     return {
-      cardBg: 'bg-[#FAFAFA]',
-      border: 'border-black/5 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.45),0_0_1px_1px_rgba(0,0,0,0.05)]',
-      textPrimary: 'text-[#0A0A0B]',
-      textSecondary: 'text-zinc-600',
-      textMuted: 'text-neutral-500',
-      accent: '#0A0A0B',
-      accentHairline: 'border-black/10',
-      tagline: 'text-[#0A0A0B]',
-      hoverHighlight: 'hover:bg-black/5',
-      sheen: 'from-black/[0.03] via-transparent to-transparent',
-      qrBg: 'bg-white',
+      cardBg: 'bg-[#F5F2EC]',
+      border: 'border-[#1C1B1A]/10 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.45),0_0_1px_1px_rgba(28,27,26,0.06)]',
+      textPrimary: 'text-[#1C1B1A]',
+      textSecondary: 'text-[#787571]',
+      textMuted: 'text-[#787571]',
+      accent: '#1C1B1A',
+      accentHairline: 'border-[#1C1B1A]/10',
+      tagline: 'text-[#1C1B1A]',
+      hoverHighlight: 'hover:bg-[#1C1B1A]/5',
+      sheen: 'from-[#1C1B1A]/[0.025] via-transparent to-transparent',
+      qrBg: 'bg-[#FAF8F4]',
       isLight: true
     };
   }
@@ -282,19 +282,19 @@ export function resolveThemeStyles(theme: CardTheme | undefined): ResolvedThemeS
     };
   }
 
-  // Default fallback (including any retired legacy theme string) -> Warm Matte Paper (#FAFAFA)
+  // Default fallback (including any retired legacy theme string) -> Warm Champagne Sand (#F5F2EC)
   return {
-    cardBg: 'bg-[#FAFAFA]',
-    border: 'border-black/5 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.45),0_0_1px_1px_rgba(0,0,0,0.05)]',
-    textPrimary: 'text-[#0A0A0B]',
-    textSecondary: 'text-zinc-600',
-    textMuted: 'text-neutral-500',
-    accent: '#0A0A0B',
-    accentHairline: 'border-black/10',
-    tagline: 'text-[#0A0A0B]',
-    hoverHighlight: 'hover:bg-black/5',
-    sheen: 'from-black/[0.03] via-transparent to-transparent',
-    qrBg: 'bg-white',
+    cardBg: 'bg-[#F5F2EC]',
+    border: 'border-[#1C1B1A]/10 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.45),0_0_1px_1px_rgba(28,27,26,0.06)]',
+    textPrimary: 'text-[#1C1B1A]',
+    textSecondary: 'text-[#787571]',
+    textMuted: 'text-[#787571]',
+    accent: '#1C1B1A',
+    accentHairline: 'border-[#1C1B1A]/10',
+    tagline: 'text-[#1C1B1A]',
+    hoverHighlight: 'hover:bg-[#1C1B1A]/5',
+    sheen: 'from-[#1C1B1A]/[0.025] via-transparent to-transparent',
+    qrBg: 'bg-[#FAF8F4]',
     isLight: true
   };
 }

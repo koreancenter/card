@@ -35,9 +35,9 @@ export const CLOUD_AI_QUIET_LUXURY_PROMPT = `너는 최고급 하이엔드 브�
 export const DEFAULT_LUXURY_HTML_FRONT = `<div class="w-full h-full aspect-[1.586/1] bg-[#121214] text-[#F2F2F5] p-7 flex flex-col justify-between border border-white/10 rounded-2xl relative overflow-hidden font-sans select-none">
   <div class="flex justify-between items-start">
     <div>
-      <span class="text-[10px] tracking-[0.22em] text-zinc-500 uppercase font-mono block mb-1.5">GLOBAL PARTNER</span>
+      <span class="text-[10px] tracking-[0.22em] text-zinc-500 uppercase font-mono block mb-1.5">GOGUMA KNOWLEDGE OFFICE</span>
       <h2 class="text-xl font-semibold tracking-tight text-[#F4F4F6]">PARK, GIHONG</h2>
-      <p class="text-xs text-zinc-400 font-normal mt-0.5">박기홍 · Principal</p>
+      <p class="text-xs text-zinc-400 font-normal mt-0.5">박기홍 · Principal Master</p>
     </div>
     <div class="w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center text-[#EAEAE6] font-serif text-xs bg-white/[0.02]">
       PG
@@ -45,11 +45,11 @@ export const DEFAULT_LUXURY_HTML_FRONT = `<div class="w-full h-full aspect-[1.58
   </div>
   <div class="space-y-2 border-t border-white/[0.08] pt-4">
     <div class="flex justify-between items-center text-[11px]">
-      <span class="text-zinc-500 font-mono">STUDIO</span>
-      <span class="text-zinc-300">GOGUMA STUDIO</span>
+      <span class="text-zinc-500 font-mono">OFFICE</span>
+      <span class="text-zinc-300">고구마 지식 관리실</span>
     </div>
     <div class="flex justify-between items-center text-[11px]">
-      <span class="text-zinc-500 font-mono">DIRECT</span>
+      <span class="text-zinc-500 font-mono">TEL</span>
       <span class="text-[#EDEDEF] font-mono tabular-nums">+82 10-1234-5678</span>
     </div>
     <div class="flex justify-between items-center text-[11px]">
@@ -63,8 +63,8 @@ export const DEFAULT_LUXURY_HTML_BACK = `<div class="w-full h-full aspect-[1.586
   <div class="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-[#EAEAE6] font-serif text-base mb-3.5 bg-white/[0.02]">
     PG
   </div>
-  <h3 class="text-xs font-medium tracking-[0.2em] text-[#F2F2F5] uppercase font-sans">GOGUMA GLOBAL NETWORK</h3>
-  <p class="text-[11px] text-zinc-500 mt-1.5 max-w-[240px] leading-relaxed">Private Digital Identity Archive</p>
+  <h3 class="text-xs font-medium tracking-[0.2em] text-[#F2F2F5] uppercase font-sans">GOGUMA KNOWLEDGE OFFICE</h3>
+  <p class="text-[10px] tracking-[0.22em] uppercase text-zinc-500 mt-1.5 max-w-[260px] leading-relaxed">KOREAN CENTER GLOBAL NETWORK</p>
   <span class="mt-4 text-[10px] font-mono text-zinc-400 tracking-wider">
     card.goguma.app/master
   </span>

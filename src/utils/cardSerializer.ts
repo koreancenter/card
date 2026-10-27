@@ -2,10 +2,10 @@ import { CardData, CardTheme, StoredCard } from '../types/card';
 import { sanitizeCardHtml } from './sanitizer';
 
 export const CARD_DATA: CardData = {
-  organization: 'GOGUMA AI STUDIO',
-  organizationKr: '고구마 AI 스튜디오',
+  organization: 'GOGUMA KNOWLEDGE OFFICE',
+  organizationKr: '고구마 지식 관리실',
   name: 'PARK, GIHONG',
-  nameKr: '박 기 홍',
+  nameKr: '박기홍',
   title: 'Principal Master',
   titleKr: '대표 마스터',
   phone: '+82 10-1234-5678',
@@ -14,15 +14,16 @@ export const CARD_DATA: CardData = {
   email: 'master@goguma.app',
   website: 'https://card.goguma.app/master',
   websiteDisplay: 'card.goguma.app/master',
-  addressLines: [],
-  address_en: '',
+  addressLines: ['152 Teheran-ro, Gangnam-gu, Seoul'],
+  address_en: '152 Teheran-ro, Gangnam-gu, Seoul',
+  addressEn: '152 Teheran-ro, Gangnam-gu, Seoul',
   addressKr: '서울특별시 강남구 테헤란로 152',
-  googleMapsUrl: 'https://maps.google.com/?q=Gangnam+Seoul',
+  googleMapsUrl: 'https://maps.google.com/?q=152+Teheran-ro+Gangnam-gu+Seoul',
   naverMapsUrl: 'https://map.naver.com',
-  backTitle: '고구마 AI 스튜디오',
-  backSubtitle: 'GOGUMA AI STUDIO',
-  backTagline: 'AI EXPERT GROUP',
-  backHqAddress: 'Gangnam-gu, Seoul, Republic of Korea'
+  backTitle: 'GOGUMA KNOWLEDGE OFFICE',
+  backSubtitle: 'KOREAN CENTER GLOBAL NETWORK',
+  backTagline: 'KOREAN CENTER GLOBAL NETWORK',
+  backHqAddress: '152 Teheran-ro, Gangnam-gu, Seoul'
 };
 
 export const APP_BASE_DOMAIN = 'card.goguma.app';
@@ -258,13 +259,13 @@ export class CardSerializer {
     const officialUrl = data.website || 'https://card.goguma.app/master';
 
     const themeColors: Record<string, { bg: string; text: string; textSec: string; border: string; accent: string }> = {
-      pure_white: { bg: '#FAFAFA', text: '#0A0A0B', textSec: '#52525B', border: 'rgba(0,0,0,0.06)', accent: '#0A0A0B' },
+      pure_white: { bg: '#F5F2EC', text: '#1C1B1A', textSec: '#787571', border: 'rgba(28,27,26,0.10)', accent: '#1C1B1A' },
       sumi_ink: { bg: '#0A0A0B', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#FAFAFA' },
       warm_paper: { bg: '#F5F5F4', text: '#121214', textSec: '#52525B', border: 'rgba(0,0,0,0.06)', accent: '#121214' },
       deep_forest: { bg: '#0D1914', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#E4E4E7' },
       classic_navy: { bg: '#0B101B', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#E4E4E7' },
       sand: { bg: '#F5F5F4', text: '#121214', textSec: '#52525B', border: 'rgba(0,0,0,0.06)', accent: '#121214' },
-      cotton: { bg: '#FAFAFA', text: '#0A0A0B', textSec: '#52525B', border: 'rgba(0,0,0,0.06)', accent: '#0A0A0B' },
+      cotton: { bg: '#F5F2EC', text: '#1C1B1A', textSec: '#787571', border: 'rgba(28,27,26,0.10)', accent: '#1C1B1A' },
       obsidian: { bg: '#121214', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#FAFAFA' },
       titanium: { bg: '#18181B', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#A1A1AA' },
       navy: { bg: '#0B101B', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#E4E4E7' },
@@ -378,9 +379,8 @@ export class CardSerializer {
         <!-- CARD BACK -->
         <div class="absolute inset-0 w-full h-full p-6 sm:p-7 flex flex-col justify-between backface-hidden rotate-y-180 rounded-2xl overflow-hidden" style="background-color: ${selectedTheme.bg}; color: ${selectedTheme.text};">
           <div class="my-auto text-center space-y-2">
-            <h2 class="text-xl sm:text-2xl font-bold tracking-tight">${sanitizeCardHtml(data.backTitle || '고구마 AI 스튜디오')}</h2>
-            <p class="text-xs font-bold uppercase tracking-[0.24em]" style="color: ${selectedTheme.textSec};">${sanitizeCardHtml(data.backSubtitle || 'GOGUMA AI STUDIO')}</p>
-            <p class="text-xs tracking-[0.16em] uppercase pt-1" style="color: ${selectedTheme.textSec};">${sanitizeCardHtml(data.backTagline || 'AI EXPERT GROUP')}</p>
+            <h2 class="text-lg sm:text-xl font-semibold tracking-[0.14em] uppercase">${sanitizeCardHtml(data.backTitle || data.organization || 'GOGUMA KNOWLEDGE OFFICE')}</h2>
+            <p class="text-[10px] font-medium uppercase tracking-[0.24em]" style="color: ${selectedTheme.textSec};">${sanitizeCardHtml(data.backSubtitle || data.backTagline || 'KOREAN CENTER GLOBAL NETWORK')}</p>
           </div>
 
           <div class="pt-4 flex flex-col items-center text-center space-y-2" style="border-top: 1px solid ${selectedTheme.border};">
