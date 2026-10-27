@@ -22,6 +22,7 @@ export interface ModalManager {
   isLegalOpen: boolean;
   legalDocType: LegalDocType;
   isResetOpen: boolean;
+  isFromShare: boolean;
 
   // Settings dropdown ref
   settingsMenuRef: React.RefObject<HTMLDivElement | null>;
@@ -29,11 +30,11 @@ export interface ModalManager {
   // Modal Open/Close Dispatchers
   openShare: () => void;
   closeShare: () => void;
-  openQr: () => void;
+  openQr: (fromShare?: boolean) => void;
   closeQr: () => void;
-  openPrint: () => void;
+  openPrint: (fromShare?: boolean) => void;
   closePrint: () => void;
-  openExport: () => void;
+  openExport: (fromShare?: boolean) => void;
   closeExport: () => void;
   openScan: () => void;
   closeScan: () => void;
@@ -59,7 +60,7 @@ export interface ModalManager {
 /**
  * useModalState
  * Lightweight, centralized Modal Manager hook.
- * Extracts sprawling boolean state flags from App.tsx into a cohesive atomic dispatcher.
+ * Supports sub-modal navigation from ShareModal (Print, Export, QR) with automatic return on close.
  */
 export function useModalState(): ModalManager {
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -79,8 +80,12 @@ export function useModalState(): ModalManager {
   const [isLegalOpen, setIsLegalOpen] = useState(false);
   const [legalDocType, setLegalDocType] = useState<LegalDocType>('privacy');
   const [isResetOpen, setIsResetOpen] = useState(false);
+  const [isFromShare, setIsFromShare] = useState(false);
 
   const settingsMenuRef = useRef<HTMLDivElement | null>(null);
+  const isShareOpenRef = useRef(false);
+  const returnToShareRef = useRef(false);
+  isShareOpenRef.current = isShareOpen;
 
   // Auto-close settings dropdown when clicking outside
   useEffect(() => {
@@ -97,17 +102,68 @@ export function useModalState(): ModalManager {
     };
   }, [isSettingsOpen]);
 
-  const openShare = useCallback(() => setIsShareOpen(true), []);
-  const closeShare = useCallback(() => setIsShareOpen(false), []);
+  const openShare = useCallback(() => {
+    returnToShareRef.current = false;
+    setIsFromShare(false);
+    setIsShareOpen(true);
+  }, []);
 
-  const openQr = useCallback(() => setIsQrOpen(true), []);
-  const closeQr = useCallback(() => setIsQrOpen(false), []);
+  const closeShare = useCallback(() => {
+    returnToShareRef.current = false;
+    setIsFromShare(false);
+    setIsShareOpen(false);
+  }, []);
 
-  const openPrint = useCallback(() => setIsPrintOpen(true), []);
-  const closePrint = useCallback(() => setIsPrintOpen(false), []);
+  const openQr = useCallback((fromShare?: boolean) => {
+    const shouldReturn = Boolean(fromShare || isShareOpenRef.current);
+    returnToShareRef.current = shouldReturn;
+    setIsFromShare(shouldReturn);
+    if (shouldReturn) setIsShareOpen(false);
+    setIsQrOpen(true);
+  }, []);
 
-  const openExport = useCallback(() => setIsExportOpen(true), []);
-  const closeExport = useCallback(() => setIsExportOpen(false), []);
+  const closeQr = useCallback(() => {
+    setIsQrOpen(false);
+    if (returnToShareRef.current) {
+      returnToShareRef.current = false;
+      setIsFromShare(false);
+      setIsShareOpen(true);
+    }
+  }, []);
+
+  const openPrint = useCallback((fromShare?: boolean) => {
+    const shouldReturn = Boolean(fromShare || isShareOpenRef.current);
+    returnToShareRef.current = shouldReturn;
+    setIsFromShare(shouldReturn);
+    if (shouldReturn) setIsShareOpen(false);
+    setIsPrintOpen(true);
+  }, []);
+
+  const closePrint = useCallback(() => {
+    setIsPrintOpen(false);
+    if (returnToShareRef.current) {
+      returnToShareRef.current = false;
+      setIsFromShare(false);
+      setIsShareOpen(true);
+    }
+  }, []);
+
+  const openExport = useCallback((fromShare?: boolean) => {
+    const shouldReturn = Boolean(fromShare || isShareOpenRef.current);
+    returnToShareRef.current = shouldReturn;
+    setIsFromShare(shouldReturn);
+    if (shouldReturn) setIsShareOpen(false);
+    setIsExportOpen(true);
+  }, []);
+
+  const closeExport = useCallback(() => {
+    setIsExportOpen(false);
+    if (returnToShareRef.current) {
+      returnToShareRef.current = false;
+      setIsFromShare(false);
+      setIsShareOpen(true);
+    }
+  }, []);
 
   const openScan = useCallback(() => setIsScanOpen(true), []);
   const closeScan = useCallback(() => setIsScanOpen(false), []);
@@ -152,6 +208,8 @@ export function useModalState(): ModalManager {
   const closeReset = useCallback(() => setIsResetOpen(false), []);
 
   const closeAll = useCallback(() => {
+    returnToShareRef.current = false;
+    setIsFromShare(false);
     setIsShareOpen(false);
     setIsQrOpen(false);
     setIsPrintOpen(false);
@@ -187,6 +245,7 @@ export function useModalState(): ModalManager {
     isLegalOpen,
     legalDocType,
     isResetOpen,
+    isFromShare,
     settingsMenuRef,
     openShare,
     closeShare,

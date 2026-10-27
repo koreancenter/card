@@ -62,7 +62,7 @@ export interface AppModalsProps {
 /**
  * AppModals
  * Centralized declarative container for all application modals.
- * Loads only the active modal on demand with automatic retry and error boundary isolation.
+ * Loads only the active modal on demand with automatic retry, sub-modal return flow, and error boundary isolation.
  */
 export const AppModals: React.FC<AppModalsProps> = ({
   modals,
@@ -95,8 +95,8 @@ export const AppModals: React.FC<AppModalsProps> = ({
             onClose={modals.closeShare}
             data={activeCard.data}
             cardUrl={getCardShareUrl(activeCard)}
-            onOpenPrint={modals.openPrint}
-            onOpenExport={modals.openExport}
+            onOpenPrint={() => modals.openPrint(true)}
+            onOpenExport={() => modals.openExport(true)}
           />
         )}
 
@@ -115,6 +115,7 @@ export const AppModals: React.FC<AppModalsProps> = ({
             data={activeCard.data}
             config={printConfig}
             onConfigChange={setPrintConfig}
+            isSubModal={modals.isFromShare}
           />
         )}
 
@@ -125,6 +126,7 @@ export const AppModals: React.FC<AppModalsProps> = ({
             card={activeCard.data}
             theme={activeCard.theme}
             slug={activeCard.slug}
+            isSubModal={modals.isFromShare}
           />
         )}
 

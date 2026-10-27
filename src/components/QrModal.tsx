@@ -23,13 +23,13 @@ export const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, data }) => {
     const contentToEncode = qrType === 'url' ? targetUrl : generateVCard(data);
 
     QRCode.toDataURL(contentToEncode, {
-      width: 480,
-      margin: 2,
+      width: 520,
+      margin: 2.5,
       color: {
         dark: '#0A0A0B',
-        light: '#FAFAFA'
+        light: '#FAFAFA',
       },
-      errorCorrectionLevel: 'M'
+      errorCorrectionLevel: 'M',
     })
       .then((url) => {
         setDataUrl(url);
@@ -41,12 +41,17 @@ export const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, data }) => {
 
   if (!isOpen) return null;
 
-  const displayHost = data.websiteDisplay || targetUrl.replace(/^https?:\/\//, '');
+  const displayHost = (data.websiteDisplay || targetUrl).replace(/^https?:\/\//, '');
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(targetUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(targetUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleDownloadQr = () => {
@@ -61,118 +66,140 @@ export const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, data }) => {
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
       onClick={onClose}
     >
-      <div 
-        className="relative w-full max-w-sm rounded-3xl bg-[#0A0A0B] border border-white/10 p-6 sm:p-7 text-neutral-100 shadow-2xl"
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="디지털 명함 QR 코드"
+        className="relative w-full max-w-[380px] sm:max-w-[400px] max-h-[92dvh] overflow-y-auto rounded-3xl bg-[#111113] border border-white/10 px-5 py-6 sm:px-7 sm:py-7 text-neutral-100 shadow-2xl flex flex-col items-center my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 transition-colors cursor-pointer"
+          className="absolute top-3.5 right-3.5 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 cursor-pointer"
           title="닫기"
           aria-label="닫기"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4 stroke-[1.75]" />
         </button>
 
         {/* Modal Header */}
-        <div className="text-center space-y-1 mb-5">
-          <p className="text-[10px] font-mono tracking-widest uppercase text-zinc-400">
-            OFFICIAL CONNECT QR
-          </p>
-          <h3 className="text-lg font-bold text-white tracking-tight">디지털 명함 QR 코드</h3>
-          <p className="text-xs text-zinc-400">
+        <div className="w-full text-center px-8 mb-5">
+          <h3 className="text-base sm:text-lg font-semibold text-white tracking-tight truncate">
+            디지털 명함 QR 코드
+          </h3>
+          <p className="text-xs text-zinc-400 mt-0.5 truncate">
             스마트폰 카메라로 스캔하면 바로 연결됩니다
           </p>
         </div>
 
         {/* Mode Segmented Tab */}
-        <div className="flex items-center p-1 bg-[#121214] rounded-xl border border-zinc-800/80 mb-5">
+        <div
+          role="tablist"
+          aria-label="QR 코드 유형"
+          className="w-full grid grid-cols-2 p-1 bg-white/[0.04] rounded-xl mb-5"
+        >
           <button
+            type="button"
+            role="tab"
+            aria-selected={qrType === 'url'}
             onClick={() => setQrType('url')}
-            className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
+            className={`py-2 px-3 text-xs rounded-lg cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
               qrType === 'url'
-                ? 'bg-white text-neutral-950 shadow-sm'
-                : 'text-zinc-400 hover:text-white hover:bg-white/10'
+                ? 'bg-white text-neutral-950 font-semibold shadow-sm'
+                : 'text-zinc-400 hover:text-white font-medium'
             }`}
           >
-            공식 도메인 (URL)
+            웹 링크 QR
           </button>
           <button
+            type="button"
+            role="tab"
+            aria-selected={qrType === 'vcard'}
             onClick={() => setQrType('vcard')}
-            className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
+            className={`py-2 px-3 text-xs rounded-lg cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
               qrType === 'vcard'
-                ? 'bg-white text-neutral-950 shadow-sm'
-                : 'text-zinc-400 hover:text-white hover:bg-white/10'
+                ? 'bg-white text-neutral-950 font-semibold shadow-sm'
+                : 'text-zinc-400 hover:text-white font-medium'
             }`}
           >
-            연락처 바로저장 (vCard)
+            연락처 저장 QR
           </button>
         </div>
 
-        {/* QR Code Container: Warm matte paper (#FAFAFA) with border-black/5 */}
-        <div className="bg-[#FAFAFA] border border-black/5 p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center mx-auto shadow-xl max-w-[260px]">
-          {dataUrl ? (
-            <img 
-              src={dataUrl} 
-              alt={`${displayHost} QR Code`} 
-              className="w-full h-auto aspect-square object-contain"
-            />
-          ) : (
-            <div className="w-[200px] h-[200px] flex items-center justify-center text-xs text-neutral-500">
-              QR 생성 중...
-            </div>
-          )}
-
-          {/* Encoded URL Display */}
-          <div className="mt-2.5 pt-2 border-t border-black/5 w-full text-center">
-            <span className="font-mono text-[10px] font-medium text-[#0A0A0B] tracking-tight">
-              {qrType === 'url' ? displayHost : `${data.name} vCard`}
-            </span>
+        {/* Unnested QR Code Image */}
+        {dataUrl ? (
+          <img
+            src={dataUrl}
+            alt={`${displayHost} QR 코드`}
+            className="w-44 h-44 sm:w-48 sm:h-48 rounded-2xl object-contain select-none shrink-0"
+          />
+        ) : (
+          <div className="w-44 h-44 sm:w-48 sm:h-48 rounded-2xl bg-[#FAFAFA] flex items-center justify-center text-xs text-neutral-600 shrink-0">
+            QR 생성 중...
           </div>
-        </div>
+        )}
 
-        {/* Info label */}
-        <p className="mt-3.5 text-center text-[11px] text-zinc-400">
-          {qrType === 'url' 
-            ? `스캔 시 공식 주소 ${displayHost} 페이지가 열립니다`
-            : `스캔 즉시 스마트폰 주소록에 ${data.nameKr || data.name} 연락처가 등록됩니다`}
+        <p className="mt-2.5 text-center text-[11px] text-zinc-400">
+          {qrType === 'url'
+            ? '카메라로 스캔하면 디지털 명함 페이지로 연결됩니다'
+            : `스캔 즉시 연락처에 ${data.nameKr || data.name} 정보가 저장됩니다`}
         </p>
 
-        {/* Action Buttons */}
-        <div className="mt-5 grid grid-cols-2 gap-2.5">
+        {/* Cohesive URL Copy Bar */}
+        <div className="w-full flex items-center justify-between gap-2.5 px-3.5 py-2 mt-4 rounded-xl bg-white/[0.04]">
+          <span className="font-mono text-xs text-zinc-300 truncate select-all min-w-0">
+            {displayHost}
+          </span>
           <button
+            type="button"
             onClick={handleCopyLink}
-            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#121214] border border-white/10 hover:bg-white/10 text-zinc-200 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 transition-colors text-xs font-semibold cursor-pointer whitespace-nowrap"
+            className="shrink-0 min-h-[34px] px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-white font-medium text-xs flex items-center gap-1.5 cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+            title="링크 복사"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? '복사 완료' : '주소 복사'}</span>
-          </button>
-
-          <button
-            onClick={handleDownloadQr}
-            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white hover:bg-zinc-200 text-neutral-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 transition-colors text-xs font-semibold cursor-pointer whitespace-nowrap"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>QR 다운로드</span>
+            {copied ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-white shrink-0" />
+                <span>복사됨</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5 shrink-0" />
+                <span>복사</span>
+              </>
+            )}
           </button>
         </div>
 
-        {/* Direct Link Affordance */}
-        <div className="mt-4 pt-3 border-t border-zinc-800/80 text-center">
+        {/* Bottom Labeled Toolbar */}
+        <div
+          role="toolbar"
+          aria-label="QR 코드 도구"
+          className="w-full pt-4 mt-5 border-t border-white/10 grid grid-cols-2 gap-2"
+        >
           <a
             href={targetUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-[11px] text-zinc-400 hover:text-white transition-colors"
+            className="min-h-[44px] py-2.5 px-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-zinc-200 hover:text-white flex items-center justify-center gap-1.5 text-xs font-medium whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
           >
-            <span>{displayHost} 바로 열기</span>
-            <ExternalLink className="w-3 h-3" />
+            <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+            <span>웹페이지 열기</span>
           </a>
+
+          <button
+            type="button"
+            onClick={handleDownloadQr}
+            className="min-h-[44px] py-2.5 px-3 rounded-xl bg-white hover:bg-zinc-200 text-neutral-950 flex items-center justify-center gap-1.5 text-xs font-semibold cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+          >
+            <Download className="w-3.5 h-3.5 shrink-0" />
+            <span>QR 이미지 저장</span>
+          </button>
         </div>
       </div>
     </div>

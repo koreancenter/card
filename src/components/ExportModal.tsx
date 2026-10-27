@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CardData, CardTheme } from '../types/card';
 import { generateStandaloneHtml } from '../utils/htmlExport';
-import { X, Copy, Download, Check } from 'lucide-react';
+import { X, Copy, Download, Check, ArrowLeft } from 'lucide-react';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -9,6 +9,7 @@ interface ExportModalProps {
   card: CardData;
   theme?: CardTheme;
   slug?: string;
+  isSubModal?: boolean;
 }
 
 export const ExportModal: React.FC<ExportModalProps> = ({
@@ -17,6 +18,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   card,
   theme = 'pure_white',
   slug,
+  isSubModal = false,
 }) => {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'deploy' | 'code'>('deploy');
@@ -42,7 +44,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `index.html`;
+    link.download = 'index.html';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -50,109 +52,127 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-200"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-200"
       onClick={onClose}
     >
-      {/* Container: Rich Dark Surface (#0A0A0B) with hairline border */}
-      <div 
-        className="w-full max-w-[520px] h-[580px] flex flex-col bg-[#0A0A0B] border border-white/10 rounded-3xl overflow-hidden shadow-2xl"
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="독립형 HTML 배포"
+        className="w-full max-w-[500px] max-h-[88dvh] sm:h-[540px] flex flex-col bg-[#111113] border border-white/10 rounded-3xl overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="px-6 py-5 border-b border-white/10 flex items-center justify-between shrink-0">
-          <div>
-            <h3 className="text-base font-semibold text-white tracking-tight">
-              독립형 HTML 배포
-            </h3>
-            <p className="text-xs text-zinc-400 mt-0.5">
-              빌드 및 DB 종속 없는 단일 <code className="text-zinc-200 font-mono">index.html</code> 파일
-            </p>
+        <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-white/10 flex items-center justify-between gap-3 shrink-0 bg-[#0A0A0B]">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {isSubModal && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="min-w-[36px] min-h-[36px] -ml-1 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-white/10 cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+                title="공유 화면으로 돌아가기"
+                aria-label="공유 화면으로 돌아가기"
+              >
+                <ArrowLeft className="w-4 h-4 stroke-[1.75]" />
+              </button>
+            )}
+            <div className="min-w-0">
+              <h3 className="text-base font-semibold text-white tracking-tight truncate">
+                독립형 HTML 파일 배포
+              </h3>
+              <p className="text-xs text-zinc-400 mt-0.5 truncate">
+                별도 서버나 빌드 없이 동작하는 단일 <code className="text-zinc-200 font-mono">index.html</code>
+              </p>
+            </div>
           </div>
+
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full text-zinc-400 hover:text-white transition cursor-pointer hover:bg-white/5"
+            className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-white/10 cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
             title="닫기"
             aria-label="닫기"
           >
-            <X className="w-5 h-5 stroke-[1.5]" />
+            <X className="w-5 h-5 stroke-[1.75]" />
           </button>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center px-6 pt-3 gap-6 border-b border-white/10 shrink-0 text-xs">
-          <button
-            type="button"
-            onClick={() => setActiveTab('deploy')}
-            className={`pb-2.5 font-medium transition-colors cursor-pointer border-b-2 ${
-              activeTab === 'deploy'
-                ? 'border-white text-white'
-                : 'border-transparent text-zinc-400 hover:text-zinc-300'
-            }`}
-          >
-            배포 가이드
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('code')}
-            className={`pb-2.5 font-medium transition-colors cursor-pointer border-b-2 ${
-              activeTab === 'code'
-                ? 'border-white text-white'
-                : 'border-transparent text-zinc-400 hover:text-zinc-300'
-            }`}
-          >
-            HTML 소스코드 미리보기
-          </button>
+        {/* Segmented Navigation Tabs */}
+        <div className="px-5 sm:px-6 pt-4 shrink-0">
+          <div className="grid grid-cols-2 p-1 rounded-xl bg-white/[0.04] text-xs">
+            <button
+              type="button"
+              onClick={() => setActiveTab('deploy')}
+              className={`py-2 px-3 rounded-lg cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
+                activeTab === 'deploy'
+                  ? 'bg-white text-neutral-950 font-semibold shadow-sm'
+                  : 'text-zinc-400 hover:text-white font-medium'
+              }`}
+            >
+              배포 안내
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('code')}
+              className={`py-2 px-3 rounded-lg cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
+                activeTab === 'code'
+                  ? 'bg-white text-neutral-950 font-semibold shadow-sm'
+                  : 'text-zinc-400 hover:text-white font-medium'
+              }`}
+            >
+              소스코드 미리보기
+            </button>
+          </div>
         </div>
 
         {/* Body Content Area */}
-        <div className="flex-1 overflow-hidden p-6 flex flex-col">
+        <div className="flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 py-5 flex flex-col">
           {activeTab === 'deploy' ? (
-            <div className="h-full flex flex-col justify-center gap-3.5">
-              {/* Target 1: Cloudflare Pages */}
-              <div className="border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] p-4 rounded-2xl transition">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="font-medium text-white text-xs">Cloudflare Pages</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-white border border-white/20 font-medium">
-                    추천
-                  </span>
+            <div className="divide-y divide-white/[0.08]">
+              <div className="py-3.5 first:pt-1">
+                <div className="flex items-center gap-2 text-xs mb-1">
+                  <span className="font-semibold text-white">01. Cloudflare Pages</span>
+                  <span aria-hidden="true" className="text-zinc-400">·</span>
+                  <span className="text-zinc-300">권장</span>
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed">
-                  index.html 업로드 즉시 글로벌 엣지 CDN 무료 호스팅
+                  다운로드한 <code className="font-mono text-zinc-300">index.html</code> 파일을 업로드하면 즉시 글로벌 CDN으로 무료 배포됩니다.
                 </p>
               </div>
 
-              {/* Target 2: GitHub Pages */}
-              <div className="border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] p-4 rounded-2xl transition">
-                <div className="font-medium text-white text-xs mb-1.5">
-                  GitHub Pages
+              <div className="py-3.5">
+                <div className="font-semibold text-white text-xs mb-1">
+                  02. GitHub Pages
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed">
-                  저장소에 업로드하여 무료 도메인 연결
+                  저장소 루트에 파일을 올리고 개인 도메인 또는 무료 주소를 연결할 수 있습니다.
                 </p>
               </div>
 
-              {/* Target 3: 자체 웹 호스팅 */}
-              <div className="border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] p-4 rounded-2xl transition">
-                <div className="font-medium text-white text-xs mb-1.5">
-                  자체 웹 호스팅
+              <div className="py-3.5 last:pb-1">
+                <div className="font-semibold text-white text-xs mb-1">
+                  03. 자체 웹 호스팅
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed">
-                  FTP / S3 루트 경로에 단일 파일 업로드
+                  사내 웹 서버, S3, FTP 루트 경로에 단일 파일을 업로드해 바로 운영할 수 있습니다.
                 </p>
+              </div>
+
+              <div className="pt-3.5 text-[11px] text-zinc-400 flex items-center justify-between">
+                <span>권장 경로</span>
+                <span className="font-mono text-zinc-300 select-all">{displaySlug}</span>
               </div>
             </div>
           ) : (
-            <div className="h-full flex flex-col">
-              <div className="flex items-center justify-between mb-2 shrink-0">
-                <span className="font-mono text-[11px] text-zinc-400">
-                  standalone index.html · {htmlCode.length.toLocaleString()} bytes
+            <div className="h-full min-h-[220px] flex flex-col">
+              <div className="flex items-center justify-between mb-2 shrink-0 text-[11px] text-zinc-400">
+                <span className="font-mono tabular-nums">
+                  index.html · {htmlCode.length.toLocaleString()} bytes
                 </span>
-                <span className="font-mono text-[11px] text-zinc-400">
-                  Zero Build Dependencies
-                </span>
+                <span>단일 독립 실행 파일</span>
               </div>
-              <div className="flex-1 bg-black/60 border border-white/5 rounded-2xl p-4 font-mono text-xs overflow-auto leading-relaxed scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent text-zinc-300 selection:bg-white/20 selection:text-white">
+              <div className="flex-1 min-h-0 bg-[#0A0A0B] border border-white/[0.08] rounded-2xl p-3.5 font-mono text-xs overflow-auto leading-relaxed text-zinc-300 selection:bg-white/20 selection:text-white">
                 <pre className="font-mono text-xs leading-relaxed whitespace-pre">
                   {htmlCode}
                 </pre>
@@ -162,34 +182,37 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         </div>
 
         {/* Bottom Action Bar */}
-        <div className="px-6 py-4 border-t border-white/10 bg-[#0A0A0B] flex items-center justify-between gap-4 shrink-0">
-          <span className="font-mono text-xs text-zinc-400 truncate max-w-[200px] select-all">
-            {displaySlug}
-          </span>
+        <div className="px-5 sm:px-6 py-4 border-t border-white/10 bg-[#0A0A0B] flex items-center justify-between gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/10 cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+          >
+            {isSubModal ? '취소' : '닫기'}
+          </button>
 
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={handleCopy}
-              className="px-4 py-2 rounded-xl text-xs text-zinc-300 bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-[0.98]"
+              className="min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-medium text-zinc-200 bg-white/[0.05] hover:bg-white/10 border border-white/10 flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-[0.98] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
               title="코드 복사"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? '복사 완료' : '코드 복사'}</span>
+              {copied ? <Check className="w-3.5 h-3.5 text-white shrink-0" /> : <Copy className="w-3.5 h-3.5 shrink-0" />}
+              <span>{copied ? '복사됨' : '코드 복사'}</span>
             </button>
 
             <button
               type="button"
               onClick={handleDownload}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-black bg-white hover:bg-zinc-200 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-[0.98] shadow-md"
+              className="min-h-[40px] px-4 py-2 rounded-xl text-xs font-semibold text-neutral-950 bg-white hover:bg-zinc-200 flex items-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-[0.98] shadow-md focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
               title="HTML 다운로드"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>HTML 다운로드</span>
+              <Download className="w-3.5 h-3.5 shrink-0" />
+              <span>다운로드</span>
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );
