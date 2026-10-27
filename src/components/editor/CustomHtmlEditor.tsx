@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { CardData } from '../../types/card';
-import { sanitizeCardHtml, detectUnsafePatterns } from '../../utils/sanitizer';
+import { sanitizeHtml, detectUnsafeHtmlPatterns } from '../../utils/sanitizeHtml';
 
 interface CustomHtmlEditorProps {
   htmlFront: string;
@@ -122,15 +122,15 @@ export const CustomHtmlEditor: React.FC<CustomHtmlEditorProps> = ({
       });
       const data = await res.json();
       if (data.success && data.html) {
-        onChangeFront(sanitizeCardHtml(data.html));
+        onChangeFront(sanitizeHtml(data.html));
         setAiStatus('새로운 코드가 적용되었습니다.');
       } else {
-        onChangeFront(sanitizeCardHtml(DEFAULT_LUXURY_HTML_FRONT));
-        onChangeBack(sanitizeCardHtml(DEFAULT_LUXURY_HTML_BACK));
+        onChangeFront(sanitizeHtml(DEFAULT_LUXURY_HTML_FRONT));
+        onChangeBack(sanitizeHtml(DEFAULT_LUXURY_HTML_BACK));
         setAiStatus('기본 템플릿이 적용되었습니다.');
       }
     } catch {
-      onChangeFront(sanitizeCardHtml(DEFAULT_LUXURY_HTML_FRONT));
+      onChangeFront(sanitizeHtml(DEFAULT_LUXURY_HTML_FRONT));
       setAiStatus('기본 템플릿이 적용되었습니다.');
     } finally {
       setIsGeneratingAi(false);
@@ -139,7 +139,7 @@ export const CustomHtmlEditor: React.FC<CustomHtmlEditorProps> = ({
   };
 
   const currentHtml = activeFace === 'front' ? htmlFront : htmlBack;
-  const detectedUnsafe = useMemo(() => detectUnsafePatterns(currentHtml), [currentHtml]);
+  const detectedUnsafe = useMemo(() => detectUnsafeHtmlPatterns(currentHtml), [currentHtml]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-150">

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CardCreationMode, CardLayoutType, CardTheme, CardFeatures, CardData } from '../../types/card';
 import { isVerticalLayout } from '../../constants/templates';
 import { BusinessCardFront } from '../BusinessCardFront';
 import { BusinessCardBack } from '../BusinessCardBack';
 import { SandboxedCardRenderer } from '../SandboxedCardRenderer';
+import { sanitizeHtml } from '../../utils/sanitizeHtml';
 
 interface EditorPreviewPanelProps {
   creationMode: CardCreationMode;
@@ -44,6 +45,8 @@ export const EditorPreviewPanel: React.FC<EditorPreviewPanelProps> = ({
   };
 
   const isVerticalCard = isVerticalLayout(layoutType) && creationMode === 'template';
+  const sanitizedFront = useMemo(() => sanitizeHtml(htmlFront), [htmlFront]);
+  const sanitizedBack = useMemo(() => sanitizeHtml(htmlBack), [htmlBack]);
 
   return (
     <div className="order-1 lg:order-2 col-span-12 lg:col-span-7 h-auto lg:h-full flex flex-col items-center justify-center bg-[#161618] border-b lg:border-b-0 lg:border-l border-white/[0.06] px-6 py-10 sm:p-12 lg:p-14 relative overflow-hidden select-none">
@@ -94,10 +97,10 @@ export const EditorPreviewPanel: React.FC<EditorPreviewPanelProps> = ({
             )}
 
             {creationMode === 'custom_html' && (
-              htmlFront ? (
+              sanitizedFront ? (
                 <div className="w-full h-full overflow-hidden rounded-2xl">
                   <SandboxedCardRenderer
-                    html={htmlFront}
+                    html={sanitizedFront}
                     isPortrait={isVerticalCard}
                     isPrintPreview={false}
                   />
@@ -142,10 +145,10 @@ export const EditorPreviewPanel: React.FC<EditorPreviewPanelProps> = ({
             )}
 
             {creationMode === 'custom_html' && (
-              htmlBack ? (
+              sanitizedBack ? (
                 <div className="w-full h-full overflow-hidden rounded-2xl">
                   <SandboxedCardRenderer
-                    html={htmlBack}
+                    html={sanitizedBack}
                     isPortrait={isVerticalCard}
                     isPrintPreview={false}
                   />

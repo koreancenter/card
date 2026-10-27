@@ -18,6 +18,7 @@ import {
 } from './editor/CustomHtmlEditor';
 import { PhotoArchivingEditor } from './editor/PhotoArchivingEditor';
 import { EditorPreviewPanel } from './editor/EditorPreviewPanel';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 interface CardEditorModalProps {
   isOpen: boolean;
@@ -278,8 +279,8 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
         show_address: features.show_address ?? true,
         show_en_name: features.show_en_name ?? true
       },
-      html_front: isHtmlMode ? htmlFront : undefined,
-      html_back: isHtmlMode ? htmlBack : undefined,
+      html_front: isHtmlMode ? sanitizeHtml(htmlFront) : undefined,
+      html_back: isHtmlMode ? sanitizeHtml(htmlBack) : undefined,
       front_image_url: isPhotoMode ? frontImageUrl : undefined,
       back_image_url: isPhotoMode ? backImageUrl : undefined,
       scannedImage: isPhotoMode ? frontImageUrl : undefined,

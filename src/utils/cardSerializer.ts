@@ -1,5 +1,5 @@
 import { CardData, CardTheme, StoredCard } from '../types/card';
-import { sanitizeCardHtml } from './sanitizer';
+import { sanitizeHtml, escapeHtmlText } from './sanitizeHtml';
 
 export const CARD_DATA: CardData = {
   organization: 'GOGUMA KNOWLEDGE OFFICE',
@@ -233,19 +233,26 @@ export class CardSerializer {
   }
 
   /**
-   * Validates and parses a JSON envelope into a StoredCard
+   * Validates and parses a JSON envelope into a StoredCard with sanitized custom HTML
    */
   static fromJsonEnvelope(jsonString: string): StoredCard {
     const parsed = JSON.parse(jsonString) as Partial<CardJsonEnvelope> & Partial<StoredCard>;
+    let targetCard: StoredCard | null = null;
     if (parsed && typeof parsed === 'object') {
       if (parsed.schemaVersion === '1.0' && parsed.card) {
-        return parsed.card;
-      }
-      if ('id' in parsed && 'data' in parsed) {
-        return parsed as StoredCard;
+        targetCard = parsed.card;
+      } else if ('id' in parsed && 'data' in parsed) {
+        targetCard = parsed as StoredCard;
       }
     }
-    throw new Error('Invalid Card JSON structure');
+    if (!targetCard) {
+      throw new Error('Invalid Card JSON structure');
+    }
+    return {
+      ...targetCard,
+      html_front: targetCard.html_front ? sanitizeHtml(targetCard.html_front) : undefined,
+      html_back: targetCard.html_back ? sanitizeHtml(targetCard.html_back) : undefined,
+    };
   }
 
   /**
@@ -254,9 +261,13 @@ export class CardSerializer {
   static toStandaloneHtml(data: CardData, theme: CardTheme = 'pure_white', options: HtmlExportOptions = {}): string {
     const vcardString = this.toVCard(data);
     const vcardEncoded = encodeURIComponent(vcardString);
-    const pageTitle = `${sanitizeCardHtml(data.name || '')} (${sanitizeCardHtml(data.nameKr || '')}) — ${sanitizeCardHtml(data.organization || '')}`;
-    const pageDesc = `${sanitizeCardHtml(data.organizationKr || '')} ${sanitizeCardHtml(data.titleKr || '')} ${sanitizeCardHtml(data.name || '')}의 디지털 명함입니다.`;
-    const officialUrl = data.website || 'https://card.goguma.app/master';
+    const pageTitle = `${escapeHtmlText(data.name || '')} (${escapeHtmlText(data.nameKr || '')}) — ${escapeHtmlText(data.organization || '')}`;
+    const pageDesc = `${escapeHtmlText(data.organizationKr || '')} ${escapeHtmlText(data.titleKr || '')} ${escapeHtmlText(data.name || '')}의 디지털 명함입니다.`;
+    const rawUrl = (data.website || 'https://card.goguma.app/master').trim();
+    const officialUrl = /^https?:\/\//i.test(rawUrl) ? escapeHtmlText(rawUrl) : 'https://card.goguma.app/master';
+    const safePhoneHref = escapeHtmlText((data.phoneRaw || '').replace(/[^0-9+]/g, ''));
+    const safeEmailHref = escapeHtmlText((data.email || '').trim());
+    const safeWhatsappUrl = /^https?:\/\//i.test(data.whatsappUrl || '') ? escapeHtmlText(data.whatsappUrl!) : '';
 
     const themeColors: Record<string, { bg: string; text: string; textSec: string; border: string; accent: string }> = {
       pure_white: { bg: '#F5F2EC', text: '#1C1B1A', textSec: '#787571', border: 'rgba(28,27,26,0.10)', accent: '#1C1B1A' },
@@ -326,7 +337,7 @@ export class CardSerializer {
         韓
       </div>
       <a href="${officialUrl}" class="font-serif tracking-widest text-xs uppercase text-zinc-300 hover:text-white transition-colors">
-        ${sanitizeCardHtml(data.organization || '')}
+        ${escapeHtmlText(data.organization || '')}
       </a>
     </div>
   </header>
@@ -349,29 +360,29 @@ export class CardSerializer {
         <!-- CARD FRONT -->
         <div class="absolute inset-0 w-full h-full p-6 sm:p-7 flex flex-col justify-between backface-hidden rounded-2xl overflow-hidden" style="background-color: ${selectedTheme.bg}; color: ${selectedTheme.text};">
           <div>
-            <p class="text-[10px] tracking-tight font-medium" style="color: ${selectedTheme.textSec};">${sanitizeCardHtml(data.organizationKr || '')}</p>
-            <h2 class="text-sm font-semibold tracking-tight">${sanitizeCardHtml(data.organization || '')}</h2>
-            ${data.subOrg ? `<p class="text-[9px] font-semibold tracking-[0.2em] uppercase mt-0.5" style="color: ${selectedTheme.textSec};">${sanitizeCardHtml(data.subOrg)}</p>` : ''}
+            <p class="text-[10px] tracking-tight font-medium" style="color: ${selectedTheme.textSec};">${escapeHtmlText(data.organizationKr || '')}</p>
+            <h2 class="text-sm font-semibold tracking-tight">${escapeHtmlText(data.organization || '')}</h2>
+            ${data.subOrg ? `<p class="text-[9px] font-semibold tracking-[0.2em] uppercase mt-0.5" style="color: ${selectedTheme.textSec};">${escapeHtmlText(data.subOrg)}</p>` : ''}
           </div>
 
           <div class="my-auto py-4 space-y-1">
-            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">${sanitizeCardHtml(data.name || '')}</h1>
-            <p class="text-xs font-mono tracking-wider" style="color: ${selectedTheme.textSec};">${sanitizeCardHtml(data.nameKr || '')}</p>
-            <p class="text-xs pt-1 font-medium">${sanitizeCardHtml(data.title || '')} <span style="color: ${selectedTheme.textSec};">(${sanitizeCardHtml(data.titleKr || '')})</span></p>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">${escapeHtmlText(data.name || '')}</h1>
+            <p class="text-xs font-mono tracking-wider" style="color: ${selectedTheme.textSec};">${escapeHtmlText(data.nameKr || '')}</p>
+            <p class="text-xs pt-1 font-medium">${escapeHtmlText(data.title || '')} <span style="color: ${selectedTheme.textSec};">(${escapeHtmlText(data.titleKr || '')})</span></p>
           </div>
 
           <div class="space-y-2 pt-4 text-xs" style="border-top: 1px solid ${selectedTheme.border};">
             <div class="flex items-center justify-between">
               <span class="font-mono text-[10px]" style="color: ${selectedTheme.textSec};">MOBILE</span>
-              <a href="tel:${data.phoneRaw || ''}" class="hover:opacity-75 transition-opacity">${sanitizeCardHtml(data.phone || '')}</a>
+              <a href="tel:${safePhoneHref}" class="hover:opacity-75 transition-opacity">${escapeHtmlText(data.phone || '')}</a>
             </div>
             <div class="flex items-center justify-between">
               <span class="font-mono text-[10px]" style="color: ${selectedTheme.textSec};">EMAIL</span>
-              <a href="mailto:${data.email || ''}" class="hover:opacity-75 transition-opacity">${sanitizeCardHtml(data.email || '')}</a>
+              <a href="mailto:${safeEmailHref}" class="hover:opacity-75 transition-opacity">${escapeHtmlText(data.email || '')}</a>
             </div>
             <div class="flex items-center justify-between">
               <span class="font-mono text-[10px]" style="color: ${selectedTheme.textSec};">WEB</span>
-              <a href="${data.website || ''}" target="_blank" class="hover:opacity-75 transition-opacity font-medium">${sanitizeCardHtml(data.websiteDisplay || '')}</a>
+              <a href="${officialUrl}" target="_blank" rel="noopener noreferrer" class="hover:opacity-75 transition-opacity font-medium">${escapeHtmlText(data.websiteDisplay || '')}</a>
             </div>
           </div>
         </div>
@@ -379,14 +390,14 @@ export class CardSerializer {
         <!-- CARD BACK -->
         <div class="absolute inset-0 w-full h-full p-6 sm:p-7 flex flex-col justify-between backface-hidden rotate-y-180 rounded-2xl overflow-hidden" style="background-color: ${selectedTheme.bg}; color: ${selectedTheme.text};">
           <div class="my-auto text-center space-y-2">
-            <h2 class="text-lg sm:text-xl font-semibold tracking-[0.14em] uppercase">${sanitizeCardHtml(data.backTitle || data.organization || 'GOGUMA KNOWLEDGE OFFICE')}</h2>
-            <p class="text-[10px] font-medium uppercase tracking-[0.24em]" style="color: ${selectedTheme.textSec};">${sanitizeCardHtml(data.backSubtitle || data.backTagline || 'KOREAN CENTER GLOBAL NETWORK')}</p>
+            <h2 class="text-lg sm:text-xl font-semibold tracking-[0.14em] uppercase">${escapeHtmlText(data.backTitle || data.organization || 'GOGUMA KNOWLEDGE OFFICE')}</h2>
+            <p class="text-[10px] font-medium uppercase tracking-[0.24em]" style="color: ${selectedTheme.textSec};">${escapeHtmlText(data.backSubtitle || data.backTagline || 'KOREAN CENTER GLOBAL NETWORK')}</p>
           </div>
 
           <div class="pt-4 flex flex-col items-center text-center space-y-2" style="border-top: 1px solid ${selectedTheme.border};">
             <div id="qrcode-container" class="p-2 bg-[#FAFAFA] border border-black/5 rounded-xl shadow-md w-20 h-20 flex items-center justify-center"></div>
             <p class="font-mono text-[9px]" style="color: ${selectedTheme.textSec};">SCAN TO CONNECT</p>
-            <p class="text-xs font-medium">${sanitizeCardHtml(data.websiteDisplay || '')}</p>
+            <p class="text-xs font-medium">${escapeHtmlText(data.websiteDisplay || '')}</p>
           </div>
         </div>
 
@@ -395,19 +406,19 @@ export class CardSerializer {
 
     <!-- Centered Action Dock -->
     <div class="w-full max-w-[360px] sm:max-w-[400px] mt-4 flex items-center justify-center flex-wrap gap-2 text-neutral-400 no-print">
-      <a href="data:text/vcard;charset=utf-8,${vcardEncoded}" download="${sanitizeCardHtml(data.name || 'card')}.vcf" class="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:text-white hover:border-neutral-700 transition-colors" title="주소록에 연락처 저장">
+      <a href="data:text/vcard;charset=utf-8,${vcardEncoded}" download="${escapeHtmlText(data.name || 'card')}.vcf" class="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:text-white hover:border-neutral-700 transition-colors" title="주소록에 연락처 저장">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
       </a>
-      <a href="tel:${data.phoneRaw || ''}" class="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:text-white hover:border-neutral-700 transition-colors" title="전화 걸기">
+      <a href="tel:${safePhoneHref}" class="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:text-white hover:border-neutral-700 transition-colors" title="전화 걸기">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
       </a>
-      <a href="${data.whatsappUrl || ''}" target="_blank" class="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:text-white hover:border-neutral-700 transition-colors" title="WhatsApp 대화">
+      <a href="${safeWhatsappUrl}" target="_blank" rel="noopener noreferrer" class="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:text-white hover:border-neutral-700 transition-colors" title="WhatsApp 대화">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
       </a>
-      <a href="mailto:${data.email || ''}" class="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:text-white hover:border-neutral-700 transition-colors" title="이메일 보내기">
+      <a href="mailto:${safeEmailHref}" class="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:text-white hover:border-neutral-700 transition-colors" title="이메일 보내기">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
       </a>
-      <a href="${data.website || ''}" target="_blank" class="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:text-white hover:border-neutral-700 transition-colors" title="공식 웹사이트">
+      <a href="${officialUrl}" target="_blank" rel="noopener noreferrer" class="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:text-white hover:border-neutral-700 transition-colors" title="공식 웹사이트">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
       </a>
       <button id="share-btn" class="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:text-white hover:border-neutral-700 transition-colors cursor-pointer" title="링크 공유">
@@ -418,7 +429,7 @@ export class CardSerializer {
   </main>
 
   <footer class="py-6 px-4 text-center text-[11px] text-neutral-400 no-print">
-    <p>© ${new Date().getFullYear()} ${sanitizeCardHtml(data.organization || '')}. Distributed via Self-Hosted Digital Pass.</p>
+    <p>© ${new Date().getFullYear()} ${escapeHtmlText(data.organization || '')}. Distributed via Self-Hosted Digital Pass.</p>
   </footer>
 
   <script>
@@ -442,8 +453,8 @@ export class CardSerializer {
     document.getElementById('share-btn').addEventListener('click', async (e) => {
       e.stopPropagation();
       const shareData = {
-        title: '${sanitizeCardHtml(data.name || '')} — ${sanitizeCardHtml(data.organization || '')}',
-        text: '${sanitizeCardHtml(data.organizationKr || '')} ${sanitizeCardHtml(data.titleKr || '')} ${sanitizeCardHtml(data.name || '')}의 디지털 명함입니다.',
+        title: ${JSON.stringify(`${data.name || ''} — ${data.organization || ''}`).replace(/</g, '\\u003c')},
+        text: ${JSON.stringify(`${data.organizationKr || ''} ${data.titleKr || ''} ${data.name || ''}의 디지털 명함입니다.`).replace(/</g, '\\u003c')},
         url: window.location.href
       };
       if (navigator.share) {
@@ -457,7 +468,7 @@ export class CardSerializer {
     window.addEventListener('DOMContentLoaded', () => {
       if (window.QRCode) {
         new QRCode(document.getElementById("qrcode-container"), {
-          text: "${officialUrl}",
+          text: ${JSON.stringify(/^https?:\/\//i.test(rawUrl) ? rawUrl : 'https://card.goguma.app/master').replace(/</g, '\\u003c')},
           width: 72,
           height: 72,
           colorDark : "#0a0a0c",

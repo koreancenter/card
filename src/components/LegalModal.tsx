@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 
 export type LegalDocType = 'privacy' | 'terms';
@@ -15,22 +15,43 @@ export const LegalModal: React.FC<LegalModalProps> = ({
   onClose,
 }) => {
   const [activeDoc, setActiveDoc] = useState<LegalDocType>(initialDoc);
+  const scrollBodyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setActiveDoc(initialDoc);
+    }
+  }, [isOpen, initialDoc]);
+
+  const handleSelectDoc = (doc: LegalDocType) => {
+    setActiveDoc(doc);
+    if (scrollBodyRef.current) {
+      scrollBodyRef.current.scrollTop = 0;
+    }
+  };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div 
-        className="w-full max-w-2xl max-h-[85vh] rounded-2xl bg-[#121214] border border-white/10 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-2xl h-[80vh] max-h-[640px] min-h-[480px] max-sm:min-h-[min(480px,85dvh)] rounded-2xl bg-[#121214] border border-white/10 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
         role="dialog"
         aria-modal="true"
         aria-labelledby="legal-modal-title"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with Segmented Switcher & Close */}
-        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#0A0A0B]">
-          <div className="flex items-center gap-2 overflow-x-auto">
+        {/* Fixed Header with Segmented Switcher & Close */}
+        <div className="shrink-0 flex-shrink-0 px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#0A0A0B]">
+          <div role="tablist" aria-label="약관 및 정책 문서 선택" className="flex items-center gap-2 overflow-x-auto">
             <button
-              onClick={() => setActiveDoc('privacy')}
+              type="button"
+              role="tab"
+              aria-selected={activeDoc === 'privacy'}
+              onClick={() => handleSelectDoc('privacy')}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 border transition-colors ${
                 activeDoc === 'privacy'
                   ? 'bg-white text-neutral-950 border-white shadow-sm'
@@ -41,7 +62,10 @@ export const LegalModal: React.FC<LegalModalProps> = ({
             </button>
 
             <button
-              onClick={() => setActiveDoc('terms')}
+              type="button"
+              role="tab"
+              aria-selected={activeDoc === 'terms'}
+              onClick={() => handleSelectDoc('terms')}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 border transition-colors ${
                 activeDoc === 'terms'
                   ? 'bg-white text-neutral-950 border-white shadow-sm'
@@ -53,6 +77,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
           </div>
 
           <button
+            type="button"
             onClick={onClose}
             className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 cursor-pointer shrink-0 ml-2 transition-colors"
             aria-label="닫기"
@@ -62,7 +87,11 @@ export const LegalModal: React.FC<LegalModalProps> = ({
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-zinc-300 text-xs leading-relaxed font-sans">
+        <div
+          ref={scrollBodyRef}
+          role="tabpanel"
+          className="flex-1 min-h-0 overflow-y-auto [scrollbar-gutter:stable] p-6 sm:p-8 space-y-6 text-zinc-300 text-xs leading-relaxed font-sans"
+        >
           {activeDoc === 'privacy' ? (
             <article className="space-y-5">
               <div>
@@ -118,7 +147,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
                 <h3 id="legal-modal-title" className="text-lg font-bold text-white tracking-tight">
                   서비스 이용약관
                 </h3>
-                <p className="text-neutral-400 text-xs mt-1">
+                <p className="text-zinc-400 text-xs mt-1">
                   최종 개정일: 2026년 10월 1일
                 </p>
               </div>
@@ -163,9 +192,10 @@ export const LegalModal: React.FC<LegalModalProps> = ({
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-6 py-3.5 border-t border-white/10 bg-[#0A0A0B] flex items-center justify-end">
+        {/* Fixed Footer */}
+        <div className="shrink-0 flex-shrink-0 px-6 py-3.5 border-t border-white/10 bg-[#0A0A0B] flex items-center justify-end">
           <button
+            type="button"
             onClick={onClose}
             className="px-4 py-2 rounded-xl bg-white hover:bg-zinc-200 text-neutral-950 text-xs font-bold cursor-pointer transition-colors"
           >

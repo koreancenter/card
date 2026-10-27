@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import { sanitizeCardHtml } from '../utils/sanitizer';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 interface SandboxedCardRendererProps {
   html: string;
@@ -12,11 +12,11 @@ interface SandboxedCardRendererProps {
 /**
  * SandboxedCardRenderer
  * 
- * Military-grade dual-layer defense for user-provided custom HTML / Tailwind cards:
- * 1. Layer 1: Strict DOMPurify zero-trust sanitization stripping all executable vectors.
- * 2. Layer 2: Sandboxed <iframe> with `sandbox=""` (restricting `allow-scripts`,
- *    `allow-same-origin`, and `allow-forms`), ensuring the rendered markup is completely
- *    inert and incapable of DOM manipulation, network exfiltration, or script execution.
+ * Dual-layer XSS defense for user-provided custom HTML / Tailwind cards:
+ * 1. Layer 1: Unified strict DOMPurify allowlist sanitization (`sanitizeHtml`) blocking
+ *    scripts, iframes, objects, event handlers, and unsafe inline CSS/URI payloads.
+ * 2. Layer 2: Sandboxed <iframe> with `sandbox=""` + strict Content-Security-Policy meta tag
+ *    restricting script execution, same-origin access, forms, objects, and network exfiltration.
  */
 export const SandboxedCardRenderer: React.FC<SandboxedCardRendererProps> = ({
   html,
@@ -31,15 +31,11 @@ export const SandboxedCardRenderer: React.FC<SandboxedCardRendererProps> = ({
   useEffect(() => {
     if (typeof document === 'undefined') return;
     try {
-      const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
-        .map((node) => {
-          if (node.tagName === 'STYLE') {
-            return node.textContent || '';
-          }
-          return '';
-        })
+      const styles = Array.from(document.querySelectorAll('style'))
+        .map((node) => node.textContent || '')
         .filter(Boolean)
-        .join('\n');
+        .join('\n')
+        .replace(/<\/style/gi, '<\\/style');
       setParentCss(styles);
     } catch {
       // Quiet fail-safe: minimal baseline fallback styles
@@ -47,7 +43,7 @@ export const SandboxedCardRenderer: React.FC<SandboxedCardRendererProps> = ({
   }, []);
 
   const sanitized = useMemo(() => {
-    return sanitizeCardHtml(html);
+    return sanitizeHtml(html);
   }, [html]);
 
   const srcDocContent = useMemo(() => {
@@ -55,6 +51,7 @@ export const SandboxedCardRenderer: React.FC<SandboxedCardRendererProps> = ({
 <html lang="ko">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; style-src 'unsafe-inline'; img-src https: http: data:; font-src https: data:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; }

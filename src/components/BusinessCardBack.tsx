@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import QRCode from 'qrcode';
 import { CardData, CardTheme, CardOrientation, CardLayoutType } from '../types/card';
 import { resolveThemeStyles, isVerticalLayout } from '../constants/templates';
 import { SandboxedCardRenderer } from './SandboxedCardRenderer';
-import { sanitizeSvg } from '../utils/sanitizer';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 interface BusinessCardBackProps {
   data: CardData;
@@ -27,6 +27,10 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
   html_back
 }) => {
   const [qrSvg, setQrSvg] = useState<string>('');
+  const sanitizedHtmlBack = useMemo(
+    () => (html_back ? sanitizeHtml(html_back) : ''),
+    [html_back]
+  );
 
   const themeStyles = resolveThemeStyles(theme);
   const isLight = themeStyles.isLight;
@@ -45,7 +49,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
       errorCorrectionLevel: 'M'
     })
       .then((svgString) => {
-        setQrSvg(sanitizeSvg(svgString));
+        setQrSvg(sanitizeHtml(svgString));
       })
       .catch((err) => {
         console.warn('Notice generating QR', err);
@@ -53,7 +57,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
   }, [theme, isLight, data.website]);
 
   // Custom HTML / Tailwind Injection Back Face Rendering
-  if (html_back) {
+  if (sanitizedHtmlBack) {
     return (
       <div
         className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
@@ -62,7 +66,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
         <SandboxedCardRenderer
-          html={html_back}
+          html={sanitizedHtmlBack}
           isPortrait={isPortrait}
           isPrintPreview={isPrintPreview}
         />

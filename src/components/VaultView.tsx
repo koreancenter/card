@@ -23,6 +23,7 @@ import { BusinessCardFront } from './BusinessCardFront';
 import { isVerticalLayout } from '../constants/templates';
 import { downloadVCard } from '../utils/vcard';
 import { PhotoArchiveModal } from './PhotoArchiveModal';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 interface VaultViewProps {
   cards: StoredCard[];
@@ -256,9 +257,10 @@ export const VaultView: React.FC<VaultViewProps> = ({
                       theme={card.theme} 
                       layout_type={card.layout_type}
                       card_features={card.card_features}
-                      isPhotoCard={card.isPhotoCard}
-                      photoUrl={card.scannedImage}
-                      isPrintPreview={true} 
+                      isPhotoCard={card.isPhotoCard || card.creation_mode === 'photo'}
+                      photoUrl={card.scannedImage || card.front_image_url}
+                      html_front={card.html_front ? sanitizeHtml(card.html_front) : undefined}
+                      hideBorder={true}
                     />
                   </div>
                   

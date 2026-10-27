@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { CardData, CardTheme, CardOrientation, CardLayoutType, CardFeatures } from '../types/card';
 import { resolveThemeStyles, generateMonogram, isVerticalLayout } from '../constants/templates';
 import { Check, Copy } from 'lucide-react';
 import { SandboxedCardRenderer } from './SandboxedCardRenderer';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 interface BusinessCardFrontProps {
   data: CardData;
@@ -30,6 +31,10 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
   html_front
 }) => {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const sanitizedHtmlFront = useMemo(
+    () => (html_front ? sanitizeHtml(html_front) : ''),
+    [html_front]
+  );
 
   const copyToClipboard = (e: React.MouseEvent, text: string, key: string) => {
     e.stopPropagation();
@@ -45,7 +50,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
   const themeStyles = resolveThemeStyles(theme);
 
   // Custom HTML / Tailwind Injection Face Rendering with Sandboxed Isolation
-  if (html_front) {
+  if (sanitizedHtmlFront) {
     return (
       <div
         className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
@@ -54,7 +59,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
         <SandboxedCardRenderer
-          html={html_front}
+          html={sanitizedHtmlFront}
           isPortrait={isPortrait}
           isPrintPreview={isPrintPreview}
         />
