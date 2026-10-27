@@ -15,7 +15,6 @@ export const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, data }) => {
   const [dataUrl, setDataUrl] = useState<string>('');
   const [copied, setCopied] = useState(false);
 
-  // The official production destination URL
   const targetUrl = data.website || 'https://card.goguma.app/master';
 
   useEffect(() => {
@@ -27,8 +26,8 @@ export const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, data }) => {
       width: 480,
       margin: 2,
       color: {
-        dark: '#0a0a0c',
-        light: '#ffffff'
+        dark: '#0A0A0B',
+        light: '#FAFAFA'
       },
       errorCorrectionLevel: 'M'
     })
@@ -62,57 +61,61 @@ export const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, data }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={onClose}
+    >
       <div 
-        className="relative w-full max-w-sm rounded-3xl bg-neutral-900 border border-neutral-800 p-6 sm:p-7 text-neutral-100 shadow-2xl"
+        className="relative w-full max-w-sm rounded-3xl bg-[#0A0A0B] border border-white/10 p-6 sm:p-7 text-neutral-100 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+          className="absolute top-4 right-4 p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 transition-colors cursor-pointer"
           title="닫기"
+          aria-label="닫기"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
         <div className="text-center space-y-1 mb-5">
-          <p className="text-[10px] font-mono tracking-widest uppercase text-neutral-400">
+          <p className="text-[10px] font-mono tracking-widest uppercase text-zinc-400">
             OFFICIAL CONNECT QR
           </p>
           <h3 className="text-lg font-bold text-white tracking-tight">디지털 명함 QR 코드</h3>
-          <p className="text-xs text-neutral-400">
+          <p className="text-xs text-neutral-500">
             스마트폰 카메라로 스캔하면 바로 연결됩니다
           </p>
         </div>
 
         {/* Mode Segmented Tab */}
-        <div className="flex items-center p-1 bg-neutral-950 rounded-xl border border-neutral-800/80 mb-5">
+        <div className="flex items-center p-1 bg-[#121214] rounded-xl border border-zinc-800/80 mb-5">
           <button
             onClick={() => setQrType('url')}
-            className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+            className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
               qrType === 'url'
-                ? 'bg-neutral-800 text-white shadow-sm'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-white text-neutral-950 shadow-sm'
+                : 'text-zinc-400 hover:text-white hover:bg-white/10'
             }`}
           >
             공식 도메인 (URL)
           </button>
           <button
             onClick={() => setQrType('vcard')}
-            className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+            className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
               qrType === 'vcard'
-                ? 'bg-neutral-800 text-white shadow-sm'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-white text-neutral-950 shadow-sm'
+                : 'text-zinc-400 hover:text-white hover:bg-white/10'
             }`}
           >
             연락처 바로저장 (vCard)
           </button>
         </div>
 
-        {/* QR Code Container */}
-        <div className="bg-white p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center mx-auto shadow-xl max-w-[260px]">
+        {/* QR Code Container: Warm matte paper (#FAFAFA) with border-black/5 */}
+        <div className="bg-[#FAFAFA] border border-black/5 p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center mx-auto shadow-xl max-w-[260px]">
           {dataUrl ? (
             <img 
               src={dataUrl} 
@@ -126,15 +129,15 @@ export const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, data }) => {
           )}
 
           {/* Encoded URL Display */}
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 w-full text-center">
-            <span className="font-mono text-[10px] font-medium text-neutral-800 tracking-tight">
+          <div className="mt-2.5 pt-2 border-t border-black/5 w-full text-center">
+            <span className="font-mono text-[10px] font-medium text-[#0A0A0B] tracking-tight">
               {qrType === 'url' ? displayHost : `${data.name} vCard`}
             </span>
           </div>
         </div>
 
         {/* Info label */}
-        <p className="mt-3.5 text-center text-[11px] text-neutral-400">
+        <p className="mt-3.5 text-center text-[11px] text-zinc-400">
           {qrType === 'url' 
             ? `스캔 시 공식 주소 ${displayHost} 페이지가 열립니다`
             : `스캔 즉시 스마트폰 주소록에 ${data.nameKr || data.name} 연락처가 등록됩니다`}
@@ -144,15 +147,15 @@ export const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, data }) => {
         <div className="mt-5 grid grid-cols-2 gap-2.5">
           <button
             onClick={handleCopyLink}
-            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 hover:text-white transition-colors text-xs font-semibold cursor-pointer"
+            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#121214] border border-white/10 hover:bg-white/10 text-zinc-200 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 transition-colors text-xs font-semibold cursor-pointer whitespace-nowrap"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? '복사 완료' : '주소 복사'}</span>
           </button>
 
           <button
             onClick={handleDownloadQr}
-            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 hover:text-white transition-colors text-xs font-semibold cursor-pointer"
+            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white hover:bg-zinc-200 text-neutral-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 transition-colors text-xs font-semibold cursor-pointer whitespace-nowrap"
           >
             <Download className="w-3.5 h-3.5" />
             <span>QR 다운로드</span>
@@ -160,12 +163,12 @@ export const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, data }) => {
         </div>
 
         {/* Direct Link Affordance */}
-        <div className="mt-4 pt-3 border-t border-neutral-800/80 text-center">
+        <div className="mt-4 pt-3 border-t border-zinc-800/80 text-center">
           <a
             href={targetUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-[11px] text-neutral-400 hover:text-neutral-200 transition-colors"
+            className="inline-flex items-center gap-1 text-[11px] text-zinc-400 hover:text-white transition-colors"
           >
             <span>{displayHost} 바로 열기</span>
             <ExternalLink className="w-3 h-3" />

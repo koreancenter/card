@@ -80,9 +80,11 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
   };
 
   const handleLoadSample = () => {
-    onChangeFrontImage('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80');
+    const sampleSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540"><rect width="900" height="540" fill="#FAFAFA"/><rect x="36" y="36" width="828" height="468" fill="none" stroke="#E4E4E7" stroke-width="1.5"/><text x="72" y="108" font-family="sans-serif" font-size="14" letter-spacing="4" fill="#71717A">GLOBAL HERITAGE FOUNDATION</text><text x="72" y="256" font-family="serif" font-size="40" font-weight="600" fill="#0A0A0B">Dr. Michael Harrison</text><text x="72" y="296" font-family="sans-serif" font-size="18" fill="#52525B">Executive Director · Cultural Strategy</text><line x1="72" y1="396" x2="828" y2="396" stroke="#E4E4E7" stroke-width="1"/><text x="72" y="444" font-family="monospace" font-size="16" fill="#27272A">+1 (202) 555-0182 · m.harrison@globalheritage.org</text></svg>`;
+    const sampleDataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(sampleSvg)}`;
+    onChangeFrontImage(sampleDataUrl);
     setFrontStats({
-      dataUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
+      dataUrl: sampleDataUrl,
       originalBytes: 1540000,
       compressedBytes: 124000,
       ratio: 92,
@@ -102,20 +104,20 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
       {/* 1. Photo Upload Slot with Drag-and-Drop & 900x540 Canvas Compression */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-            <span className="text-[#C5A880] font-mono">01.</span>
+          <label className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
+            <span className="text-zinc-400 font-mono">01.</span>
             <span>실물 명함 사진 등록 (Canvas 900×540 WebP)</span>
           </label>
           <button
             type="button"
             onClick={handleLoadSample}
-            className="flex items-center gap-1 text-[11px] text-[#C5A880] hover:underline cursor-pointer"
+            className="flex items-center gap-1 text-[11px] text-zinc-300 hover:text-white hover:underline cursor-pointer"
           >
             <Sparkles className="w-3 h-3" />
             <span>샘플 명함 로드</span>
           </button>
         </div>
-        <p className="text-[11px] text-neutral-400">
+        <p className="text-[11px] text-zinc-400">
           드래그 앤 드롭 또는 클릭하여 사진을 올리면 900×540 해상도의 고품질 WebP 파일로 브라우저에서 자동 압축됩니다.
         </p>
 
@@ -125,12 +127,12 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => !frontImageUrl && frontInputRef.current?.click()}
-          className={`relative w-full aspect-[900/540] rounded-2xl border-2 transition-all overflow-hidden flex flex-col items-center justify-center ${
+          className={`relative w-full aspect-[900/540] rounded-2xl border transition-all overflow-hidden flex flex-col items-center justify-center ${
             isDraggingFront
-              ? 'border-[#C5A880] bg-[#C5A880]/10 scale-[1.01]'
+              ? 'border-white bg-white/10 scale-[1.01]'
               : frontImageUrl
-                ? 'border-white/10 bg-black/60'
-                : 'border-dashed border-white/20 hover:border-[#C5A880]/80 bg-white/[0.02] hover:bg-white/[0.04] cursor-pointer'
+                ? 'border-white/10 bg-[#0A0A0B]'
+                : 'border-dashed border-white/20 hover:border-white/40 bg-[#0A0A0B] hover:bg-white/[0.04] cursor-pointer'
           }`}
         >
           {frontImageUrl ? (
@@ -138,16 +140,17 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
               <img
                 src={frontImageUrl}
                 alt="실물 명함"
+                referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     frontInputRef.current?.click();
                   }}
-                  className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs backdrop-blur-md transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-white text-neutral-950 hover:bg-zinc-200 font-semibold text-xs transition-colors cursor-pointer"
                 >
                   사진 교체
                 </button>
@@ -158,7 +161,7 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
                     onChangeFrontImage(undefined);
                     setFrontStats(null);
                   }}
-                  className="p-1.5 rounded-xl bg-rose-500/80 hover:bg-rose-600 text-white text-xs backdrop-blur-md transition-colors cursor-pointer"
+                  className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs backdrop-blur-md transition-colors cursor-pointer"
                   title="사진 삭제"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -167,15 +170,15 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center p-6 text-center space-y-2 pointer-events-none">
-              <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#C5A880] mb-1">
+              <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white mb-1">
                 {isCompressing ? <Zap className="w-6 h-6 animate-pulse" /> : <Camera className="w-6 h-6" />}
               </div>
               <div>
                 <p className="text-xs font-bold text-white">명함 사진 드래그 앤 드롭 또는 클릭하여 업로드</p>
-                <p className="text-[11px] text-neutral-400 mt-0.5">900×540 Canvas 자동 스케일링 & WebP 압축</p>
+                <p className="text-[11px] text-zinc-400 mt-0.5">900×540 Canvas 자동 스케일링 & WebP 압축</p>
               </div>
-              <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-[#C5A880]">
-                JPG / PNG / WEBP 지원
+              <span className="text-[10px] font-mono text-zinc-400">
+                JPG · PNG · WEBP 지원
               </span>
             </div>
           )}
@@ -189,27 +192,27 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
           />
         </div>
 
-        {/* Compression Badge */}
+        {/* Compression Summary */}
         {frontStats && (
-          <div className="px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 font-mono flex items-center justify-between animate-in fade-in duration-200">
+          <div className="px-3 py-2 rounded-xl bg-[#0A0A0B] border border-zinc-800/80 text-xs text-zinc-300 font-mono tabular-nums flex items-center justify-between animate-in fade-in duration-200">
             <span className="flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 shrink-0" />
+              <Zap className="w-3.5 h-3.5 shrink-0 text-white" />
               <span>{formatByteSize(frontStats.originalBytes)} → {formatByteSize(frontStats.compressedBytes)}</span>
-              <span className="text-[10px] text-emerald-500">(Canvas 900×540 WebP)</span>
+              <span className="text-[10px] text-zinc-500">(Canvas 900×540 WebP)</span>
             </span>
-            <span className="font-bold">{frontStats.ratio}% 용량 절감</span>
+            <span className="font-bold text-white">{frontStats.ratio}% 용량 절감</span>
           </div>
         )}
       </div>
 
       {/* 2. Quick-Input Metadata Form (Frictionless) */}
-      <div className="border-t border-white/[0.06] pt-5 space-y-3">
+      <div className="border-t border-white/10 pt-5 space-y-3">
         <div className="space-y-0.5">
-          <label className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-            <span className="text-[#C5A880] font-mono">02.</span>
+          <label className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
+            <span className="text-zinc-400 font-mono">02.</span>
             <span>퀵 메타데이터 입력 (하단 액션바 바인딩)</span>
           </label>
-          <p className="text-[11px] text-neutral-400">
+          <p className="text-[11px] text-zinc-400">
             실물 사진과 연동되어 원클릭 통화, vCard 저장, 전용 링크 공유를 작동시키는 핵심 정보입니다.
           </p>
         </div>
@@ -217,9 +220,9 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
           {/* 성명 (Name) - Required */}
           <div className="space-y-1">
-            <label className="text-[11px] text-neutral-300 font-medium flex items-center gap-1">
+            <label className="text-[11px] text-zinc-300 font-medium flex items-center gap-1">
               <span>성명 (Name)</span>
-              <span className="text-[#C5A880] font-bold">*</span>
+              <span className="text-zinc-400 font-bold">*</span>
             </label>
             <input
               type="text"
@@ -227,15 +230,15 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
               value={cardData.name}
               onChange={(e) => onChangeCardData('name', e.target.value)}
               placeholder="예: 홍길동 또는 John Doe"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:outline-none text-white text-xs font-semibold"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:ring-1 focus:ring-white/20 focus:border-white/20 focus:outline-none text-white text-xs font-semibold"
             />
           </div>
 
           {/* 대표 전화번호 (Phone) - Required */}
           <div className="space-y-1">
-            <label className="text-[11px] text-neutral-300 font-medium flex items-center gap-1">
+            <label className="text-[11px] text-zinc-300 font-medium flex items-center gap-1">
               <span>대표 전화번호 (Phone)</span>
-              <span className="text-[#C5A880] font-bold">*</span>
+              <span className="text-zinc-400 font-bold">*</span>
             </label>
             <input
               type="text"
@@ -243,7 +246,7 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
               value={cardData.phone}
               onChange={(e) => onChangeCardData('phone', e.target.value)}
               placeholder="010-1234-5678"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:outline-none text-white text-xs font-mono"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:ring-1 focus:ring-white/20 focus:border-white/20 focus:outline-none text-white text-xs font-mono tabular-nums"
             />
           </div>
         </div>
@@ -251,7 +254,7 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* 공식 이메일 (Email) - Optional */}
           <div className="space-y-1">
-            <label className="text-[11px] text-neutral-400 flex items-center gap-1">
+            <label className="text-[11px] text-zinc-400 flex items-center gap-1">
               <span>공식 이메일 (Email, Optional)</span>
             </label>
             <input
@@ -259,18 +262,18 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
               value={cardData.email}
               onChange={(e) => onChangeCardData('email', e.target.value)}
               placeholder="contact@example.com"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:outline-none text-white text-xs"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:ring-1 focus:ring-white/20 focus:border-white/20 focus:outline-none text-white text-xs"
             />
           </div>
 
           {/* 전용 URL 슬러그 (Slug) - Required */}
           <div className="space-y-1">
-            <label className="text-[11px] text-neutral-300 font-medium flex items-center gap-1">
+            <label className="text-[11px] text-zinc-300 font-medium flex items-center gap-1">
               <span>전용 URL 슬러그 (Slug)</span>
-              <span className="text-[#C5A880] font-bold">*</span>
+              <span className="text-zinc-400 font-bold">*</span>
             </label>
-            <div className="flex rounded-xl bg-white/[0.02] border border-white/10 focus-within:border-[#C5A880] overflow-hidden text-xs">
-              <span className="px-2.5 py-2.5 bg-neutral-800/60 text-neutral-400 font-mono text-[10px] shrink-0 border-r border-white/10 select-none">
+            <div className="flex rounded-xl bg-[#0A0A0B] border border-white/10 focus-within:ring-1 focus-within:ring-white/20 focus-within:border-white/20 overflow-hidden text-xs">
+              <span className="px-2.5 py-2.5 bg-zinc-900 text-zinc-400 font-mono text-[10px] shrink-0 border-r border-white/10 select-none">
                 {APP_BASE_DOMAIN}/
               </span>
               <input
@@ -278,7 +281,7 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
                 value={slug}
                 onChange={(e) => onChangeSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                 placeholder="slug"
-                className="w-full px-2.5 py-2.5 bg-transparent text-[#C5A880] focus:outline-none font-mono text-xs"
+                className="w-full px-2.5 py-2.5 bg-transparent text-white focus:outline-none font-mono text-xs"
               />
             </div>
           </div>
@@ -286,13 +289,13 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
 
         {/* Optional Notes */}
         <div className="space-y-1 pt-1">
-          <label className="text-[11px] text-neutral-400">만난 장소 / 수령 메모 (Notes, Optional)</label>
+          <label className="text-[11px] text-zinc-400">만난 장소 / 수령 메모 (Notes, Optional)</label>
           <input
             type="text"
             value={notes}
             onChange={(e) => onChangeNotes(e.target.value)}
             placeholder="예: 2026 글로벌 파트너스 데이 미팅에서 수령"
-            className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.02] border border-white/10 focus:border-[#C5A880] focus:outline-none text-white text-xs"
+            className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:ring-1 focus:ring-white/20 focus:border-white/20 focus:outline-none text-white text-xs"
           />
         </div>
       </div>

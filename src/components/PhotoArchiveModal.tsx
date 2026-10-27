@@ -59,29 +59,25 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
         <div 
-          className="relative w-full max-w-4xl max-h-[92vh] flex flex-col rounded-3xl bg-[#0F1015] border border-white/10 text-neutral-100 shadow-2xl overflow-hidden"
+          className="relative w-full max-w-4xl max-h-[92vh] flex flex-col rounded-3xl bg-[#121214] border border-white/10 text-neutral-100 shadow-2xl overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="p-4 sm:p-6 border-b border-white/5 flex items-center justify-between shrink-0 bg-[#0B0C10]">
+          <div className="p-4 sm:p-6 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#0A0A0B]">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-[#C5A880]/15 text-[#C5A880] border border-[#C5A880]/30 font-mono text-xs">
+                <span className="text-[10px] font-mono tracking-widest uppercase text-zinc-400">
                   ARCHIVE
                 </span>
+                <span aria-hidden="true" className="text-zinc-600">·</span>
                 <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
                   {card.data.name} — 실물 명함 원본 아카이브
                 </h3>
               </div>
-              <div className="flex items-center gap-3 text-xs text-neutral-400">
-                <span className="flex items-center gap-1">
-                  <Tag className="w-3 h-3 text-[#C5A880]" />
-                  <span>{card.category}</span>
-                </span>
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3 text-neutral-400" />
-                  <span>보관일: {card.createdAt}</span>
-                </span>
+              <div className="flex items-center gap-2 text-xs text-zinc-400">
+                <span>{card.category}</span>
+                <span aria-hidden="true">·</span>
+                <span className="tabular-nums">보관일: {card.createdAt}</span>
               </div>
             </div>
 
@@ -89,7 +85,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
               {card.scannedImage && (
                 <button
                   onClick={downloadOriginalPhoto}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-medium cursor-pointer transition-colors"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-medium cursor-pointer transition-colors"
                   title="실물 사진 원본 다운로드"
                 >
                   <Download className="w-3.5 h-3.5" />
@@ -98,7 +94,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
               )}
               <button
                 onClick={onClose}
-                className="p-2 rounded-full text-neutral-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                 title="닫기"
               >
                 <X className="w-5 h-5" />
@@ -107,41 +103,41 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
           </div>
 
           {/* View Mode Bar */}
-          <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 bg-[#0B0C10]/80 border-b border-white/5 text-xs">
-            <div className="flex items-center gap-1 p-1 bg-[#14151C] rounded-xl border border-white/5">
+          <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 bg-[#0A0A0B] border-b border-white/10 text-xs">
+            <div className="flex items-center gap-1 p-1 bg-[#121214] rounded-xl border border-zinc-800/80">
               <button
                 onClick={() => setViewTab('photo')}
-                className={`px-3 py-1 rounded-lg transition-colors cursor-pointer font-medium ${
+                className={`px-3 py-1 rounded-lg transition-colors cursor-pointer font-medium whitespace-nowrap shrink-0 ${
                   viewTab === 'photo'
-                    ? 'bg-[#C5A880] text-black font-bold shadow-sm'
-                    : 'text-neutral-400 hover:text-white'
+                    ? 'bg-white text-neutral-950 font-bold shadow-sm'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/10'
                 }`}
               >
                 실물 원본 사진
               </button>
               <button
                 onClick={() => setViewTab('compare')}
-                className={`px-3 py-1 rounded-lg transition-colors cursor-pointer font-medium ${
+                className={`px-3 py-1 rounded-lg transition-colors cursor-pointer font-medium whitespace-nowrap shrink-0 ${
                   viewTab === 'compare'
-                    ? 'bg-[#C5A880] text-black font-bold shadow-sm'
-                    : 'text-neutral-400 hover:text-white'
+                    ? 'bg-white text-neutral-950 font-bold shadow-sm'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/10'
                 }`}
               >
                 실물 & 디지털 듀얼 비교
               </button>
               <button
                 onClick={() => setViewTab('digital')}
-                className={`px-3 py-1 rounded-lg transition-colors cursor-pointer font-medium ${
+                className={`px-3 py-1 rounded-lg transition-colors cursor-pointer font-medium whitespace-nowrap shrink-0 ${
                   viewTab === 'digital'
-                    ? 'bg-[#C5A880] text-black font-bold shadow-sm'
-                    : 'text-neutral-400 hover:text-white'
+                    ? 'bg-white text-neutral-950 font-bold shadow-sm'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/10'
                 }`}
               >
                 디지털 명함 뷰
               </button>
             </div>
 
-            <div className="text-[11px] text-neutral-400 hidden sm:block">
+            <div className="text-[11px] text-zinc-400 hidden sm:block">
               {card.scannedImage ? 'WebP 무손실 로컬 아카이빙 완료' : '실물 사진 미등록'}
             </div>
           </div>
@@ -195,10 +191,10 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <span className="text-[11px] text-[#C5A880] font-mono uppercase tracking-wider block text-center">
+                  <span className="text-[11px] text-zinc-300 font-mono uppercase tracking-wider block text-center">
                     실시간 디지털 인터랙티브 뷰
                   </span>
-                  <div className="rounded-2xl overflow-hidden ring-1 ring-white/20 shadow-xl w-full">
+                  <div className="rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-xl w-full">
                     <BusinessCardFront 
                       data={card.data} 
                       theme={card.theme} 
@@ -322,7 +318,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
       <div 
-        className="relative w-full max-w-2xl max-h-[92vh] flex flex-col rounded-3xl bg-[#0F1015] border border-white/10 text-neutral-100 shadow-2xl overflow-hidden"
+        className="relative w-full max-w-2xl max-h-[92vh] flex flex-col rounded-3xl bg-[#121214] border border-white/10 text-neutral-100 shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Hidden inputs */}
@@ -343,23 +339,23 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
         />
 
         {/* Modal Header */}
-        <div className="p-4 sm:p-5 border-b border-white/5 flex items-center justify-between shrink-0 bg-[#0B0C10]">
+        <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#0A0A0B]">
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-[#C5A880]/15 text-[#C5A880] border border-[#C5A880]/30">
+              <span className="p-1.5 rounded-lg bg-white/5 text-white border border-white/10">
                 <Camera className="w-4 h-4" />
               </span>
               <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
                 실물 명함 사진 보관 및 간편 등록
               </h3>
             </div>
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-zinc-400">
               클라이언트 캔버스 WebP 압축으로 원본을 최적화하고 성명·연락처만 빠르게 등록합니다.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full text-neutral-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+            className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
             title="닫기"
           >
             <X className="w-5 h-5" />
@@ -373,29 +369,29 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-white flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-[#C5A880]" />
+                <Layers className="w-3.5 h-3.5 text-zinc-400" />
                 <span>명함 실물 사진 첨부 (9:5 비율 자동 최적화)</span>
               </label>
-              <span className="text-[10px] text-neutral-400 font-mono">WebP Canvas Compressed</span>
+              <span className="text-[10px] text-zinc-400 font-mono">WebP Canvas Compressed</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Front Slot */}
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[11px] text-neutral-400 font-medium">
+                <div className="flex items-center justify-between text-[11px] text-zinc-400 font-medium">
                   <span>명함 앞면 사진 {frontPhoto && '✓'}</span>
                   {frontPhoto && (
                     <button
                       type="button"
                       onClick={() => setFrontPhoto(null)}
-                      className="text-rose-400 hover:underline text-[10px] cursor-pointer"
+                      className="text-zinc-300 hover:text-white hover:underline text-[10px] cursor-pointer"
                     >
                       삭제
                     </button>
                   )}
                 </div>
 
-                <div className="relative aspect-[9/5] w-full rounded-2xl border border-white/10 bg-[#14151C] overflow-hidden flex flex-col items-center justify-center group shadow-inner">
+                <div className="relative aspect-[9/5] w-full rounded-2xl border border-white/10 bg-[#0A0A0B] overflow-hidden flex flex-col items-center justify-center group shadow-inner">
                   {frontPhoto ? (
                     <div className="relative w-full h-full">
                       <img 
@@ -418,7 +414,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                         <button
                           type="button"
                           onClick={() => triggerUpload('front', true)}
-                          className="px-3 py-1.5 rounded-xl bg-[#C5A880]/15 hover:bg-[#C5A880]/25 text-[#C5A880] border border-[#C5A880]/30 flex items-center gap-1.5 cursor-pointer font-medium"
+                          className="px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-neutral-950 flex items-center gap-1.5 cursor-pointer font-semibold transition-colors"
                         >
                           <Camera className="w-3.5 h-3.5" />
                           <span>촬영</span>
@@ -426,13 +422,13 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                         <button
                           type="button"
                           onClick={() => triggerUpload('front', false)}
-                          className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-300 border border-white/10 flex items-center gap-1.5 cursor-pointer"
+                          className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 flex items-center gap-1.5 cursor-pointer transition-colors"
                         >
                           <Upload className="w-3.5 h-3.5" />
                           <span>앨범</span>
                         </button>
                       </div>
-                      <span className="text-[10px] text-neutral-500">실물 앞면</span>
+                      <span className="text-[10px] text-zinc-500">실물 앞면</span>
                     </div>
                   )}
                 </div>
@@ -440,20 +436,20 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
 
               {/* Back Slot */}
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[11px] text-neutral-400 font-medium">
+                <div className="flex items-center justify-between text-[11px] text-zinc-400 font-medium">
                   <span>명함 뒷면 (선택 사항) {backPhoto && '✓'}</span>
                   {backPhoto && (
                     <button
                       type="button"
                       onClick={() => setBackPhoto(null)}
-                      className="text-rose-400 hover:underline text-[10px] cursor-pointer"
+                      className="text-zinc-300 hover:text-white hover:underline text-[10px] cursor-pointer"
                     >
                       삭제
                     </button>
                   )}
                 </div>
 
-                <div className="relative aspect-[9/5] w-full rounded-2xl border border-white/10 bg-[#14151C] overflow-hidden flex flex-col items-center justify-center group shadow-inner">
+                <div className="relative aspect-[9/5] w-full rounded-2xl border border-white/10 bg-[#0A0A0B] overflow-hidden flex flex-col items-center justify-center group shadow-inner">
                   {backPhoto ? (
                     <div className="relative w-full h-full">
                       <img 
@@ -476,7 +472,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                         <button
                           type="button"
                           onClick={() => triggerUpload('back', true)}
-                          className="px-3 py-1.5 rounded-xl bg-[#C5A880]/15 hover:bg-[#C5A880]/25 text-[#C5A880] border border-[#C5A880]/30 flex items-center gap-1.5 cursor-pointer font-medium"
+                          className="px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-neutral-950 flex items-center gap-1.5 cursor-pointer font-semibold transition-colors"
                         >
                           <Camera className="w-3.5 h-3.5" />
                           <span>촬영</span>
@@ -484,13 +480,13 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                         <button
                           type="button"
                           onClick={() => triggerUpload('back', false)}
-                          className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-neutral-300 border border-white/10 flex items-center gap-1.5 cursor-pointer"
+                          className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 flex items-center gap-1.5 cursor-pointer transition-colors"
                         >
                           <Upload className="w-3.5 h-3.5" />
                           <span>앨범</span>
                         </button>
                       </div>
-                      <span className="text-[10px] text-neutral-500">실물 뒷면</span>
+                      <span className="text-[10px] text-zinc-500">실물 뒷면</span>
                     </div>
                   )}
                 </div>
@@ -499,42 +495,42 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
           </div>
 
           {/* 2. Quick Essential Input Fields (Name + Phone) */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-[#14151C] border border-white/10 space-y-3.5">
-            <h4 className="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-[#C5A880]" />
-              <span>핵심 정보 빠른 입력 (Manual Input)</span>
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#0A0A0B] border border-zinc-800/80 space-y-3.5">
+            <h4 className="font-bold text-white text-xs tracking-wide flex items-center gap-1.5">
+              <User className="w-3.5 h-3.5 text-zinc-400" />
+              <span>핵심 정보 빠른 입력</span>
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-[11px] text-neutral-300 font-medium">
-                  성명 (필수) <span className="text-rose-400">*</span>
+                <label className="text-[11px] text-zinc-300 font-medium">
+                  성명 (필수) <span className="text-zinc-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="예: 김민수 대표"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0C10] border border-white/10 focus:border-[#C5A880] focus:outline-none text-white text-xs"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121214] border border-white/10 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none text-white text-xs"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] text-neutral-300 font-medium">
-                  전화번호 (필수) <span className="text-rose-400">*</span>
+                <label className="text-[11px] text-zinc-300 font-medium">
+                  전화번호 (필수) <span className="text-zinc-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="예: 010-1234-5678"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0C10] border border-white/10 focus:border-[#C5A880] focus:outline-none text-white text-xs font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121214] border border-white/10 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none text-white text-xs font-mono tabular-nums"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] text-neutral-300 font-medium">
+              <label className="text-[11px] text-zinc-300 font-medium">
                 소속 및 메모 (선택)
               </label>
               <input
@@ -542,23 +538,23 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                 value={companyAndNote}
                 onChange={(e) => setCompanyAndNote(e.target.value)}
                 placeholder="예: 글로벌 디자인 랩 / 2026 파트너십 미팅"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0C10] border border-white/10 focus:border-[#C5A880] focus:outline-none text-white text-xs"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#121214] border border-white/10 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none text-white text-xs"
               />
             </div>
 
             {/* Category Quick Chips */}
-            <div className="space-y-1 pt-1 border-t border-white/5">
-              <label className="text-[10px] text-neutral-400">보관함 카테고리</label>
+            <div className="space-y-1 pt-2 border-t border-white/10">
+              <label className="text-[10px] text-zinc-400">보관함 카테고리</label>
               <div className="flex flex-wrap gap-1.5">
                 {categories.map((cat) => (
                   <button
                     key={cat}
                     type="button"
                     onClick={() => setCategory(cat)}
-                    className={`px-2.5 py-1 rounded-full text-[10px] transition-colors cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-full text-[10px] transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                       category === cat
-                        ? 'bg-[#C5A880] text-black font-bold'
-                        : 'bg-[#0B0C10] text-neutral-400 hover:text-white border border-white/5'
+                        ? 'bg-white text-neutral-950 font-bold'
+                        : 'bg-[#121214] text-zinc-400 hover:text-white hover:bg-white/10 border border-white/10'
                     }`}
                   >
                     {cat}
@@ -571,11 +567,11 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 sm:p-5 border-t border-white/10 bg-[#0B0C10] flex items-center justify-between shrink-0">
+        <div className="p-4 sm:p-5 border-t border-white/10 bg-[#0A0A0B] flex items-center justify-between shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-neutral-400 hover:text-white transition-colors cursor-pointer text-xs"
+            className="px-4 py-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer text-xs"
           >
             취소
           </button>
@@ -584,7 +580,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
             type="button"
             onClick={handleSave}
             disabled={!name.trim() || !phone.trim() || isProcessing}
-            className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-[#C5A880] hover:bg-[#d6b991] disabled:opacity-40 disabled:hover:bg-[#C5A880] text-black font-bold text-xs transition-all cursor-pointer shadow-lg active:scale-95"
+            className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-white hover:bg-zinc-200 disabled:opacity-40 disabled:hover:bg-white text-neutral-950 font-bold text-xs transition-all cursor-pointer shadow-lg active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
           >
             <Check className="w-4 h-4" />
             <span>보관함에 실물 명함 저장</span>

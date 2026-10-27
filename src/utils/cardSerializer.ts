@@ -258,19 +258,18 @@ export class CardSerializer {
     const officialUrl = data.website || 'https://card.goguma.app/master';
 
     const themeColors: Record<string, { bg: string; text: string; textSec: string; border: string; accent: string }> = {
-      pure_white: { bg: '#FFFFFF', text: '#111111', textSec: '#525252', border: '#E5E5E5', accent: '#000000' },
-      sumi_ink: { bg: '#0B0C10', text: '#F8F4EB', textSec: '#C5BEB3', border: '#262420', accent: '#C5A880' },
-      warm_paper: { bg: '#F8F4EB', text: '#1F2023', textSec: '#4F4C47', border: '#DFD7C7', accent: '#111111' },
-      deep_forest: { bg: '#0D1F18', text: '#F4F7F4', textSec: '#AEC2B4', border: '#1C362A', accent: '#C2A478' },
-      classic_navy: { bg: '#0A1128', text: '#F0F4FC', textSec: '#A8BADB', border: '#1E2C52', accent: '#D0D9E8' },
-      sand: { bg: '#f8f6f0', text: '#191614', textSec: '#484037', border: '#ded7cb', accent: '#d97706' },
-      cotton: { bg: '#fcfcfb', text: '#171717', textSec: '#525252', border: '#e5e5e5', accent: '#171717' },
-      obsidian: { bg: '#0c0c0d', text: '#ffffff', textSec: '#9ca3af', border: '#262626', accent: '#d4af37' },
-      titanium: { bg: '#18181b', text: '#f4f4f5', textSec: '#a1a1aa', border: '#3f3f46', accent: '#71717a' },
-      navy: { bg: '#080e1a', text: '#f8fafc', textSec: '#94a3b8', border: '#1e293b', accent: '#38bdf8' },
-      emerald: { bg: '#08140e', text: '#f0fdf4', textSec: '#86efac', border: '#14532d', accent: '#4ade80' },
-      burgundy: { bg: '#FFFFFF', text: '#111111', textSec: '#525252', border: '#E5E5E5', accent: '#000000' },
-      slate: { bg: '#10151f', text: '#f1f5f9', textSec: '#94a3b8', border: '#334155', accent: '#64748b' }
+      pure_white: { bg: '#FAFAFA', text: '#0A0A0B', textSec: '#52525B', border: 'rgba(0,0,0,0.06)', accent: '#0A0A0B' },
+      sumi_ink: { bg: '#0A0A0B', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#FAFAFA' },
+      warm_paper: { bg: '#F5F5F4', text: '#121214', textSec: '#52525B', border: 'rgba(0,0,0,0.06)', accent: '#121214' },
+      deep_forest: { bg: '#0D1914', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#E4E4E7' },
+      classic_navy: { bg: '#0B101B', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#E4E4E7' },
+      sand: { bg: '#F5F5F4', text: '#121214', textSec: '#52525B', border: 'rgba(0,0,0,0.06)', accent: '#121214' },
+      cotton: { bg: '#FAFAFA', text: '#0A0A0B', textSec: '#52525B', border: 'rgba(0,0,0,0.06)', accent: '#0A0A0B' },
+      obsidian: { bg: '#121214', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#FAFAFA' },
+      titanium: { bg: '#18181B', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#A1A1AA' },
+      navy: { bg: '#0B101B', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#E4E4E7' },
+      emerald: { bg: '#0D1914', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#E4E4E7' },
+      slate: { bg: '#121214', text: '#FAFAFA', textSec: '#A1A1AA', border: 'rgba(255,255,255,0.10)', accent: '#A1A1AA' }
     };
 
     const targetTheme = options.theme || theme;
@@ -317,15 +316,15 @@ export class CardSerializer {
     }
   </style>
 </head>
-<body class="bg-[#0a0a0c] text-neutral-100 min-h-screen flex flex-col items-center justify-between font-sans antialiased selection:bg-neutral-700 selection:text-white">
+<body class="bg-[#0A0A0B] text-neutral-100 min-h-screen flex flex-col items-center justify-between font-sans antialiased selection:bg-zinc-800 selection:text-white">
 
   <!-- Header -->
-  <header class="w-full border-b border-neutral-900/80 px-4 sm:px-8 py-3.5 flex items-center justify-between no-print">
+  <header class="w-full border-b border-white/10 px-4 sm:px-8 py-3.5 flex items-center justify-between no-print">
     <div class="flex items-center gap-2.5">
-      <div class="w-5 h-5 rounded-full border border-neutral-700 flex items-center justify-center text-[10px] font-serif text-neutral-300">
+      <div class="w-5 h-5 rounded-full border border-white/15 flex items-center justify-center text-[10px] font-serif text-zinc-300">
         韓
       </div>
-      <a href="${officialUrl}" class="font-serif tracking-widest text-xs uppercase text-neutral-300 hover:text-white transition-colors">
+      <a href="${officialUrl}" class="font-serif tracking-widest text-xs uppercase text-zinc-300 hover:text-white transition-colors">
         ${sanitizeCardHtml(data.organization || '')}
       </a>
     </div>
@@ -334,9 +333,9 @@ export class CardSerializer {
   <!-- Main Viewport -->
   <main class="flex-1 flex flex-col items-center justify-center p-4 max-w-xl w-full">
     
-    <div class="flex items-center justify-between w-full max-w-[360px] sm:max-w-[400px] mb-3 no-print text-xs text-neutral-400">
-      <span class="text-[11px] font-mono text-neutral-400 uppercase tracking-widest">DIGITAL PASS</span>
-      <button id="flip-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 hover:text-white transition-colors cursor-pointer text-xs">
+    <div class="flex items-center justify-between w-full max-w-[360px] sm:max-w-[400px] mb-3 no-print text-xs text-zinc-400">
+      <span class="text-[11px] font-mono text-zinc-400 uppercase tracking-widest">DIGITAL PASS</span>
+      <button id="flip-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#121214] border border-white/10 hover:bg-white/10 hover:text-white transition-colors cursor-pointer text-xs">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         <span>뒷면 회전</span>
       </button>
@@ -344,50 +343,50 @@ export class CardSerializer {
 
     <!-- 3D Card Object Canvas -->
     <div class="w-full max-w-[360px] sm:max-w-[400px] perspective-1200 cursor-pointer select-none" id="card-wrapper">
-      <div id="card-inner" class="relative w-full aspect-[5/8] rounded-2xl transform-style-3d transition-transform duration-700 shadow-2xl" style="background-color: ${selectedTheme.bg}; border: 1px solid ${selectedTheme.border};">
+      <div id="card-inner" class="relative w-full aspect-[5/8] rounded-2xl transform-style-3d transition-transform duration-700 shadow-2xl" style="background-color: ${selectedTheme.bg}; border: 1px solid ${selectedTheme.border}; color: ${selectedTheme.text};">
         
         <!-- CARD FRONT -->
-        <div class="absolute inset-0 w-full h-full p-6 sm:p-7 flex flex-col justify-between backface-hidden rounded-2xl overflow-hidden" style="background-color: ${selectedTheme.bg};">
+        <div class="absolute inset-0 w-full h-full p-6 sm:p-7 flex flex-col justify-between backface-hidden rounded-2xl overflow-hidden" style="background-color: ${selectedTheme.bg}; color: ${selectedTheme.text};">
           <div>
-            <p class="text-[10px] tracking-tight font-medium text-neutral-400">${sanitizeCardHtml(data.organizationKr || '')}</p>
-            <h2 class="text-sm font-semibold tracking-tight text-white">${sanitizeCardHtml(data.organization || '')}</h2>
-            ${data.subOrg ? `<p class="text-[9px] font-semibold tracking-[0.2em] uppercase text-neutral-400 mt-0.5">${sanitizeCardHtml(data.subOrg)}</p>` : ''}
+            <p class="text-[10px] tracking-tight font-medium" style="color: ${selectedTheme.textSec};">${sanitizeCardHtml(data.organizationKr || '')}</p>
+            <h2 class="text-sm font-semibold tracking-tight">${sanitizeCardHtml(data.organization || '')}</h2>
+            ${data.subOrg ? `<p class="text-[9px] font-semibold tracking-[0.2em] uppercase mt-0.5" style="color: ${selectedTheme.textSec};">${sanitizeCardHtml(data.subOrg)}</p>` : ''}
           </div>
 
           <div class="my-auto py-4 space-y-1">
-            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">${sanitizeCardHtml(data.name || '')}</h1>
-            <p class="text-xs font-mono tracking-wider text-neutral-400">${sanitizeCardHtml(data.nameKr || '')}</p>
-            <p class="text-xs text-neutral-300 pt-1 font-medium">${sanitizeCardHtml(data.title || '')} <span class="text-neutral-400">(${sanitizeCardHtml(data.titleKr || '')})</span></p>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">${sanitizeCardHtml(data.name || '')}</h1>
+            <p class="text-xs font-mono tracking-wider" style="color: ${selectedTheme.textSec};">${sanitizeCardHtml(data.nameKr || '')}</p>
+            <p class="text-xs pt-1 font-medium">${sanitizeCardHtml(data.title || '')} <span style="color: ${selectedTheme.textSec};">(${sanitizeCardHtml(data.titleKr || '')})</span></p>
           </div>
 
-          <div class="space-y-2 pt-4 border-t border-neutral-800 text-xs">
-            <div class="flex items-center justify-between text-neutral-300">
-              <span class="text-neutral-400 font-mono text-[10px]">MOBILE</span>
-              <a href="tel:${data.phoneRaw || ''}" class="hover:text-white transition-colors">${sanitizeCardHtml(data.phone || '')}</a>
+          <div class="space-y-2 pt-4 text-xs" style="border-top: 1px solid ${selectedTheme.border};">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-[10px]" style="color: ${selectedTheme.textSec};">MOBILE</span>
+              <a href="tel:${data.phoneRaw || ''}" class="hover:opacity-75 transition-opacity">${sanitizeCardHtml(data.phone || '')}</a>
             </div>
-            <div class="flex items-center justify-between text-neutral-300">
-              <span class="text-neutral-400 font-mono text-[10px]">EMAIL</span>
-              <a href="mailto:${data.email || ''}" class="hover:text-white transition-colors">${sanitizeCardHtml(data.email || '')}</a>
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-[10px]" style="color: ${selectedTheme.textSec};">EMAIL</span>
+              <a href="mailto:${data.email || ''}" class="hover:opacity-75 transition-opacity">${sanitizeCardHtml(data.email || '')}</a>
             </div>
-            <div class="flex items-center justify-between text-neutral-300">
-              <span class="text-neutral-400 font-mono text-[10px]">WEB</span>
-              <a href="${data.website || ''}" target="_blank" class="hover:text-white transition-colors font-medium">${sanitizeCardHtml(data.websiteDisplay || '')}</a>
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-[10px]" style="color: ${selectedTheme.textSec};">WEB</span>
+              <a href="${data.website || ''}" target="_blank" class="hover:opacity-75 transition-opacity font-medium">${sanitizeCardHtml(data.websiteDisplay || '')}</a>
             </div>
           </div>
         </div>
 
         <!-- CARD BACK -->
-        <div class="absolute inset-0 w-full h-full p-6 sm:p-7 flex flex-col justify-between backface-hidden rotate-y-180 rounded-2xl overflow-hidden" style="background-color: ${selectedTheme.bg};">
+        <div class="absolute inset-0 w-full h-full p-6 sm:p-7 flex flex-col justify-between backface-hidden rotate-y-180 rounded-2xl overflow-hidden" style="background-color: ${selectedTheme.bg}; color: ${selectedTheme.text};">
           <div class="my-auto text-center space-y-2">
-            <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">${sanitizeCardHtml(data.backTitle || '고구마 AI 스튜디오')}</h2>
-            <p class="text-xs font-bold uppercase tracking-[0.24em] text-neutral-400">${sanitizeCardHtml(data.backSubtitle || 'GOGUMA AI STUDIO')}</p>
-            <p class="text-xs tracking-[0.16em] uppercase text-neutral-400 pt-1">${sanitizeCardHtml(data.backTagline || 'AI EXPERT GROUP')}</p>
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight">${sanitizeCardHtml(data.backTitle || '고구마 AI 스튜디오')}</h2>
+            <p class="text-xs font-bold uppercase tracking-[0.24em]" style="color: ${selectedTheme.textSec};">${sanitizeCardHtml(data.backSubtitle || 'GOGUMA AI STUDIO')}</p>
+            <p class="text-xs tracking-[0.16em] uppercase pt-1" style="color: ${selectedTheme.textSec};">${sanitizeCardHtml(data.backTagline || 'AI EXPERT GROUP')}</p>
           </div>
 
-          <div class="pt-4 border-t border-neutral-800 flex flex-col items-center text-center space-y-2">
-            <div id="qrcode-container" class="p-2 bg-white rounded-xl shadow-md w-20 h-20 flex items-center justify-center"></div>
-            <p class="font-mono text-[9px] text-neutral-400">SCAN TO CONNECT</p>
-            <p class="text-xs font-medium text-neutral-300">${sanitizeCardHtml(data.websiteDisplay || '')}</p>
+          <div class="pt-4 flex flex-col items-center text-center space-y-2" style="border-top: 1px solid ${selectedTheme.border};">
+            <div id="qrcode-container" class="p-2 bg-[#FAFAFA] border border-black/5 rounded-xl shadow-md w-20 h-20 flex items-center justify-center"></div>
+            <p class="font-mono text-[9px]" style="color: ${selectedTheme.textSec};">SCAN TO CONNECT</p>
+            <p class="text-xs font-medium">${sanitizeCardHtml(data.websiteDisplay || '')}</p>
           </div>
         </div>
 

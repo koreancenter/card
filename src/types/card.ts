@@ -44,22 +44,21 @@ export interface PhotoCard extends BaseCard {
 export type BusinessCard = TemplateCard | CustomHtmlCard | PhotoCard;
 
 export type ThemePreset =
-  | 'pure_white'   // Luxury Pure White (#FFFFFF), crisp monochrome black text (#111111)
-  | 'sumi_ink'     // Deep matte ink canvas (#0B0C10), warm ivory text (#F8F4EB), champagne brass accent (#C5A880)
-  | 'warm_paper'   // Subtle fine paper ivory (#F8F4EB), deep charcoal text (#1F2023), luxury monochrome accent (#111111)
-  | 'deep_forest'  // Muted dark forest emerald (#0D1F18), off-white typography, warm antique bronze details (#C2A478)
-  | 'classic_navy'; // Midnight indigo (#0A1128), silver-white typography, platinum border hints (#D0D9E8)
+  | 'pure_white'   // Warm Matte Paper (#FAFAFA), crisp monochrome black text (#0A0A0B)
+  | 'sumi_ink'     // Rich Dark Canvas (#0A0A0B), matte white text (#FAFAFA), platinum monochrome accent
+  | 'warm_paper'   // Fine Cotton Paper (#F5F5F4), deep charcoal text (#18181B), monochrome black accent
+  | 'deep_forest'  // Muted Dark Forest (#0D1F18), soft platinum typography (#F4F7F4)
+  | 'classic_navy'; // Midnight Indigo (#0A1128), silver-white typography, platinum border hints (#D0D9E8)
 
 export type LegacyTheme =
-  | 'obsidian'   // 1. Obsidian Noir
-  | 'cotton'     // 2. Cotton White
-  | 'titanium'   // 3. Architectural Titanium
+  | 'obsidian'   // 1. Obsidian Charcoal (#121214)
+  | 'cotton'     // 2. Matte Paper White (#FAFAFA)
+  | 'titanium'   // 3. Architectural Titanium (#18181B)
   | 'navy'       // 4. Midnight Diplomatic Navy
   | 'emerald'    // 5. Deep Forest Evergreen
-  | 'sand'       // 6. Warm Travertine Cashmere
-  | 'burgundy'   // 7. Luxury Pure White (replaces legacy Burgundy)
-  | 'pure_white' // 8. Luxury Pure White
-  | 'slate';     // 9. Nordic Mineral Slate
+  | 'sand'       // 6. Warm Stone Neutral
+  | 'pure_white' // 7. Luxury Matte Paper White
+  | 'slate';     // 8. Nordic Mineral Slate
 
 export type CardTheme = ThemePreset | LegacyTheme;
 

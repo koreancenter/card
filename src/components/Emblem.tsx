@@ -12,33 +12,25 @@ export const Emblem: React.FC<EmblemProps> = ({
   size = 40,
   theme = 'obsidian' 
 }) => {
-  const isLight = theme === 'cotton' || theme === 'sand' || theme === 'warm_paper' || theme === 'burgundy' || (theme as string) === 'pure_white';
-  
-  // Refined palette mapping per theme
-  let strokeColor = '#f5f5f5';
-  let accentColor = '#a3a3a3';
+  // Refined monochrome palette mapping per theme
+  let strokeColor = '#FAFAFA';
+  let accentColor = '#A1A1AA';
 
-  if (theme === 'cotton' || theme === 'burgundy' || (theme as string) === 'pure_white') {
-    strokeColor = '#111111';
-    accentColor = '#525252';
-  } else if (theme === 'warm_paper') {
-    strokeColor = '#1F2023';
-    accentColor = '#666666';
-  } else if (theme === 'sand') {
-    strokeColor = '#27231f';
-    accentColor = '#85796e';
-  } else if (theme === 'navy') {
-    strokeColor = '#f8fafc';
-    accentColor = '#94a3b8';
-  } else if (theme === 'emerald') {
-    strokeColor = '#f0fdf4';
-    accentColor = '#d4af37'; // Champagne gold
-  } else if (theme === 'slate') {
-    strokeColor = '#f1f5f9';
-    accentColor = '#94a3b8';
-  } else if (theme === 'titanium') {
-    strokeColor = '#e4e4e7';
-    accentColor = '#a1a1aa';
+  if (theme === 'cotton' || theme === 'pure_white') {
+    strokeColor = '#0A0A0B';
+    accentColor = '#52525B';
+  } else if (theme === 'warm_paper' || theme === 'sand') {
+    strokeColor = '#121214';
+    accentColor = '#71717A';
+  } else if (theme === 'navy' || theme === 'classic_navy') {
+    strokeColor = '#FAFAFA';
+    accentColor = '#A1A1AA';
+  } else if (theme === 'emerald' || theme === 'deep_forest') {
+    strokeColor = '#FAFAFA';
+    accentColor = '#D4D4D8';
+  } else if (theme === 'slate' || theme === 'titanium') {
+    strokeColor = '#E4E4E7';
+    accentColor = '#A1A1AA';
   }
 
   return (

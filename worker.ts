@@ -4,9 +4,48 @@
  * Enforces Zero-Trust parameter binding on Cloudflare D1 with zero string concatenation.
  */
 
+export interface D1PreparedStatementLike {
+  bind: (...values: Array<string | number | null>) => D1PreparedStatementLike;
+  first: <T = Record<string, unknown>>() => Promise<T | null>;
+  all: <T = Record<string, unknown>>() => Promise<{ results?: T[] }>;
+  run: () => Promise<unknown>;
+}
+
+export interface D1DatabaseLike {
+  prepare: (query: string) => D1PreparedStatementLike;
+}
+
+export interface D1CardRow {
+  id: string;
+  slug: string;
+  custom_domain?: string | null;
+  owner_key?: string | null;
+  theme?: string | null;
+  data?: unknown;
+  updated_at?: string;
+}
+
+export interface D1WalletRow {
+  cards_json?: string | null;
+}
+
+export interface CardUpsertPayload {
+  id?: unknown;
+  slug?: unknown;
+  custom_domain?: unknown;
+  owner_key?: unknown;
+  theme?: unknown;
+  data?: unknown;
+}
+
+export interface SyncWalletPayload {
+  syncId?: unknown;
+  cards?: unknown;
+}
+
 export interface Env {
-  DB: any;
-  R2?: any;
+  DB: D1DatabaseLike;
+  R2?: unknown;
   ASSETS: { fetch: (request: Request) => Promise<Response> };
   GEMINI_API_KEY?: string;
   BASE_DOMAIN?: string;
@@ -79,16 +118,16 @@ export default {
       const host = sanitizeParam(rawHost.toLowerCase().replace(/:\d+$/, ""), 255);
 
       try {
-        let card: any = null;
+        let card: D1CardRow | null = null;
 
         // Custom domain routing (host match) via bound prepared query
         const baseDomain = env.BASE_DOMAIN || "card.goguma.app";
         if (host && !host.includes(baseDomain) && !host.includes("localhost") && !host.includes("127.0.0.1")) {
-          card = await env.DB.prepare(SQL_SELECT_CARD_BY_DOMAIN).bind(host).first();
+          card = await env.DB.prepare(SQL_SELECT_CARD_BY_DOMAIN).bind(host).first<D1CardRow>();
         } 
         // Standard slug lookup via bound prepared query
         else if (slug) {
-          card = await env.DB.prepare(SQL_SELECT_CARD_BY_SLUG).bind(slug).first();
+          card = await env.DB.prepare(SQL_SELECT_CARD_BY_SLUG).bind(slug).first<D1CardRow>();
         }
 
         if (!card) {
@@ -111,9 +150,10 @@ export default {
           JSON.stringify({ success: true, card }),
           { headers: corsHeaders }
         );
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Query failed";
         return new Response(
-          JSON.stringify({ success: false, error: err.message || "Query failed" }),
+          JSON.stringify({ success: false, error: message }),
           { status: 500, headers: corsHeaders }
         );
       }
@@ -126,7 +166,7 @@ export default {
 
       try {
         if (slug) {
-          const card: any = await env.DB.prepare(SQL_SELECT_CARD_BY_SLUG).bind(slug).first();
+          const card = await env.DB.prepare(SQL_SELECT_CARD_BY_SLUG).bind(slug).first<D1CardRow>();
           if (!card) {
             return new Response(
               JSON.stringify({ error: "Card not found for slug" }),
@@ -140,7 +180,7 @@ export default {
         }
 
         if (domain) {
-          const card: any = await env.DB.prepare(SQL_SELECT_CARD_BY_DOMAIN).bind(domain).first();
+          const card = await env.DB.prepare(SQL_SELECT_CARD_BY_DOMAIN).bind(domain).first<D1CardRow>();
           if (!card) {
             return new Response(
               JSON.stringify({ error: "Card not found for custom domain" }),
@@ -154,8 +194,8 @@ export default {
         }
 
         // Fetch recent cards collection
-        const { results = [] } = await env.DB.prepare(SQL_SELECT_RECENT_CARDS).all();
-        const cards = results.map((c: any) => {
+        const { results = [] } = await env.DB.prepare(SQL_SELECT_RECENT_CARDS).all<D1CardRow>();
+        const cards = results.map((c: D1CardRow) => {
           if (typeof c.data === 'string') {
             try { c.data = JSON.parse(c.data); } catch {}
           }
@@ -163,9 +203,10 @@ export default {
         });
 
         return new Response(JSON.stringify({ cards }), { headers: corsHeaders });
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Query failed";
         return new Response(
-          JSON.stringify({ error: err.message || "Query failed" }),
+          JSON.stringify({ error: message }),
           { status: 500, headers: corsHeaders }
         );
       }
@@ -174,7 +215,7 @@ export default {
     // 4. Card Upsert: POST /api/cards
     if (url.pathname === "/api/cards" && request.method === "POST") {
       try {
-        const body: any = await request.json();
+        const body = (await request.json()) as CardUpsertPayload | null;
         if (!body || typeof body !== 'object') {
           return new Response(
             JSON.stringify({ success: false, error: "Invalid payload" }),
@@ -211,9 +252,10 @@ export default {
           JSON.stringify({ success: true, id: validId, slug: validSlug }),
           { headers: corsHeaders }
         );
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Write failed";
         return new Response(
-          JSON.stringify({ success: false, error: err.message || "Write failed" }),
+          JSON.stringify({ success: false, error: message }),
           { status: 500, headers: corsHeaders }
         );
       }
@@ -232,7 +274,7 @@ export default {
       const syncId = rawSyncId.trim();
 
       try {
-        const wallet: any = await env.DB.prepare(SQL_SELECT_WALLET).bind(syncId).first();
+        const wallet = await env.DB.prepare(SQL_SELECT_WALLET).bind(syncId).first<D1WalletRow>();
 
         return new Response(
           JSON.stringify({
@@ -242,9 +284,10 @@ export default {
           }),
           { headers: corsHeaders }
         );
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Sync fetch failed";
         return new Response(
-          JSON.stringify({ success: false, error: err.message || "Sync fetch failed" }),
+          JSON.stringify({ success: false, error: message }),
           { status: 500, headers: corsHeaders }
         );
       }
@@ -253,7 +296,7 @@ export default {
     // 6. Cross-Device Anonymous Sync: POST /api/sync
     if (url.pathname === "/api/sync" && request.method === "POST") {
       try {
-        const body: any = await request.json();
+        const body = (await request.json()) as SyncWalletPayload | null;
         const { syncId, cards } = body || {};
 
         if (!syncId || typeof syncId !== 'string' || !/^[a-zA-Z0-9_\-]{3,64}$/.test(syncId) || !Array.isArray(cards)) {
@@ -271,9 +314,10 @@ export default {
           JSON.stringify({ success: true, syncId, count: cards.length }),
           { headers: corsHeaders }
         );
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Sync save failed";
         return new Response(
-          JSON.stringify({ success: false, error: err.message || "Sync save failed" }),
+          JSON.stringify({ success: false, error: message }),
           { status: 500, headers: corsHeaders }
         );
       }

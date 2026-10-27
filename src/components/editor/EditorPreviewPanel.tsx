@@ -51,11 +51,11 @@ export const EditorPreviewPanel: React.FC<EditorPreviewPanelProps> = ({
   const isVerticalAtelier = layoutType === 'vertical_atelier' && creationMode === 'template';
 
   return (
-    <div className="order-1 lg:order-2 col-span-12 lg:col-span-7 h-auto lg:h-full flex items-center justify-center bg-black/40 border-b lg:border-b-0 lg:border-l border-white/5 p-6 sm:p-10 lg:p-12 relative overflow-hidden select-none">
+    <div className="order-1 lg:order-2 col-span-12 lg:col-span-7 h-auto lg:h-full flex items-center justify-center bg-[#0A0A0B] border-b lg:border-b-0 lg:border-l border-white/10 p-6 sm:p-10 lg:p-12 relative overflow-hidden select-none">
       {/* Pure Ambient Atmosphere Glow */}
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/[0.03] via-transparent to-transparent" />
 
-      {/* Prominently Centered Luxury Card Object Floating on Sumi Ink Canvas */}
+      {/* Prominently Centered Luxury Card Object Floating on Deep Monochrome Canvas */}
       <div 
         className={`${
           isVerticalAtelier
@@ -71,7 +71,7 @@ export const EditorPreviewPanel: React.FC<EditorPreviewPanelProps> = ({
           }`}
         >
           {/* ================= FRONT FACE ================= */}
-          <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-2xl overflow-hidden bg-[#0A0B0E]">
+          <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-2xl overflow-hidden bg-[#0A0A0B]">
             {creationMode === 'template' && (
               <BusinessCardFront 
                 data={cardDataForPreview} 
@@ -89,19 +89,20 @@ export const EditorPreviewPanel: React.FC<EditorPreviewPanelProps> = ({
                   <img
                     src={frontImageUrl}
                     alt={formData.name || '실물 명함 사진 앞면'}
+                    referrerPolicy="no-referrer"
                     className="w-full h-full object-cover rounded-2xl"
                   />
                   <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
-                    <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-[#C5A880] tracking-wider uppercase shadow-sm">
+                    <span className="px-2 py-0.5 rounded bg-black/70 backdrop-blur-md border border-white/10 text-[9px] font-mono text-zinc-200 tracking-wider uppercase shadow-sm">
                       PHOTO ARCHIVE
                     </span>
                   </div>
                 </div>
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-neutral-400 bg-neutral-900/60">
-                  <Camera className="w-8 h-8 text-[#C5A880]/60 mb-2" />
+                <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-zinc-400 bg-[#121214] border border-white/10 rounded-2xl">
+                  <Camera className="w-8 h-8 text-zinc-400 mb-2" />
                   <p className="text-xs font-semibold text-white">등록된 명함 사진이 없습니다</p>
-                  <p className="text-[10px] text-neutral-500 mt-1">좌측 패널에서 사진을 업로드해 주세요</p>
+                  <p className="text-[10px] text-zinc-500 mt-1">좌측 패널에서 사진을 업로드해 주세요</p>
                 </div>
               )
             )}
@@ -116,17 +117,17 @@ export const EditorPreviewPanel: React.FC<EditorPreviewPanelProps> = ({
                   />
                 </div>
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-neutral-400 bg-neutral-900/60">
-                  <Code2 className="w-8 h-8 text-[#C5A880]/60 mb-2" />
+                <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-zinc-400 bg-[#121214] border border-white/10 rounded-2xl">
+                  <Code2 className="w-8 h-8 text-zinc-400 mb-2" />
                   <p className="text-xs font-semibold text-white">HTML 코드가 비어 있습니다</p>
-                  <p className="text-[10px] text-neutral-500 mt-1">좌측 에디터에 Tailwind HTML 코드를 입력하세요</p>
+                  <p className="text-[10px] text-zinc-500 mt-1">좌측 에디터에 Tailwind HTML 코드를 입력하세요</p>
                 </div>
               )
             )}
           </div>
 
           {/* ================= BACK FACE ================= */}
-          <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-2xl overflow-hidden bg-[#0A0B0E]">
+          <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-2xl overflow-hidden bg-[#0A0A0B]">
             {creationMode === 'template' && (
               <BusinessCardBack 
                 data={cardDataForPreview} 
@@ -143,10 +144,11 @@ export const EditorPreviewPanel: React.FC<EditorPreviewPanelProps> = ({
                   <img
                     src={backImageUrl}
                     alt="실물 명함 사진 뒷면"
+                    referrerPolicy="no-referrer"
                     className="w-full h-full object-cover rounded-2xl"
                   />
                   <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
-                    <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-[#C5A880] tracking-wider uppercase shadow-sm">
+                    <span className="px-2 py-0.5 rounded bg-black/70 backdrop-blur-md border border-white/10 text-[9px] font-mono text-zinc-200 tracking-wider uppercase shadow-sm">
                       BACK PHOTO
                     </span>
                   </div>

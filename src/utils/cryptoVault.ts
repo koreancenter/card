@@ -30,13 +30,19 @@ export function bufferToBase64(buf: ArrayBuffer | Uint8Array): string {
   return btoa(binary);
 }
 
-export function base64ToBuffer(b64: string): Uint8Array {
+export function base64ToBuffer(b64: string): Uint8Array<ArrayBuffer> {
   const binary = atob(b64);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) {
     bytes[i] = binary.charCodeAt(i);
   }
   return bytes;
+}
+
+function toArrayBufferView(view: Uint8Array): Uint8Array<ArrayBuffer> {
+  const copy = new Uint8Array(view.byteLength);
+  copy.set(view);
+  return copy;
 }
 
 /**
@@ -66,7 +72,7 @@ export async function deriveKeyFromPin(pin: string, salt: Uint8Array): Promise<C
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: salt as any,
+      salt: toArrayBufferView(salt),
       iterations: PBKDF2_ITERATIONS,
       hash: 'SHA-256',
     },
@@ -85,13 +91,13 @@ export async function encryptTextWithKey(plaintext: string, key: CryptoKey, salt
   const encodedData = enc.encode(plaintext);
 
   const iv = new Uint8Array(12);
-  crypto.getRandomValues(iv as any);
+  crypto.getRandomValues(iv);
 
-  const saltBytes = salt || new Uint8Array(16);
-  if (!salt) crypto.getRandomValues(saltBytes as any);
+  const saltBytes = salt ? toArrayBufferView(salt) : new Uint8Array(16);
+  if (!salt) crypto.getRandomValues(saltBytes);
 
   const encryptedBuffer = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv: iv as any },
+    { name: 'AES-GCM', iv },
     key,
     encodedData
   );
@@ -116,9 +122,9 @@ export async function decryptTextWithKey(envelope: EncryptedEnvelope, key: Crypt
   const ciphertext = base64ToBuffer(envelope.ciphertext);
 
   const decryptedBuffer = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv: iv as any },
+    { name: 'AES-GCM', iv },
     key,
-    ciphertext as any
+    ciphertext
   );
 
   return new TextDecoder().decode(decryptedBuffer);
@@ -246,7 +252,7 @@ export async function linkBiometricsToVault(pin: string, credentialId: string): 
       ['deriveKey']
     );
     const bioKey = await crypto.subtle.deriveKey(
-      { name: 'PBKDF2', salt: bioSalt as any, iterations: 50000, hash: 'SHA-256' },
+      { name: 'PBKDF2', salt: toArrayBufferView(bioSalt), iterations: 50000, hash: 'SHA-256' },
       bioBaseKey,
       { name: 'AES-GCM', length: 256 },
       false,
@@ -255,8 +261,8 @@ export async function linkBiometricsToVault(pin: string, credentialId: string): 
 
     // Encrypt the raw PIN key bytes with the biometric key
     const iv = new Uint8Array(12);
-    crypto.getRandomValues(iv as any);
-    const wrappedKeyBuffer = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv as any }, bioKey, rawPinKey);
+    crypto.getRandomValues(iv);
+    const wrappedKeyBuffer = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, bioKey, rawPinKey);
 
     const vaultToken = {
       version: 1,
@@ -290,7 +296,7 @@ export async function unlockVaultWithBiometrics(credentialId: string): Promise<C
       ['deriveKey']
     );
     const bioKey = await crypto.subtle.deriveKey(
-      { name: 'PBKDF2', salt: bioSalt as any, iterations: 50000, hash: 'SHA-256' },
+      { name: 'PBKDF2', salt: toArrayBufferView(bioSalt), iterations: 50000, hash: 'SHA-256' },
       bioBaseKey,
       { name: 'AES-GCM', length: 256 },
       false,
@@ -300,7 +306,7 @@ export async function unlockVaultWithBiometrics(credentialId: string): Promise<C
     const iv = base64ToBuffer(token.iv);
     const wrappedBytes = base64ToBuffer(token.wrapped);
 
-    const rawPinKey = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv as any }, bioKey, wrappedBytes as any);
+    const rawPinKey = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, bioKey, wrappedBytes);
     const importedVaultKey = await crypto.subtle.importKey(
       'raw',
       rawPinKey,

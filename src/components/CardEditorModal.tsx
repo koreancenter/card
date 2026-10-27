@@ -8,7 +8,6 @@ import {
   CardCategory,
   CardCreationMode 
 } from '../types/card';
-import { LAYOUT_PRESETS } from '../constants/templates';
 import { 
   X, Check, RotateCcw,
   Palette, Camera, Code2
@@ -39,58 +38,51 @@ export const THEME_OPTIONS: {
   {
     id: 'pure_white',
     name: '럭셔리 퓨어 화이트',
-    description: '순백 프리미엄 & 모노크롬 블랙',
-    dotColor: '#FFFFFF',
-    accent: '#000000'
+    description: '순백 매트 코튼 & 모노크롬 블랙',
+    dotColor: '#FAFAFA',
+    accent: '#0A0A0B'
   },
   {
     id: 'sumi_ink',
     name: '수묵 인크',
-    description: '깊은 먹색 매트 & 샴페인 황동',
-    dotColor: '#0B0C10',
-    accent: '#C5A880'
+    description: '깊은 수묵 매트 & 크리스프 화이트',
+    dotColor: '#0A0A0B',
+    accent: '#FAFAFA'
   },
   {
     id: 'warm_paper',
     name: '웜 페이퍼',
-    description: '파인아트 코튼 & 모노크롬 블랙',
-    dotColor: '#F8F4EB',
-    accent: '#111111'
+    description: '파인아트 코튼 & 차콜 블랙',
+    dotColor: '#F5F5F4',
+    accent: '#18181B'
   },
   {
     id: 'deep_forest',
-    name: '딥 포레스트',
-    description: '다크 에메랄드 & 앤틱 브론즈',
-    dotColor: '#0D1F18',
-    accent: '#C2A478'
+    name: '딥 슬레이트',
+    description: '아키텍처 차콜 & 실버 모노',
+    dotColor: '#121214',
+    accent: '#D4D4D8'
   },
   {
     id: 'classic_navy',
-    name: '클래식 네이비',
-    description: '미드나잇 인디고 & 플래티넘',
-    dotColor: '#0A1128',
-    accent: '#D0D9E8'
+    name: '미드나잇 스틸',
+    description: '다크 스틸 & 플래티넘 화이트',
+    dotColor: '#0F1115',
+    accent: '#E4E4E7'
   },
   {
     id: 'obsidian',
     name: '옵시디언 블랙',
-    description: '흑요석 매트 & 퓨어 골드',
-    dotColor: '#0C0C0D',
-    accent: '#D4AF37'
+    description: '옵시디언 매트 & 퓨어 화이트',
+    dotColor: '#121214',
+    accent: '#FAFAFA'
   },
   {
     id: 'sand',
     name: '샌드 캐시미어',
-    description: '린넨 텍스처 & 차콜 그레이',
-    dotColor: '#F6F3EC',
-    accent: '#544B40'
-  },
-  {
-    id: 'burgundy',
-    name: '럭셔리 퓨어 화이트',
-    description: '순백 매트 코튼 & 하이콘트라스트 블랙',
-    dotColor: '#FFFFFF',
-    accent: '#000000'
+    description: '린넨 매트 & 징크 차콜',
+    dotColor: '#F4F4F5',
+    accent: '#27272A'
   },
   {
     id: 'titanium',
@@ -331,11 +323,11 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
         .editor-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.12) transparent; }
       `}</style>
       <div 
-        className="CardEditorModal relative w-full max-w-6xl h-[90vh] max-h-[880px] flex flex-col rounded-3xl bg-[#0F1015] border border-white/10 text-neutral-100 shadow-2xl overflow-hidden"
+        className="CardEditorModal relative w-full max-w-6xl h-[90vh] max-h-[880px] flex flex-col rounded-3xl bg-[#121214] border border-white/10 text-neutral-100 shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 py-3.5 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#0B0C10]">
+        <div className="px-6 py-3.5 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#0A0A0B]">
           <div className="space-y-0.5">
             <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
               {isCreating 
@@ -344,13 +336,13 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                   ? '내 디지털 명함 커스터마이징' 
                   : '명함 정보 & 디자인 에디터'}
             </h3>
-            <p className="text-xs text-white/50">
+            <p className="text-xs text-zinc-400">
               3-Way 생성 방식: 디자인 템플릿, 실물 명함 사진 보관, 커스텀 HTML/Tailwind 주입
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full text-white/40 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+            className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
             title="닫기"
             aria-label="닫기"
           >
@@ -359,49 +351,48 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
         </div>
 
         {/* STEP 2: PRIMARY 3-WAY CREATION MODE SEGMENTED SWITCH */}
-        <div className="px-6 py-2.5 border-b border-white/10 bg-[#0B0C10]/95 shrink-0 flex items-center justify-between gap-3 overflow-x-auto">
-          {/* Segmented Switch with Minimalist Luxury Cues: bg-white/[0.03], border-white/10, active in #C5A880 */}
-          <div className="inline-flex p-1 rounded-2xl bg-white/[0.03] border border-white/10 gap-1 text-xs">
+        <div className="px-6 py-2.5 border-b border-white/10 bg-[#0A0A0B] shrink-0 flex items-center justify-between gap-3 overflow-x-auto">
+          <div className="inline-flex p-1 rounded-2xl bg-[#121214] border border-zinc-800/80 gap-1 text-xs">
             {/* 1. 디자인 템플릿 */}
             <button
               type="button"
               onClick={() => setCreationMode('template')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
                 creationMode === 'template'
-                  ? 'bg-[#C5A880] text-black font-bold shadow-md'
-                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-white text-neutral-950 font-bold shadow-sm'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/10'
               }`}
             >
               <Palette className="w-4 h-4" />
-              <span>🎨 디자인 템플릿</span>
+              <span>디자인 템플릿</span>
             </button>
 
             {/* 2. 실물 명함 사진 */}
             <button
               type="button"
               onClick={() => setCreationMode('photo')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
                 creationMode === 'photo'
-                  ? 'bg-[#C5A880] text-black font-bold shadow-md'
-                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-white text-neutral-950 font-bold shadow-sm'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/10'
               }`}
             >
               <Camera className="w-4 h-4" />
-              <span>📄 실물 명함 사진</span>
+              <span>실물 명함 사진</span>
             </button>
 
             {/* 3. 커스텀 HTML */}
             <button
               type="button"
               onClick={() => setCreationMode('custom_html')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
                 creationMode === 'custom_html'
-                  ? 'bg-[#C5A880] text-black font-bold shadow-md'
-                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-white text-neutral-950 font-bold shadow-sm'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/10'
               }`}
             >
               <Code2 className="w-4 h-4" />
-              <span>⚡ 커스텀 HTML</span>
+              <span>커스텀 HTML</span>
             </button>
           </div>
 
@@ -415,11 +406,11 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
               setLayoutType('editorial_minimal');
               setCreationMode('template');
             }}
-            className="p-1.5 rounded-lg text-white/30 hover:text-white/80 hover:bg-white/5 transition-all cursor-pointer shrink-0"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer shrink-0"
             title="샘플 데이터 복원"
             aria-label="샘플 데이터 복원"
           >
-            <RotateCcw className="w-4 h-4 text-white/30 hover:text-white/80" />
+            <RotateCcw className="w-4 h-4" />
           </button>
         </div>
 
@@ -503,11 +494,11 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] border-t border-white/10 bg-[#0B0C10] flex items-center justify-between shrink-0">
+        <div className="px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] border-t border-white/10 bg-[#0A0A0B] flex items-center justify-between shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-neutral-400 hover:text-white transition-colors cursor-pointer text-xs"
+            className="px-4 py-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer text-xs"
           >
             취소
           </button>
@@ -515,7 +506,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
           <button
             type="button"
             onClick={handleSave}
-            className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-[#C5A880] hover:bg-[#d6b991] text-black font-bold text-xs transition-all cursor-pointer shadow-lg active:scale-95"
+            className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-neutral-950 font-bold text-xs transition-all cursor-pointer shadow-lg active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
           >
             <Check className="w-4 h-4" />
             <span>{isCreating ? '새 럭셔리 명함 등록' : '수정 사항 저장'}</span>

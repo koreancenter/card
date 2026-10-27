@@ -23,16 +23,15 @@ export const KoreanCenterLogo: React.FC<KoreanCenterLogoProps> = ({
 }) => {
   const pixelSize = typeof size === 'number' ? size : parseInt(size.toString(), 10) || 48;
 
-  // Resolve luxury metallic / monochrome stroke color based on theme
+  // Resolve luxury monochrome stroke color based on theme
   const isLight =
     theme === 'cotton' ||
     theme === 'sand' ||
     theme === 'warm_paper' ||
-    theme === 'burgundy' ||
     theme === 'pure_white';
 
-  const defaultStroke = isLight ? '#111111' : '#F8F4EB';
-  const defaultGold = '#C5A880';
+  const defaultStroke = isLight ? '#0A0A0B' : '#FAFAFA';
+  const cardinalAccent = isLight ? '#52525B' : '#A1A1AA';
   const activeStroke = color || defaultStroke;
 
   return (
@@ -100,11 +99,11 @@ export const KoreanCenterLogo: React.FC<KoreanCenterLogoProps> = ({
           strokeLinejoin="miter"
         />
 
-        {/* Cardinal Accent Points in Champagne Brass Gold */}
-        <circle cx="50" cy="8" r="1.6" fill={defaultGold} />
-        <circle cx="92" cy="50" r="1.6" fill={defaultGold} />
-        <circle cx="50" cy="92" r="1.6" fill={defaultGold} />
-        <circle cx="8" cy="50" r="1.6" fill={defaultGold} />
+        {/* Cardinal Accent Points in Precision Monochrome */}
+        <circle cx="50" cy="8" r="1.6" fill={cardinalAccent} />
+        <circle cx="92" cy="50" r="1.6" fill={cardinalAccent} />
+        <circle cx="50" cy="92" r="1.6" fill={cardinalAccent} />
+        <circle cx="8" cy="50" r="1.6" fill={cardinalAccent} />
       </svg>
 
       {showText && (

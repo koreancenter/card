@@ -76,7 +76,7 @@ export const INITIAL_CARDS: StoredCard[] = [
     },
     createdAt: '2026-03-12',
     notes: '워싱턴 DC 국제문화교류 심포지엄 미팅 (실물 명함 사진 보관)',
-    scannedImage: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
+    scannedImage: `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500"><rect width="900" height="500" fill="#FAFAFA"/><rect x="28" y="28" width="844" height="444" fill="none" stroke="#E4E4E7" stroke-width="1.5"/><text x="68" y="100" font-family="sans-serif" font-size="18" fill="#52525B" letter-spacing="3">GLOBAL HERITAGE FOUNDATION</text><text x="68" y="245" font-family="serif" font-size="44" font-weight="bold" fill="#0A0A0B">Dr. Michael Harrison</text><text x="68" y="288" font-family="sans-serif" font-size="20" fill="#52525B">Senior Executive Director</text><line x1="68" y1="365" x2="832" y2="365" stroke="#E4E4E7" stroke-width="1"/><text x="68" y="412" font-family="monospace" font-size="18" fill="#18181B">+1 (202) 555-0182  ·  m.harrison@globalheritage.org</text><text x="68" y="442" font-family="sans-serif" font-size="16" fill="#71717A">1400 K Street NW, Suite 900, Washington, DC</text></svg>')}`,
     data: {
       organization: 'Global Heritage Foundation',
       organizationKr: '글로벌헤리티지재단',
@@ -143,7 +143,7 @@ export const INITIAL_CARDS: StoredCard[] = [
     },
     createdAt: '2026-03-22',
     notes: '아시아태평양 벤처 펀드 운용 총괄 (실물 명함 보관)',
-    scannedImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80',
+    scannedImage: `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500"><rect width="900" height="500" fill="#121214"/><rect x="28" y="28" width="844" height="444" fill="none" stroke="#27272A" stroke-width="1.5"/><text x="68" y="100" font-family="sans-serif" font-size="18" fill="#A1A1AA" letter-spacing="3">VANCE &amp; PARTNERS CAPITAL</text><text x="68" y="245" font-family="sans-serif" font-size="44" font-weight="bold" fill="#FAFAFA">JAMES VANCE</text><text x="68" y="288" font-family="sans-serif" font-size="20" fill="#A1A1AA">Managing Partner</text><line x1="68" y1="365" x2="832" y2="365" stroke="#27272A" stroke-width="1"/><text x="68" y="412" font-family="monospace" font-size="18" fill="#E4E4E7">+65 6712 3400  ·  jvance@vancecap.sg</text><text x="68" y="442" font-family="sans-serif" font-size="16" fill="#71717A">1 Raffles Place, Singapore 048616</text></svg>')}`,
     data: {
       organization: 'Vance & Partners Capital',
       organizationKr: '밴스 앤 파트너스 캐피탈',

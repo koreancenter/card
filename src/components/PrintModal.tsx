@@ -63,13 +63,13 @@ export const PrintModal: React.FC<PrintModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto">
       <div 
-        className="relative w-full max-w-5xl rounded-3xl bg-neutral-900 border border-neutral-800 p-5 sm:p-8 text-neutral-100 shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-5xl rounded-3xl bg-[#121214] border border-white/10 p-5 sm:p-8 text-neutral-100 shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+          className="absolute top-5 right-5 p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           title="닫기"
         >
           <X className="w-5 h-5" />
@@ -77,28 +77,26 @@ export const PrintModal: React.FC<PrintModalProps> = ({
 
         {/* Modal Header */}
         <div className="space-y-1 mb-6 pr-10">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono tracking-widest uppercase px-2 py-0.5 rounded bg-neutral-800 text-neutral-300">
-              HIGH-RESOLUTION PRINT & VECTOR PDF
-            </span>
-          </div>
+          <span className="text-[10px] font-mono tracking-widest uppercase text-zinc-400 block">
+            HIGH-RESOLUTION PRINT & VECTOR PDF
+          </span>
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
             인쇄용 고품질 PDF 출력 및 설정
           </h2>
-          <p className="text-xs text-neutral-400">
+          <p className="text-xs text-zinc-400">
             인쇄소 상업 인쇄 규격(3mm 재단 여백, 십자 돔보선) 및 사무용 A4 출력을 위한 고해상도 벡터 PDF를 생성합니다.
           </p>
         </div>
 
         {/* Configuration Controls Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-5 p-4 rounded-2xl bg-neutral-950 border border-neutral-800/80 text-xs">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-5 p-4 rounded-2xl bg-[#0A0A0B] border border-zinc-800/80 text-xs">
           {/* 1. Layout Mode */}
           <div className="space-y-1.5">
-            <label className="font-semibold text-neutral-300 block">출력 레이아웃 (Layout)</label>
+            <label className="font-semibold text-zinc-300 block">출력 레이아웃 (Layout)</label>
             <select
               value={config.layout}
               onChange={(e) => updateConfig({ layout: e.target.value as PrintLayout })}
-              className="w-full bg-neutral-900 border border-neutral-700/80 rounded-xl p-2.5 text-white font-medium focus:outline-none focus:border-neutral-500 cursor-pointer"
+              className="w-full bg-[#121214] border border-white/10 rounded-xl p-2.5 text-white font-medium focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 cursor-pointer"
             >
               <option value="single-card">양면 2페이지 (명함 전용 인쇄소용)</option>
               <option value="front-back-duo">한 장 나란히 보기 (1-Sheet Duo / 프레젠테이션용)</option>
@@ -108,11 +106,11 @@ export const PrintModal: React.FC<PrintModalProps> = ({
 
           {/* 2. Paper Size Specification */}
           <div className="space-y-1.5">
-            <label className="font-semibold text-neutral-300 block">규격 (Dimensions)</label>
+            <label className="font-semibold text-zinc-300 block">규격 (Dimensions)</label>
             <select
               value={config.size}
               onChange={(e) => updateConfig({ size: e.target.value as PrintSize })}
-              className="w-full bg-neutral-900 border border-neutral-700/80 rounded-xl p-2.5 text-white font-medium focus:outline-none focus:border-neutral-500 cursor-pointer"
+              className="w-full bg-[#121214] border border-white/10 rounded-xl p-2.5 text-white font-medium focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 cursor-pointer"
             >
               <option value="kr-standard">한국 표준 규격 (90 × 50 mm)</option>
               <option value="iso-standard">국제 / 유럽 규격 (85 × 55 mm)</option>
@@ -121,11 +119,11 @@ export const PrintModal: React.FC<PrintModalProps> = ({
 
           {/* 3. Paper Tone / Finish */}
           <div className="space-y-1.5">
-            <label className="font-semibold text-neutral-300 block">지류 / 테마 피니시 (Color Finish)</label>
+            <label className="font-semibold text-zinc-300 block">지류 / 테마 피니시 (Color Finish)</label>
             <select
               value={config.theme}
               onChange={(e) => updateConfig({ theme: e.target.value as CardTheme })}
-              className="w-full bg-neutral-900 border border-neutral-700/80 rounded-xl p-2.5 text-white font-medium focus:outline-none focus:border-neutral-500 cursor-pointer"
+              className="w-full bg-[#121214] border border-white/10 rounded-xl p-2.5 text-white font-medium focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 cursor-pointer"
             >
               {THEMES.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -137,30 +135,27 @@ export const PrintModal: React.FC<PrintModalProps> = ({
         </div>
 
         {/* Options Toggles */}
-        <div className="flex flex-wrap items-center justify-between gap-3 px-1 mb-5 text-xs text-neutral-300">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-1 mb-5 text-xs text-zinc-300">
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={config.showCropMarks}
               onChange={(e) => updateConfig({ showCropMarks: e.target.checked })}
-              className="rounded bg-neutral-950 border-neutral-700 text-white focus:ring-0 focus:ring-offset-0 w-4 h-4 cursor-pointer"
+              className="rounded accent-white w-4 h-4 cursor-pointer"
             />
             <span>3mm 재단 여백(Bleed) 및 십자 돔보선(Crop Marks) 포함</span>
           </label>
 
-          <div className="flex items-center gap-1.5 text-neutral-400 text-[11px]">
-            <Info className="w-3.5 h-3.5 text-neutral-500 shrink-0" />
+          <div className="flex items-center gap-1.5 text-zinc-400 text-[11px]">
+            <Info className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
             <span>브라우저 인쇄 창에서 대상: <b>PDF로 저장</b>, <b>배경 그래픽 포함</b>을 체크하세요</span>
           </div>
         </div>
 
         {/* Visual Print Live Preview Box */}
-        <div className="p-4 sm:p-6 bg-neutral-950/90 rounded-2xl border border-neutral-800/80">
-          <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-800/70 text-[11px] font-mono text-neutral-400">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span>LIVE WYSIWYG PREVIEW</span>
-            </div>
+        <div className="p-4 sm:p-6 bg-[#0A0A0B] rounded-2xl border border-zinc-800/80">
+          <div className="flex items-center justify-between mb-4 pb-2 border-b border-zinc-800/80 text-[11px] font-mono tabular-nums text-zinc-400">
+            <span>LIVE WYSIWYG PREVIEW</span>
             <span>{widthDisplay} · {config.theme.toUpperCase()}</span>
           </div>
 
@@ -192,30 +187,30 @@ export const PrintModal: React.FC<PrintModalProps> = ({
           ) : (
             /* Mode C: A4 Sheet 10-Card Multi-Up Grid Preview */
             <div className="flex flex-col items-center justify-center py-2">
-              <div className="flex items-center gap-2 mb-3 text-xs text-neutral-400">
-                <Layers className="w-4 h-4 text-emerald-400" />
+              <div className="flex items-center gap-2 mb-3 text-xs text-zinc-400">
+                <Layers className="w-4 h-4 text-zinc-300" />
                 <span>A4 용지 1장에 10매 배열 (2열 × 5행 칼선 가이드 포함)</span>
               </div>
 
               {/* A4 Sheet Proportion Canvas (210 x 297 ratio) */}
               <div 
-                className="relative bg-neutral-900 border border-neutral-700/80 rounded-lg p-3 shadow-2xl max-w-sm w-full mx-auto"
+                className="relative bg-[#121214] border border-zinc-800/80 rounded-lg p-3 shadow-2xl max-w-sm w-full mx-auto"
                 style={{ aspectRatio: '210 / 297' }}
               >
-                <div className="w-full h-full grid grid-cols-2 gap-1.5 border border-dashed border-neutral-600/80 p-1.5">
+                <div className="w-full h-full grid grid-cols-2 gap-1.5 border border-dashed border-zinc-700/80 p-1.5">
                   {Array.from({ length: 10 }).map((_, i) => (
                     <div 
                       key={i} 
-                      className="border border-neutral-700/50 rounded flex flex-col justify-between p-1 bg-neutral-800/40 text-[7px] leading-tight overflow-hidden"
+                      className="border border-zinc-800 rounded flex flex-col justify-between p-1 bg-[#0A0A0B] text-[7px] leading-tight overflow-hidden"
                     >
-                      <div className="flex items-center justify-between text-neutral-500 font-mono text-[6px]">
+                      <div className="flex items-center justify-between text-zinc-500 font-mono tabular-nums text-[6px]">
                         <span>#{i + 1}</span>
                         <span>{widthDisplay}</span>
                       </div>
-                      <div className="text-center font-bold text-neutral-300 truncate">
+                      <div className="text-center font-bold text-zinc-300 truncate">
                         {data.name}
                       </div>
-                      <div className="text-[6px] text-neutral-400 text-center truncate">
+                      <div className="text-[6px] text-zinc-400 text-center truncate">
                         {data.organization}
                       </div>
                     </div>
@@ -228,20 +223,20 @@ export const PrintModal: React.FC<PrintModalProps> = ({
 
         {/* Modal Bottom Actions */}
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-          <p className="text-xs text-neutral-500 font-sans">
+          <p className="text-xs text-zinc-500 font-sans">
             * 인쇄 시 브라우저 설정에서 <b>‘배경 그래픽 포함’</b> 옵션을 꼭 체크해 주세요.
           </p>
 
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white transition-colors text-xs font-semibold cursor-pointer"
+              className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-white/10 hover:bg-white/10 text-zinc-300 hover:text-white transition-colors text-xs font-semibold cursor-pointer"
             >
               닫기
             </button>
             <button
               onClick={handleExecutePrint}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-white text-neutral-950 hover:bg-neutral-200 transition-colors text-xs font-bold shadow-lg cursor-pointer active:scale-95"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-white text-neutral-950 hover:bg-zinc-200 transition-colors text-xs font-bold shadow-lg cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
             >
               <Printer className="w-4 h-4 text-neutral-950" />
               <span>고품질 인쇄 / PDF 저장</span>

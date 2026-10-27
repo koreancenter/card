@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
 import { CardData } from '../types/card';
-import { downloadVCard } from '../utils/vcard';
+import { downloadVCard, generateVCard } from '../utils/vcard';
 import { 
   X, 
   Copy, 
   Check, 
-  UserPlus, 
   Share2, 
+  UserPlus, 
   Printer, 
   FileCode2 
 } from 'lucide-react';
@@ -16,6 +16,7 @@ interface ShareModalProps {
   isOpen: boolean;
   onClose: () => void;
   data: CardData;
+  cardUrl?: string;
   onOpenPrint?: () => void;
   onOpenExport?: () => void;
 }
@@ -24,54 +25,46 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   isOpen,
   onClose,
   data,
+  cardUrl,
   onOpenPrint,
-  onOpenExport,
+  onOpenExport
 }) => {
-  const [dataUrl, setDataUrl] = useState<string>('');
-  const [copied, setCopied] = useState<boolean>(false);
+  const [copied, setCopied] = useState(false);
   const [qrType, setQrType] = useState<'url' | 'vcard'>('url');
+  const [qrDataUrl, setQrDataUrl] = useState<string>('');
 
-  const targetUrl = data.website || (typeof window !== 'undefined' ? window.location.href : 'https://card.goguma.app/master');
-  const displayHost = data.websiteDisplay || targetUrl.replace(/^https?:\/\//, '');
+  const resolvedUrl = cardUrl || data.website || 'https://card.goguma.app/master';
 
   useEffect(() => {
     if (!isOpen) return;
 
-    const contentToEncode = qrType === 'url' ? targetUrl : `BEGIN:VCARD\nVERSION:3.0\nFN:${data.name}\nTEL:${data.phoneRaw || data.phone}\nEMAIL:${data.email}\nORG:${data.organization}\nTITLE:${data.title}\nURL:${data.website}\nEND:VCARD`;
-
-    QRCode.toDataURL(contentToEncode, {
-      width: 400,
-      margin: 1.5,
+    const qrTarget = qrType === 'url' ? resolvedUrl : generateVCard(data);
+    QRCode.toDataURL(qrTarget, {
+      width: 480,
+      margin: 1,
       color: {
-        dark: '#16181D',
-        light: '#F7F5F0'
+        dark: '#0A0A0B',
+        light: '#FAFAFA'
       },
       errorCorrectionLevel: 'M'
     })
-      .then((url) => {
-        setDataUrl(url);
-      })
-      .catch((err) => {
-        console.error('Failed to create QR code', err);
-      });
-  }, [isOpen, qrType, data, targetUrl]);
+      .then((url) => setQrDataUrl(url))
+      .catch((err) => console.error('Failed to generate QR code:', err));
+  }, [isOpen, qrType, resolvedUrl, data]);
 
   if (!isOpen) return null;
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(targetUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const displayHost = (data.websiteDisplay || resolvedUrl).replace(/^https?:\/\//, '');
 
-  const handleDownloadQr = () => {
-    if (!dataUrl) return;
-    const a = document.createElement('a');
-    a.href = dataUrl;
-    a.download = `QR_${(data.name || 'Card').replace(/[^a-zA-Z0-9가-힣]/g, '_')}_${qrType.toUpperCase()}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(resolvedUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleNativeShare = async () => {
@@ -79,110 +72,118 @@ export const ShareModal: React.FC<ShareModalProps> = ({
       try {
         await navigator.share({
           title: `${data.name} — ${data.organization}`,
-          text: `${data.organization} ${data.title} ${data.name} 디지털 명함`,
-          url: targetUrl,
+          text: `${data.organizationKr} ${data.titleKr} ${data.name}의 디지털 명함입니다.`,
+          url: resolvedUrl
         });
-      } catch (err: any) {
-        if (err.name !== 'AbortError') {
-          handleCopyLink();
-        }
+      } catch {
+        // User cancelled share
       }
     } else {
       handleCopyLink();
     }
   };
 
+  const handleDownloadQr = () => {
+    if (!qrDataUrl) return;
+    const a = document.createElement('a');
+    a.href = qrDataUrl;
+    a.download = `QR_${data.name}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-200"
       onClick={onClose}
     >
-      {/* Modal Surface: Deep Sumi Ink matte canvas */}
+      {/* Modal Surface: Rich dark canvas (#0A0A0B) with hairline border */}
       <div 
-        className="relative bg-[#0B0C10]/95 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 max-w-[420px] w-full shadow-2xl flex flex-col items-center"
+        className="relative bg-[#0A0A0B] border border-white/10 rounded-3xl p-7 sm:p-8 max-w-[420px] w-full shadow-2xl flex flex-col items-center"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Minimal, airy close button */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 text-white/30 hover:text-[#C5A880] transition cursor-pointer p-1"
+          className="absolute top-5 right-5 text-zinc-400 hover:text-white transition cursor-pointer p-1.5 rounded-full hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
           title="닫기"
           aria-label="닫기"
         >
-          <X className="w-5 h-5 stroke-[1.5]" />
+          <X className="w-4 h-4 stroke-[1.5]" />
         </button>
 
-        {/* 1. Header: Minimalist Name & Org header */}
+        {/* 1. Header: Crisp Monochrome Header Hierarchy */}
         <div className="text-center mb-5">
-          <span className="text-[10px] font-mono tracking-widest text-[#C5A880] uppercase block mb-1.5">
+          <span className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase block mb-1.5">
             DIGITAL CARD SHARING
           </span>
-          <h3 className="text-base font-medium text-white tracking-tight">
-            {data.name} {data.title && <span className="text-white/40 font-normal">· {data.title}</span>}
+          <h3 className="text-base font-semibold text-white tracking-tight">
+            {data.name} {data.title && <span className="text-zinc-400 font-normal">· {data.title}</span>}
           </h3>
           {data.organization && (
-            <p className="text-xs text-white/40 mt-0.5 truncate max-w-[280px]">
+            <p className="text-xs text-neutral-500 mt-0.5 truncate max-w-[280px]">
               {data.organization}
             </p>
           )}
         </div>
 
-        {/* Tab Switcher: Wide letter-spacing, champagne brass active indicator */}
-        <div className="flex items-center justify-center gap-6 mb-4 text-xs tracking-widest">
+        {/* Tab Switcher: Crisp monochrome active indicator */}
+        <div className="flex items-center justify-center gap-6 mb-4 text-xs tracking-wider">
           <button
             type="button"
             onClick={() => setQrType('url')}
-            className={`transition cursor-pointer pb-1 ${
+            className={`transition cursor-pointer pb-1 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
               qrType === 'url'
-                ? 'text-[#C5A880] border-b border-[#C5A880] font-medium'
-                : 'text-white/40 hover:text-white/70 border-b border-transparent'
+                ? 'text-white border-b-2 border-white font-medium'
+                : 'text-neutral-500 hover:text-zinc-300 border-b-2 border-transparent'
             }`}
           >
             웹 링크 QR
           </button>
-          <span className="text-white/10 select-none">|</span>
+          <span className="text-zinc-800 select-none">|</span>
           <button
             type="button"
             onClick={() => setQrType('vcard')}
-            className={`transition cursor-pointer pb-1 ${
+            className={`transition cursor-pointer pb-1 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
               qrType === 'vcard'
-                ? 'text-[#C5A880] border-b border-[#C5A880] font-medium'
-                : 'text-white/40 hover:text-white/70 border-b border-transparent'
+                ? 'text-white border-b-2 border-white font-medium'
+                : 'text-neutral-500 hover:text-zinc-300 border-b-2 border-transparent'
             }`}
           >
             연락처 저장 QR
           </button>
         </div>
 
-        {/* 2. QR Code Canvas: Fine Paper + Champagne Brass inner border */}
-        <div className="relative p-5 rounded-2xl bg-[#F7F5F0] border border-[#C5A880]/30 shadow-inner mb-6 flex flex-col items-center justify-center">
-          {dataUrl ? (
+        {/* 2. QR Code Canvas: Warm matte paper (#FAFAFA) with subtle black/5 border */}
+        <div className="relative p-5 rounded-2xl bg-[#FAFAFA] border border-black/5 shadow-inner mb-6 flex flex-col items-center justify-center">
+          {qrDataUrl ? (
             <img 
-              src={dataUrl} 
+              src={qrDataUrl} 
               alt="Digital Card QR" 
               className="w-44 h-44 object-contain"
             />
           ) : (
-            <div className="w-44 h-44 flex items-center justify-center text-neutral-400 text-xs font-mono">
+            <div className="w-44 h-44 flex items-center justify-center text-xs text-neutral-500 font-mono">
               QR 생성 중...
             </div>
           )}
         </div>
 
         {/* 3. URL Row: Monospace URL with text copy link */}
-        <div className="w-full flex items-center justify-between gap-3 border-b border-white/10 pb-3 mb-6">
-          <span className="font-mono text-xs text-white/70 truncate select-all">
+        <div className="w-full flex items-center justify-between gap-3 border-b border-zinc-800/80 pb-3 mb-6">
+          <span className="font-mono text-xs text-zinc-300 truncate select-all">
             {displayHost}
           </span>
           <button
             type="button"
             onClick={handleCopyLink}
-            className="text-[#C5A880] hover:text-[#E2CFB4] font-medium text-xs transition flex items-center gap-1.5 cursor-pointer shrink-0"
+            className="text-white hover:bg-white/10 px-2.5 py-1 rounded-lg font-medium text-xs transition flex items-center gap-1.5 cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
             title="링크 복사"
           >
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5" />
+                <Check className="w-3.5 h-3.5 text-white" />
                 <span>복사됨</span>
               </>
             ) : (
@@ -194,52 +195,47 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           </button>
         </div>
 
-        {/* 4. Bottom: Unified Minimalist Floating Action Dock matching studio canvas */}
+        {/* 4. Bottom: Restrained Monochrome Floating Action Dock */}
         <div 
-          className="bg-white/[0.03] border border-white/10 rounded-full px-5 py-2.5 flex items-center justify-center gap-4 shadow-xl backdrop-blur-md"
+          className="bg-[#121214] border border-white/10 rounded-full px-5 py-2 flex items-center justify-center gap-4 shadow-xl"
           role="toolbar"
           aria-label="명함 빠른 작업 도크"
         >
-          {/* Action 1: Add to Contacts (.vcf) */}
           <button
             type="button"
             onClick={() => downloadVCard(data)}
-            className="text-white/60 hover:text-[#C5A880] transition transform hover:scale-110 p-1.5 cursor-pointer rounded-full hover:bg-white/5 flex items-center justify-center"
+            className="text-zinc-400 hover:text-white transition p-1.5 cursor-pointer rounded-full hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 flex items-center justify-center"
             title="연락처(.vcf) 저장"
             aria-label="연락처(.vcf) 저장"
           >
             <UserPlus className="w-4 h-4" />
           </button>
 
-          {/* Action 2: Share Card Link / Web Share */}
           <button
             type="button"
             onClick={handleNativeShare}
-            className="text-white/60 hover:text-[#C5A880] transition transform hover:scale-110 p-1.5 cursor-pointer rounded-full hover:bg-white/5 flex items-center justify-center"
+            className="text-zinc-400 hover:text-white transition p-1.5 cursor-pointer rounded-full hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 flex items-center justify-center"
             title="명함 링크 공유"
             aria-label="명함 링크 공유"
           >
             <Share2 className="w-4 h-4" />
           </button>
 
-          {/* 1px Vertical Divider */}
-          <div className="h-4 w-[1px] bg-white/10" />
+          <div className="h-4 w-px bg-white/10" />
 
-          {/* Action 3: Open Print / PDF Modal */}
           <button
             type="button"
             onClick={() => {
               onClose();
               onOpenPrint?.();
             }}
-            className="text-white/60 hover:text-[#C5A880] transition transform hover:scale-110 p-1.5 cursor-pointer rounded-full hover:bg-white/5 flex items-center justify-center"
+            className="text-zinc-400 hover:text-white transition p-1.5 cursor-pointer rounded-full hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 flex items-center justify-center"
             title="인쇄 및 고해상도 PDF"
             aria-label="인쇄 및 고해상도 PDF"
           >
             <Printer className="w-4 h-4" />
           </button>
 
-          {/* Action 4: Open Standalone HTML Modal (or download QR if not configured) */}
           <button
             type="button"
             onClick={() => {
@@ -250,7 +246,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
                 handleDownloadQr();
               }
             }}
-            className="text-white/60 hover:text-[#C5A880] transition transform hover:scale-110 p-1.5 cursor-pointer rounded-full hover:bg-white/5 flex items-center justify-center"
+            className="text-zinc-400 hover:text-white transition p-1.5 cursor-pointer rounded-full hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 flex items-center justify-center"
             title="독립 HTML 파일 배포"
             aria-label="독립 HTML 파일 배포"
           >

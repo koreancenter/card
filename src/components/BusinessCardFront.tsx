@@ -50,7 +50,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
       <div 
         className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
           isPrintPreview || hideBorder ? 'border-0' : `border border-white/10 shadow-2xl`
-        } bg-[#0A0B0E] transition-all duration-300`}
+        } bg-[#0A0A0B] transition-all duration-300`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
         <SandboxedCardRenderer
@@ -68,7 +68,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
       <div 
         className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
           isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border} shadow-2xl`
-        } bg-[#0A0B0E] transition-all duration-300`}
+        } bg-[#0A0A0B] transition-all duration-300`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
         {/* Authentic High-Resolution Cropped Physical Card Photo */}
@@ -89,7 +89,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
 
         {/* Top-Right Badge: Authentic Physical Archive */}
         <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
-          <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-[#C5A880] tracking-wider uppercase shadow-sm">
+          <span className="px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-white/10 text-[9px] font-mono text-zinc-200 tracking-wider uppercase shadow-sm">
             PHOTO ARCHIVE
           </span>
         </div>
@@ -101,13 +101,13 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
               {data.name}
             </h3>
             {data.organization && (
-              <p className="text-[10px] text-neutral-300 drop-shadow-sm line-clamp-1">
+              <p className="text-[10px] text-zinc-300 drop-shadow-sm line-clamp-1">
                 {data.organization}
               </p>
             )}
           </div>
           {data.phone && (
-            <span className="text-[10px] sm:text-[11px] font-mono text-[#C5A880] drop-shadow-sm tabular-nums shrink-0 font-medium">
+            <span className="text-[10px] sm:text-[11px] font-mono text-zinc-200 drop-shadow-sm tabular-nums shrink-0 font-medium">
               {data.phone}
             </span>
           )}
@@ -127,7 +127,7 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
   const rawAddressEn = (
     data.address_en ||
     data.details?.address_en ||
-    (data as any).addressEn ||
+    data.addressEn ||
     (data.addressLines && data.addressLines.length > 0 ? data.addressLines.join(', ') : '')
   ).trim();
 

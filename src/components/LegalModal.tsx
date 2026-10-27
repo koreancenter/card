@@ -21,20 +21,20 @@ export const LegalModal: React.FC<LegalModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-2xl max-h-[85vh] rounded-2xl bg-[#16181D] border border-white/10 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+        className="w-full max-w-2xl max-h-[85vh] rounded-2xl bg-[#121214] border border-white/10 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
         role="dialog"
         aria-modal="true"
         aria-labelledby="legal-modal-title"
       >
         {/* Header with Segmented Switcher & Close */}
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-[#121318]">
+        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#0A0A0B]">
           <div className="flex items-center gap-2 overflow-x-auto">
             <button
               onClick={() => setActiveDoc('privacy')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 border ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 border transition-colors ${
                 activeDoc === 'privacy'
-                  ? 'bg-white/10 text-white border-white/10 shadow-sm'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5 border-transparent'
+                  ? 'bg-white text-neutral-950 border-white shadow-sm'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/10 border-transparent'
               }`}
             >
               <span>개인정보처리방침</span>
@@ -42,10 +42,10 @@ export const LegalModal: React.FC<LegalModalProps> = ({
 
             <button
               onClick={() => setActiveDoc('terms')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 border ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 border transition-colors ${
                 activeDoc === 'terms'
-                  ? 'bg-white/10 text-white border-white/10 shadow-sm'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5 border-transparent'
+                  ? 'bg-white text-neutral-950 border-white shadow-sm'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/10 border-transparent'
               }`}
             >
               <span>서비스 이용약관</span>
@@ -54,7 +54,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 cursor-pointer shrink-0 ml-2"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 cursor-pointer shrink-0 ml-2 transition-colors"
             aria-label="닫기"
           >
             <X className="w-4 h-4" />
@@ -62,20 +62,20 @@ export const LegalModal: React.FC<LegalModalProps> = ({
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-neutral-300 text-xs leading-relaxed font-sans">
+        <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-zinc-300 text-xs leading-relaxed font-sans">
           {activeDoc === 'privacy' ? (
             <article className="space-y-5">
               <div>
                 <h3 id="legal-modal-title" className="text-lg font-bold text-white tracking-tight">
                   개인정보처리방침
                 </h3>
-                <p className="text-neutral-400 text-xs mt-1">
+                <p className="text-zinc-400 text-xs mt-1">
                   최종 개정일: 2026년 10월 1일 · 로컬 퍼스트(Local-First) 원칙
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-black/40 border border-[#C5A880]/20">
-                <p className="text-neutral-300 leading-snug">
+              <div className="p-4 rounded-xl bg-[#0A0A0B] border border-zinc-800/80">
+                <p className="text-zinc-300 leading-snug">
                   <strong className="text-white">로컬 퍼스트 핵심 원칙:</strong> 본 서비스는 이용자의 이름, 전화번호, 이메일, 직함, 조직 및 보관함 명함 정보를 중앙 데이터베이스에 일체 전송하거나 수집하지 않습니다. 모든 데이터는 이용자의 웹 브라우저 로컬 저장소에만 보관됩니다.
                 </p>
               </div>
@@ -164,10 +164,10 @@ export const LegalModal: React.FC<LegalModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 border-t border-white/5 bg-[#121318] flex items-center justify-end">
+        <div className="px-6 py-3.5 border-t border-white/10 bg-[#0A0A0B] flex items-center justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-white hover:bg-zinc-200 text-neutral-950 text-xs font-bold cursor-pointer transition-colors"
           >
             확인 및 닫기
           </button>

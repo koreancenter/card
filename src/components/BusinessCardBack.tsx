@@ -39,7 +39,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
       <div 
         className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
           isPrintPreview || hideBorder ? 'border-0' : `border border-white/10 shadow-2xl`
-        } bg-[#0A0B0E] transition-all duration-300`}
+        } bg-[#0A0A0B] transition-all duration-300`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
         <SandboxedCardRenderer
@@ -57,7 +57,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
       <div 
         className={`relative w-full h-full select-none overflow-hidden rounded-2xl ${
           isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border} shadow-2xl`
-        } bg-[#0A0B0E] transition-all duration-300`}
+        } bg-[#0A0A0B] transition-all duration-300`}
         style={{ aspectRatio: isPortrait ? '5 / 8' : '9 / 5' }}
       >
         <img 
@@ -81,7 +81,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
       type: 'svg',
       margin: 0,
       color: {
-        dark: isLight ? '#111111' : '#F8F4EB',
+        dark: '#0A0A0B',
         light: '#00000000'
       },
       errorCorrectionLevel: 'M'
@@ -151,7 +151,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
           >
             {qrSvg && (
               <div 
-                className={`w-11 h-11 p-1 rounded-lg ${isLight ? 'bg-neutral-100/90 border-neutral-200' : 'bg-white/95 border-white/10'} border flex items-center justify-center shrink-0 shadow-md [&>svg]:w-full [&>svg]:h-full mb-1`}
+                className="w-11 h-11 p-1 rounded-lg bg-[#FAFAFA] border border-black/5 flex items-center justify-center shrink-0 shadow-sm [&>svg]:w-full [&>svg]:h-full mb-1"
                 dangerouslySetInnerHTML={{ __html: qrSvg }}
                 title="디지털 명함 바로가기 QR 코드"
               />
@@ -181,7 +181,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
           >
             {qrSvg && (
               <div 
-                className={`w-9 h-9 p-0.5 rounded-lg ${isLight ? 'bg-neutral-100/90 border-neutral-200' : 'bg-white/95 border-white/10'} border flex items-center justify-center shrink-0 shadow-sm [&>svg]:w-full [&>svg]:h-full`}
+                className="w-9 h-9 p-1 rounded-lg bg-[#FAFAFA] border border-black/5 flex items-center justify-center shrink-0 shadow-sm [&>svg]:w-full [&>svg]:h-full"
                 dangerouslySetInnerHTML={{ __html: qrSvg }}
                 title="디지털 명함 바로가기 QR 코드"
               />

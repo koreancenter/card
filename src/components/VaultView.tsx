@@ -82,7 +82,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
   if (isLocked) {
     return (
       <div className="w-full max-w-lg mx-auto py-16 px-6 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in-95 duration-200">
-        <div className="w-16 h-16 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center text-[#C5A880] mb-5 shadow-2xl">
+        <div className="w-16 h-16 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center text-white mb-5 shadow-2xl">
           <Lock className="w-8 h-8" />
         </div>
         <h3 className="text-xl font-bold text-white mb-2 tracking-tight">명함 보관함이 잠겨 있습니다</h3>
@@ -104,18 +104,18 @@ export const VaultView: React.FC<VaultViewProps> = ({
     <div className="w-full max-w-6xl mx-auto space-y-5 animate-in fade-in duration-300">
       {/* 1. Quiet Luxury Search Bar */}
       <div className="relative w-full max-w-md">
-        <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="이름, 회사, 직함, 메모 검색..."
-          className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#121318] border border-white/10 text-xs text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:border-[#C5A880]/50 transition-colors"
+          className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#121214] border border-white/10 text-xs text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 transition-colors"
         />
       </div>
 
       {/* 2. Wallet Toolbar (Categories on Left, View Mode & Primary Accent Button on Right) */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-1 border-b border-white/5">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-2 border-b border-white/10">
         {/* Left: Category Filter Chips */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
           {categories.map((cat) => {
@@ -128,14 +128,14 @@ export const VaultView: React.FC<VaultViewProps> = ({
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-full whitespace-nowrap text-xs transition-all cursor-pointer font-medium ${
+                className={`px-3 py-1.5 rounded-full whitespace-nowrap text-xs transition-all cursor-pointer font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
                   isSelected
-                    ? 'bg-[#C5A880] text-neutral-950 font-semibold shadow-sm'
-                    : 'bg-[#121318] text-neutral-400 hover:text-white border border-white/5 hover:border-white/10'
+                    ? 'bg-white text-neutral-950 font-semibold shadow-sm'
+                    : 'bg-[#121214] text-zinc-400 hover:text-white hover:bg-white/10 border border-white/10'
                 }`}
               >
                 <span>{cat}</span>
-                <span className={`ml-1.5 text-[10px] ${isSelected ? 'text-neutral-900/80 font-bold' : 'text-neutral-500'}`}>
+                <span className={`ml-1.5 text-[10px] tabular-nums ${isSelected ? 'text-neutral-900/80 font-bold' : 'text-zinc-500'}`}>
                   {count}
                 </span>
               </button>
@@ -146,7 +146,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
         {/* Right: View Mode Toggles + Single Primary Accent Button */}
         <div className="flex items-center gap-2.5 shrink-0 self-end lg:self-auto">
           {/* View Mode Toggle */}
-          <div className="flex items-center p-1 bg-[#121318] rounded-xl border border-white/10 text-xs">
+          <div className="flex items-center p-1 bg-[#121214] rounded-xl border border-zinc-800/80 text-xs">
             <button
               onClick={() => setViewMode('cards')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors cursor-pointer ${
@@ -176,7 +176,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
           {/* Primary Action Button: Photo Archive & Card Creation */}
           <button
             onClick={onOpenScan}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C5A880] hover:bg-[#d6b991] active:bg-[#b59870] text-neutral-950 text-xs font-bold transition-all shadow-md cursor-pointer active:scale-95 shrink-0"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-neutral-200 active:bg-neutral-300 text-neutral-950 text-xs font-bold transition-all shadow-md cursor-pointer active:scale-95 shrink-0"
           >
             <Camera className="w-3.5 h-3.5" />
             <span>+ 실물 사진 보관 및 등록</span>
@@ -191,7 +191,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
           <p className="text-xs text-neutral-500">실물 명함 사진을 보관하거나 새로운 명함을 등록해 보세요.</p>
           <button
             onClick={onOpenScan}
-            className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C5A880] text-black text-xs font-bold hover:bg-[#d6b991] transition-colors cursor-pointer"
+            className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-black text-xs font-bold hover:bg-neutral-200 transition-colors cursor-pointer"
           >
             <Camera className="w-3.5 h-3.5" />
             <span>실물 사진 보관하기</span>
@@ -206,35 +206,39 @@ export const VaultView: React.FC<VaultViewProps> = ({
             return (
               <div
                 key={card.id}
-                className="group relative rounded-2xl bg-neutral-900/80 border border-neutral-800/80 hover:border-neutral-700 overflow-hidden shadow-xl transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
+                className="group relative rounded-2xl bg-[#121214] border border-zinc-800/80 hover:border-white/20 overflow-hidden shadow-xl transition-all duration-200 flex flex-col justify-between hover:-translate-y-0.5"
               >
                 {/* Card Header Info */}
-                <div className="p-3.5 sm:p-4 border-b border-neutral-800/60 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-800 text-neutral-300 border border-neutral-700/60">
+                <div className="p-3.5 sm:p-4 border-b border-zinc-800/80 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                    <span className="font-medium text-zinc-300">
                       {card.category}
                     </span>
                     {card.isMyCard && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                        내 명함
-                      </span>
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span className="font-semibold text-white">내 명함</span>
+                      </>
                     )}
                     {hasPhoto && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPhotoArchiveCard(card);
-                        }}
-                        className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#C5A880]/15 text-[#C5A880] border border-[#C5A880]/30 hover:bg-[#C5A880]/25 transition-colors cursor-pointer flex items-center gap-1"
-                        title="클릭하여 실물 명함 원본 사진 열람"
-                      >
-                        <Camera className="w-3 h-3" />
-                        <span>사진 보관</span>
-                      </button>
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPhotoArchiveCard(card);
+                          }}
+                          className="font-medium text-zinc-300 hover:text-white transition-colors cursor-pointer inline-flex items-center gap-1 underline-offset-2 hover:underline"
+                          title="클릭하여 실물 명함 원본 사진 열람"
+                        >
+                          <Camera className="w-3 h-3" />
+                          <span>사진 보관</span>
+                        </button>
+                      </>
                     )}
                   </div>
-                  <span className="text-[10px] font-mono text-neutral-400">
+                  <span className="text-[10px] font-mono tabular-nums text-zinc-500">
                     {card.createdAt}
                   </span>
                 </div>
@@ -277,20 +281,20 @@ export const VaultView: React.FC<VaultViewProps> = ({
                 </div>
 
                 {/* Action Rail Footer */}
-                <div className="p-3 border-t border-neutral-800/60 bg-neutral-950/40 flex items-center justify-between text-neutral-400">
+                <div className="p-3 border-t border-zinc-800/80 bg-[#0A0A0B] flex items-center justify-between text-zinc-400">
                   <div className="flex items-center gap-1">
                     {card.data.phoneRaw && (
                       <>
                         <a
                           href={`tel:${card.data.phoneRaw}`}
-                          className="p-1.5 rounded-lg text-emerald-400 hover:text-white hover:bg-neutral-800 transition-colors"
+                          className="p-1.5 rounded-lg text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
                           title="전화 통화 걸기"
                         >
                           <Phone className="w-3.5 h-3.5" />
                         </a>
                         <a
                           href={`sms:${card.data.phoneRaw}`}
-                          className="p-1.5 rounded-lg text-sky-400 hover:text-white hover:bg-neutral-800 transition-colors"
+                          className="p-1.5 rounded-lg text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
                           title="문자 보내기"
                         >
                           <MessageSquare className="w-3.5 h-3.5" />
@@ -300,7 +304,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
                     {card.data.email && (
                       <a
                         href={`mailto:${card.data.email}`}
-                        className="p-1.5 rounded-lg hover:text-white hover:bg-neutral-800 transition-colors"
+                        className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors"
                         title="이메일 발송"
                       >
                         <Mail className="w-3.5 h-3.5" />
@@ -311,7 +315,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
                         href={card.data.website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 rounded-lg hover:text-white hover:bg-neutral-800 transition-colors"
+                        className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors"
                         title="공식 웹사이트"
                       >
                         <Globe className="w-3.5 h-3.5" />
@@ -319,7 +323,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
                     )}
                     <button
                       onClick={() => downloadVCard(card.data)}
-                      className="p-1.5 rounded-lg hover:text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                       title="주소록 저장 (.vcf)"
                     >
                       <UserPlus className="w-3.5 h-3.5" />
@@ -331,7 +335,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
                     {hasPhoto && (
                       <button
                         onClick={() => setPhotoArchiveCard(card)}
-                        className="p-1.5 rounded-lg text-[#C5A880] hover:bg-neutral-800 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-zinc-200 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                         title="실물 명함 원본 사진 보기"
                       >
                         <Camera className="w-3.5 h-3.5" />
@@ -340,7 +344,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
                     {/* HTML Export */}
                     <button
                       onClick={() => onExportCard(card)}
-                      className="p-1.5 rounded-lg hover:text-amber-400 hover:bg-neutral-800 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                       title="독립형 HTML 코드 내보내기"
                     >
                       <Download className="w-3.5 h-3.5" />
@@ -348,7 +352,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
                     {/* Edit */}
                     <button
                       onClick={() => onEditCard(card)}
-                      className="p-1.5 rounded-lg hover:text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                       title="명함 정보 및 레이아웃 수정"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
@@ -357,7 +361,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
                     {!card.isMyCard && (
                       <button
                         onClick={() => onDeleteCard(card.id)}
-                        className="p-1.5 rounded-lg hover:text-rose-400 hover:bg-neutral-800 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                         title="명함 삭제"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -372,11 +376,11 @@ export const VaultView: React.FC<VaultViewProps> = ({
         </div>
       ) : (
         /* ================= EDITORIAL LIST VIEW ================= */
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 overflow-hidden shadow-xl">
+        <div className="rounded-2xl border border-zinc-800/80 bg-[#121214] overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-neutral-800 bg-neutral-950/80 text-neutral-400 font-mono text-[10px] uppercase tracking-wider">
+                <tr className="border-b border-zinc-800/80 bg-[#0A0A0B] text-zinc-400 font-mono text-[10px] uppercase tracking-wider">
                   <th className="py-3 px-4">성명</th>
                   <th className="py-3 px-4">직함</th>
                   <th className="py-3 px-4">소속 회사/기관</th>
@@ -386,33 +390,31 @@ export const VaultView: React.FC<VaultViewProps> = ({
                   <th className="py-3 px-4 text-right">액션</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-800/60 text-neutral-300">
+              <tbody className="divide-y divide-zinc-800/80 text-neutral-300">
                 {filteredCards.map((card) => (
                   <tr 
                     key={card.id} 
-                    className="hover:bg-neutral-800/30 transition-colors cursor-pointer group"
+                    className="hover:bg-white/[0.04] transition-colors cursor-pointer group"
                     onClick={() => onSelectCard(card)}
                   >
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-white group-hover:underline underline-offset-2">{card.data.name}</span>
                         {card.isMyCard && (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                            내 명함
+                          <span className="text-[10px] text-zinc-400 font-medium">
+                            · 내 명함
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 text-neutral-400">
+                    <td className="py-3.5 px-4 text-zinc-400">
                       {card.data.titleKr || card.data.title}
                     </td>
-                    <td className="py-3.5 px-4 text-neutral-300">
+                    <td className="py-3.5 px-4 text-zinc-300">
                       {card.data.organization}
                     </td>
-                    <td className="py-3.5 px-4">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-800 text-neutral-300 border border-neutral-700/60">
-                        {card.category}
-                      </span>
+                    <td className="py-3.5 px-4 text-zinc-400 text-[11px]">
+                      {card.category}
                     </td>
                     <td className="py-3.5 px-4">
                       {card.scannedImage ? (
@@ -422,30 +424,30 @@ export const VaultView: React.FC<VaultViewProps> = ({
                             e.stopPropagation();
                             setPhotoArchiveCard(card);
                           }}
-                          className="flex items-center gap-1 text-[10px] text-[#C5A880] hover:underline"
+                          className="flex items-center gap-1 text-[10px] text-zinc-200 hover:text-white hover:underline cursor-pointer"
                         >
                           <Camera className="w-3 h-3" />
                           <span>사진 보기</span>
                         </button>
                       ) : (
-                        <span className="text-[10px] text-neutral-600">-</span>
+                        <span className="text-[10px] text-zinc-600">-</span>
                       )}
                     </td>
-                    <td className="py-3.5 px-4 text-neutral-400 font-mono text-[11px]">
+                    <td className="py-3.5 px-4 text-zinc-400 font-mono tabular-nums text-[11px]">
                       {card.data.phone || card.data.email || '-'}
                     </td>
                     <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center justify-end gap-1 text-neutral-400">
+                      <div className="flex items-center justify-end gap-1 text-zinc-400">
                         <button
                           onClick={() => downloadVCard(card.data)}
-                          className="p-1.5 rounded-lg hover:text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                           title="vCard 다운로드"
                         >
                           <UserPlus className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => onEditCard(card)}
-                          className="p-1.5 rounded-lg hover:text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                           title="수정"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -453,7 +455,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
                         {!card.isMyCard && (
                           <button
                             onClick={() => onDeleteCard(card.id)}
-                            className="p-1.5 rounded-lg hover:text-rose-400 hover:bg-neutral-800 transition-colors cursor-pointer"
+                            className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                             title="삭제"
                           >
                             <Trash2 className="w-3.5 h-3.5" />

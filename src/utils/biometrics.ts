@@ -43,10 +43,19 @@ export function isIframe(): boolean {
  * Checks whether Permissions Policy restricts WebAuthn (publickey-credentials-*).
  * In cross-origin iframes (like AI Studio preview), WebAuthn is restricted by default.
  */
+interface FeaturePolicyLike {
+  allowsFeature?: (feature: string) => boolean;
+}
+
+interface DocumentWithPolicy extends Document {
+  permissionsPolicy?: FeaturePolicyLike;
+  featurePolicy?: FeaturePolicyLike;
+}
+
 export function isPermissionsPolicyRestricted(): boolean {
   if (typeof window === 'undefined') return false;
   try {
-    const doc = document as any;
+    const doc = document as DocumentWithPolicy;
     if (doc.permissionsPolicy && typeof doc.permissionsPolicy.allowsFeature === 'function') {
       if (!doc.permissionsPolicy.allowsFeature('publickey-credentials-create')) {
         return true;
@@ -260,7 +269,7 @@ export async function registerBiometric(): Promise<{ success: boolean; error?: s
       }
 
       return { success: true };
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.warn('Local credential setup notice:', err);
       return { success: false, error: '보안 크레덴셜 생성 중 오류가 발생했습니다.' };
     }
@@ -319,14 +328,15 @@ export async function registerBiometric(): Promise<{ success: boolean; error?: s
     }
 
     return { success: true };
-  } catch (err: any) {
-    const errorMsg = String(err?.message || '');
+  } catch (err: unknown) {
+    const errName = err instanceof DOMException || err instanceof Error ? err.name : '';
+    const errorMsg = err instanceof Error ? err.message : '';
 
     // Seamless fallback if Permissions Policy restriction is encountered at runtime
     if (
-      err.name === 'SecurityError' || 
+      errName === 'SecurityError' || 
       errorMsg.includes('publickey-credentials-create') || 
-      (err.name === 'NotAllowedError' && errorMsg.includes('Permissions Policy'))
+      (errName === 'NotAllowedError' && errorMsg.includes('Permissions Policy'))
     ) {
       try {
         const randomId = new Uint8Array(32);
@@ -347,12 +357,12 @@ export async function registerBiometric(): Promise<{ success: boolean; error?: s
       }
     }
 
-    if (err.name === 'NotAllowedError') {
+    if (errName === 'NotAllowedError') {
       return { success: false, error: '사용자가 인증을 취소했거나 권한이 거부되었습니다.' };
     }
 
     console.warn('Biometric registration notice:', err);
-    return { success: false, error: err.message || '생체 인증 등록 중 오류가 발생했습니다.' };
+    return { success: false, error: errorMsg || '생체 인증 등록 중 오류가 발생했습니다.' };
   }
 }
 
@@ -437,22 +447,23 @@ export async function verifyBiometric(): Promise<{
     }
 
     return { success: false, error: '인증에 실패했습니다.' };
-  } catch (err: any) {
-    const errorMsg = String(err?.message || '');
+  } catch (err: unknown) {
+    const errName = err instanceof DOMException || err instanceof Error ? err.name : '';
+    const errorMsg = err instanceof Error ? err.message : '';
     if (
-      err.name === 'SecurityError' || 
+      errName === 'SecurityError' || 
       errorMsg.includes('publickey-credentials-get') || 
-      (err.name === 'NotAllowedError' && errorMsg.includes('Permissions Policy'))
+      (errName === 'NotAllowedError' && errorMsg.includes('Permissions Policy'))
     ) {
       await unlockVaultOnSuccess();
       return { success: true };
     }
 
     console.warn('Biometric verification notice:', err);
-    if (err.name === 'NotAllowedError') {
+    if (errName === 'NotAllowedError') {
       return { success: false, error: '생체 인증이 취소되었습니다.' };
     }
-    return { success: false, error: err.message || '생체 인증 실패' };
+    return { success: false, error: errorMsg || '생체 인증 실패' };
   }
 }
 

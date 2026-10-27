@@ -14,6 +14,7 @@ import { LazyPinSetupModal } from './LazyPinSetupModal';
 import { LegalModal } from './LegalModal';
 import { ResetDataModal } from './ResetDataModal';
 import { loadUserCards } from '../utils/initialCards';
+import { getCardShareUrl } from '../utils/domain';
 
 export interface AppModalsProps {
   modals: ModalManager;
@@ -62,6 +63,7 @@ export const AppModals: React.FC<AppModalsProps> = ({
             isOpen={modals.isShareOpen}
             onClose={modals.closeShare}
             data={activeCard.data}
+            cardUrl={getCardShareUrl(activeCard)}
             onOpenPrint={modals.openPrint}
             onOpenExport={modals.openExport}
           />
@@ -85,6 +87,7 @@ export const AppModals: React.FC<AppModalsProps> = ({
             onClose={modals.closeExport}
             card={activeCard.data}
             theme={activeCard.theme}
+            slug={activeCard.slug}
           />
         </>
       )}

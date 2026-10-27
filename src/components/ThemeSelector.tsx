@@ -17,15 +17,15 @@ export const THEMES: {
   isCurated?: boolean;
 }[] = [
   // Curated Luxury Material Themes
-  { id: 'pure_white', label: '럭셔리 퓨어 화이트 (Pure White)', shortLabel: '화이트', previewClass: 'bg-[#FFFFFF] border-neutral-300', dotColor: '#FFFFFF', accent: '#000000', isCurated: true },
-  { id: 'sumi_ink', label: '수묵 인크 (Sumi Ink)', shortLabel: '수묵', previewClass: 'bg-[#0B0C10] border-[#33312B]', dotColor: '#0B0C10', accent: '#C5A880', isCurated: true },
-  { id: 'warm_paper', label: '웜 페이퍼 (Fine Paper)', shortLabel: '웜 페이퍼', previewClass: 'bg-[#F8F4EB] border-[#D8D0C0]', dotColor: '#F8F4EB', accent: '#111111', isCurated: true },
-  { id: 'deep_forest', label: '딥 포레스트 (Emerald)', shortLabel: '에메랄드', previewClass: 'bg-[#0D1F18] border-[#1C362A]', dotColor: '#0D1F18', accent: '#C2A478', isCurated: true },
-  { id: 'classic_navy', label: '클래식 네이비 (Midnight)', shortLabel: '네이비', previewClass: 'bg-[#0A1128] border-[#1E2C52]', dotColor: '#0A1128', accent: '#D0D9E8', isCurated: true },
+  { id: 'pure_white', label: '매트 페이퍼 화이트 (Matte White)', shortLabel: '매트 화이트', previewClass: 'bg-[#FAFAFA] border-black/10', dotColor: '#FAFAFA', accent: '#0A0A0B', isCurated: true },
+  { id: 'sumi_ink', label: '수묵 블랙 (Sumi Black)', shortLabel: '수묵 블랙', previewClass: 'bg-[#0A0A0B] border-white/15', dotColor: '#0A0A0B', accent: '#FAFAFA', isCurated: true },
+  { id: 'warm_paper', label: '파인 코튼 (Fine Cotton)', shortLabel: '파인 코튼', previewClass: 'bg-[#F5F5F4] border-black/10', dotColor: '#F5F5F4', accent: '#121214', isCurated: true },
+  { id: 'deep_forest', label: '딥 포레스트 (Forest)', shortLabel: '포레스트', previewClass: 'bg-[#0D1914] border-white/15', dotColor: '#0D1914', accent: '#E4E4E7', isCurated: true },
+  { id: 'classic_navy', label: '클래식 네이비 (Midnight)', shortLabel: '네이비', previewClass: 'bg-[#0B101B] border-white/15', dotColor: '#0B101B', accent: '#E4E4E7', isCurated: true },
   // Classic Archivist Options
-  { id: 'obsidian', label: '옵시디언 블랙', shortLabel: '블랙', previewClass: 'bg-[#0c0c0d] border-neutral-700', dotColor: '#0c0c0d', accent: '#C5A880' },
-  { id: 'sand', label: '샌드 캐시미어', shortLabel: '샌드', previewClass: 'bg-[#f6f3ec] border-[#dfd8cb]', dotColor: '#f6f3ec', accent: '#544b40' },
-  { id: 'titanium', label: '티타늄 그레이', shortLabel: '티타늄', previewClass: 'bg-[#18181b] border-zinc-600', dotColor: '#18181b', accent: '#A1A1AA' },
+  { id: 'obsidian', label: '옵시디언 차콜', shortLabel: '차콜', previewClass: 'bg-[#121214] border-zinc-700', dotColor: '#121214', accent: '#FAFAFA' },
+  { id: 'sand', label: '스톤 뉴트럴', shortLabel: '스톤', previewClass: 'bg-[#F5F5F4] border-zinc-300', dotColor: '#F5F5F4', accent: '#27272A' },
+  { id: 'titanium', label: '티타늄 그레이', shortLabel: '티타늄', previewClass: 'bg-[#18181B] border-zinc-600', dotColor: '#18181B', accent: '#A1A1AA' },
 ];
 
 export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
@@ -54,7 +54,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
       {/* Refined Luxury Trigger Button */}
       <button
         onClick={() => setIsOpen(prev => !prev)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#121318] hover:bg-[#181920] border border-white/10 text-neutral-200 transition-all text-xs font-medium cursor-pointer shadow-sm active:scale-95"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#121214] hover:bg-white/10 border border-white/10 text-neutral-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 transition-all text-xs font-medium cursor-pointer shadow-sm active:scale-95 whitespace-nowrap"
         title="명함 피니시 및 재질 테마 선택"
         aria-expanded={isOpen}
       >
@@ -62,7 +62,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
           className="w-2.5 h-2.5 rounded-full ring-1 ring-white/20 shrink-0"
           style={{ backgroundColor: activeTheme.dotColor }}
         />
-        <span className="text-[11px] font-sans tracking-tight text-neutral-300">
+        <span className="text-[11px] font-sans tracking-tight text-zinc-300">
           {activeTheme.label}
         </span>
         <ChevronDown className={`w-3 h-3 text-neutral-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -70,16 +70,16 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
 
       {/* Floating Bespoke Palette Popover */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 p-2 rounded-2xl bg-[#121318]/95 backdrop-blur-xl border border-white/10 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
-          <div className="px-2 py-1 mb-1.5 border-b border-white/5 flex items-center justify-between">
-            <p className="text-[10px] font-mono tracking-widest text-[#C5A880] uppercase">
+        <div className="absolute right-0 mt-2 w-64 p-2 rounded-2xl bg-[#121214]/95 backdrop-blur-xl border border-white/10 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150">
+          <div className="px-2 py-1 mb-1.5 border-b border-zinc-800/80 flex items-center justify-between">
+            <p className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase">
               Curated Material Palettes
             </p>
           </div>
           
           <div className="space-y-0.5 max-h-72 overflow-y-auto no-scrollbar">
-            <div className="px-2 py-1 text-[9px] text-neutral-400 font-semibold uppercase tracking-wider">
-              프리미엄 럭셔리 팔레트
+            <div className="px-2 py-1 text-[9px] text-neutral-500 font-semibold uppercase tracking-wider">
+              프리미엄 모노크롬 팔레트
             </div>
             {THEMES.filter(t => t.isCurated).map((t) => {
               const isSelected = t.id === currentTheme;
@@ -93,26 +93,26 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
                   className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs transition-colors cursor-pointer text-left ${
                     isSelected 
                       ? 'bg-white/10 text-white font-medium' 
-                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5'
+                      : 'text-zinc-400 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <span 
-                      className={`w-4 h-4 rounded-full border border-white/20 shadow-xs shrink-0 ${t.previewClass}`} 
+                      className={`w-4 h-4 rounded-full border shadow-xs shrink-0 ${t.previewClass}`} 
                     />
                     <div className="leading-tight">
                       <span className="text-xs text-white block">{t.label}</span>
-                      <span className="text-[9px] text-neutral-400 block" style={{ color: t.accent }}>
-                        Accent • {t.accent}
+                      <span className="text-[9px] text-neutral-500 font-mono block">
+                        Accent · {t.accent}
                       </span>
                     </div>
                   </div>
-                  {isSelected && <Check className="w-3.5 h-3.5 text-[#C5A880]" />}
+                  {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
                 </button>
               );
             })}
 
-            <div className="px-2 pt-2.5 pb-1 text-[9px] text-neutral-400 font-semibold uppercase tracking-wider border-t border-white/5 mt-1">
+            <div className="px-2 pt-2.5 pb-1 text-[9px] text-neutral-500 font-semibold uppercase tracking-wider border-t border-zinc-800/80 mt-1">
               아카이브 클래식
             </div>
             {THEMES.filter(t => !t.isCurated).map((t) => {
@@ -127,16 +127,16 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
                   className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs transition-colors cursor-pointer text-left ${
                     isSelected 
                       ? 'bg-white/10 text-white font-medium' 
-                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5'
+                      : 'text-zinc-400 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <span 
-                      className={`w-3.5 h-3.5 rounded-full border border-neutral-700/60 shadow-xs shrink-0 ${t.previewClass}`} 
+                      className={`w-3.5 h-3.5 rounded-full border shadow-xs shrink-0 ${t.previewClass}`} 
                     />
-                    <span className="text-xs text-neutral-300">{t.label}</span>
+                    <span className="text-xs text-zinc-300">{t.label}</span>
                   </div>
-                  {isSelected && <Check className="w-3.5 h-3.5 text-neutral-300" />}
+                  {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
                 </button>
               );
             })}

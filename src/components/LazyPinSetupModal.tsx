@@ -17,7 +17,7 @@ export const LazyPinSetupModal: React.FC<LazyPinSetupModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
       <div 
-        className="w-full max-w-md rounded-2xl bg-[#16181D] border border-[#C5A880]/30 shadow-2xl p-6 sm:p-7 relative flex flex-col items-center text-center animate-in zoom-in-95 duration-200"
+        className="w-full max-w-md rounded-2xl bg-[#121214] border border-white/10 shadow-2xl p-6 sm:p-7 relative flex flex-col items-center text-center animate-in zoom-in-95 duration-200"
         role="dialog"
         aria-modal="true"
         aria-labelledby="lazy-pin-title"
@@ -32,8 +32,8 @@ export const LazyPinSetupModal: React.FC<LazyPinSetupModalProps> = ({
         </button>
 
         {/* Security Icon Badge */}
-        <div className="w-14 h-14 rounded-2xl bg-[#C5A880]/15 border border-[#C5A880]/40 flex items-center justify-center text-[#C5A880] mb-4 shadow-lg shadow-[#C5A880]/10">
-          <Lock className="w-7 h-7 text-[#C5A880]" />
+        <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white mb-4 shadow-lg shadow-black/40">
+          <Lock className="w-7 h-7 text-white" />
         </div>
 
         {/* Title */}
@@ -42,7 +42,7 @@ export const LazyPinSetupModal: React.FC<LazyPinSetupModalProps> = ({
         </h3>
 
         {/* Subtitle */}
-        <p className="text-xs text-[#C5A880] font-medium mt-1">
+        <p className="text-xs text-zinc-400 font-medium mt-1">
           첫 번째 명함이 기기 로컬 저장소에 안전하게 등록되었습니다.
         </p>
 
@@ -52,7 +52,7 @@ export const LazyPinSetupModal: React.FC<LazyPinSetupModalProps> = ({
         </p>
 
         <div className="w-full mt-4 p-3 rounded-xl bg-black/40 border border-white/5 text-left flex items-start gap-2.5">
-          <ShieldCheck className="w-4 h-4 text-[#C5A880] shrink-0 mt-0.5" />
+          <ShieldCheck className="w-4 h-4 text-zinc-300 shrink-0 mt-0.5" />
           <p className="text-[11px] text-neutral-400 leading-snug">
             PIN 번호는 서버에 저장되지 않고 단말기 내 브라우저에서 안전한 SHA-256 해시로만 검증됩니다. 상단 설정 메뉴에서 언제든 변경할 수 있습니다.
           </p>
@@ -62,7 +62,7 @@ export const LazyPinSetupModal: React.FC<LazyPinSetupModalProps> = ({
         <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full mt-6">
           <button
             onClick={onProceedSetup}
-            className="w-full sm:flex-1 py-2.5 px-4 rounded-xl bg-[#C5A880] hover:bg-[#D6B991] text-neutral-950 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-[#C5A880]/20 active:scale-95 whitespace-nowrap"
+            className="w-full sm:flex-1 py-2.5 px-4 rounded-xl bg-white hover:bg-zinc-200 text-neutral-950 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg active:scale-95 whitespace-nowrap"
           >
             <span>4자리 PIN 설정하기</span>
             <ArrowRight className="w-3.5 h-3.5" />

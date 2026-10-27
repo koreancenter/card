@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { GoogleGenAI } from '@google/genai';
 import { INITIAL_CARDS } from './src/utils/initialCards';
+import { StoredCard } from './src/types/card';
 
 dotenv.config();
 
@@ -13,8 +14,8 @@ const port = 3000;
 app.use(express.json({ limit: '25mb' }));
 
 // In-memory sync wallet store for local-first peer synchronization
-const syncStore: Record<string, any[]> = {};
-const cardStore: Record<string, any> = {};
+const syncStore: Record<string, StoredCard[]> = {};
+const cardStore: Record<string, StoredCard> = {};
 
 // Pre-seed sample cards into cardStore for instant public URL resolution
 INITIAL_CARDS.forEach(card => {
@@ -137,12 +138,12 @@ app.post('/api/generate-card-html', async (req, res) => {
 Generate a modern, ultra-high-end digital business card front in Tailwind CSS HTML.
 Requirements:
 1. The root element must be a single <div class="w-full h-full ..."> filling 100% of the parent container with aspect ratio 90:50 (horizontal) or 50:80 (vertical).
-2. Use sophisticated color palettes: sumi ink (#0B0C10), ivory (#F8F4EB), champagne brass (#C5A880), deep forest emerald (#0D1F18), or classic navy (#0A1128).
-3. Use fine borders (border border-white/10), clean typography hierarchy, and subtle micro-details (e.g. initials badge, metadata labels).
+2. Use a strict Luxury Black & White monochrome palette: obsidian black (#0A0A0B), elevated matte charcoal (#121214), or warm matte paper (#FAFAFA) with crisp neutral typography (#FAFAFA, #A1A1AA, #18181B). Never use warm gold, bronze, or burgundy accents.
+3. Use hairline borders (border border-white/10 on dark or border border-black/5 on light), clean typography hierarchy, and subtle monochrome micro-details.
 4. Do NOT output markdown code fences (\`\`\`html or \`\`\`), doctype, html, head, or body tags. Output ONLY the raw HTML string for the card div.`;
 
-    const userPrompt = `Create an ultra-luxury digital business card front HTML with Tailwind CSS.
-Prompt / Style Request: ${prompt || '미니멀 샴페인 골드 & 매트 차콜 최고경영자 명함'}
+    const userPrompt = `Create an ultra-luxury monochrome digital business card front HTML with Tailwind CSS.
+Prompt / Style Request: ${prompt || '미니멀 럭셔리 블랙 & 화이트 최고경영자 명함'}
 Card Details:
 - Name: ${profileData?.name || 'PARK, GIHONG'}
 - Company: ${profileData?.company || profileData?.organizationKr || 'GOGUMA AI STUDIO'}
@@ -165,9 +166,10 @@ Card Details:
     html = html.replace(/^```html\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
 
     return res.json({ success: true, html });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Gemini card HTML generation error:', error);
-    return res.status(500).json({ success: false, error: error.message || 'Generation failed' });
+    const message = error instanceof Error ? error.message : 'Generation failed';
+    return res.status(500).json({ success: false, error: message });
   }
 });
 

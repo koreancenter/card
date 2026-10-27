@@ -1,71 +1,7 @@
-import { CardLayoutType, ThemePreset, CardTheme, CardFeatures } from '../types/card';
-
-export interface LayoutPresetDefinition {
-  id: CardLayoutType;
-  name: string;
-  nameEn: string;
-  description: string;
-  recommendedFor: string;
-  defaultOrientation: 'landscape' | 'portrait';
-  aspectRatio: string;
-  iconType: string;
-}
-
-export const LAYOUT_PRESETS: LayoutPresetDefinition[] = [
-  {
-    id: 'editorial_minimal',
-    name: '에디토리얼 미니멀',
-    nameEn: 'Editorial Minimal',
-    description: '비대칭 2단 그리드와 국·영문 듀얼 타이포그래피. 정제된 레이아웃의 정석.',
-    recommendedFor: '재단, 국제 네트워크, 고위 공직, 외교',
-    defaultOrientation: 'landscape',
-    aspectRatio: '9 / 5',
-    iconType: 'grid-asymmetric'
-  },
-  {
-    id: 'monogram_executive',
-    name: '모노그램 익제큐티브',
-    nameEn: 'Monogram Executive',
-    description: '상단 중앙 우아한 모노그램 엠블럼과 품격 있는 세리프 서체.',
-    recommendedFor: 'C-Level, 사모펀드 파트너, 프라이빗 뱅커, 로펌',
-    defaultOrientation: 'landscape',
-    aspectRatio: '9 / 5',
-    iconType: 'shield-monogram'
-  },
-  {
-    id: 'warm_organic',
-    name: '웜 오가닉',
-    nameEn: 'Warm Organic',
-    description: '부드러운 한지/파인아트 코튼 질감과 여백의 미학을 극대화한 클래식 비례.',
-    recommendedFor: '헤리티지 문화재단, 작가, 학술 석학, 갤러리스트',
-    defaultOrientation: 'landscape',
-    aspectRatio: '9 / 5',
-    iconType: 'organic-leaf'
-  },
-  {
-    id: 'swiss_typo_bold',
-    name: '스위스 볼드 타이포',
-    nameEn: 'Swiss Typo Bold',
-    description: '모던 그로테스크 산세리프, 대담한 성명 프레즌스와 정확한 모듈 그리드.',
-    recommendedFor: '테크 파운더, 글로벌 벤처, 디자인 아키텍트',
-    defaultOrientation: 'landscape',
-    aspectRatio: '9 / 5',
-    iconType: 'swiss-bold'
-  },
-  {
-    id: 'vertical_atelier',
-    name: '버티컬 아틀리에',
-    nameEn: 'Vertical Atelier',
-    description: '5:8 세로 비율의 건축적 절제미와 정교한 마이크로 메타데이터.',
-    recommendedFor: '건축가, 크리에이티브 디렉터, 수석 컨설턴트, 아티스트',
-    defaultOrientation: 'portrait',
-    aspectRatio: '5 / 8',
-    iconType: 'vertical-ratio'
-  }
-];
+import { CardTheme, CardFeatures, CardLayoutType } from '../types/card';
 
 export interface ThemePresetDefinition {
-  id: ThemePreset;
+  id: CardTheme;
   name: string;
   nameEn: string;
   description: string;
@@ -83,95 +19,135 @@ export interface ThemePresetDefinition {
   isLight: boolean;
 }
 
+export interface LayoutPresetDefinition {
+  id: CardLayoutType;
+  name: string;
+  aspectRatio: string;
+  description: string;
+}
+
+export const LAYOUT_PRESETS: LayoutPresetDefinition[] = [
+  {
+    id: 'editorial_minimal',
+    name: '에디토리얼 미니멀',
+    aspectRatio: '9:5',
+    description: '비대칭 2단 그리드와 국·영문 조화가 돋보이는 건축적 미니멀 레이아웃'
+  },
+  {
+    id: 'monogram_executive',
+    name: '모노그램 이그제큐티브',
+    aspectRatio: '9:5',
+    description: '상단 중앙 실(Seal) 모노그램과 클래식 세리프 중심의 임원용 대칭 구도'
+  },
+  {
+    id: 'vertical_atelier',
+    name: '버티컬 아틀리에',
+    aspectRatio: '5:8',
+    description: '건축가·디렉터·크리에이터를 위한 절제된 수직형 아틀리에 포맷'
+  },
+  {
+    id: 'swiss_typo_bold',
+    name: '스위스 타이포 볼드',
+    aspectRatio: '9:5',
+    description: '고대비 그로테스크 서체와 정교한 마이크로 그리드의 모더니즘 레이아웃'
+  },
+  {
+    id: 'warm_organic',
+    name: '매트 오가닉 페이퍼',
+    aspectRatio: '9:5',
+    description: '여백의 미와 매트 파인아트 지류 감성을 극대화한 정제된 밸런스'
+  }
+];
+
 export const LUXURY_THEME_PRESETS: ThemePresetDefinition[] = [
   {
     id: 'pure_white',
-    name: '럭셔리 퓨어 화이트 (Pure White)',
-    nameEn: 'Luxury Pure White & Monochrome Black',
-    description: '순백 프리미엄 캔버스(#FFFFFF)와 깊이 있는 블랙 텍스트, 모노크롬 정밀 디테일',
-    canvasBg: 'bg-[#FFFFFF]',
-    textPrimary: 'text-[#111111]',
-    textSecondary: 'text-[#4A4A4A]',
-    textMuted: 'text-[#737373]',
-    accent: '#000000',
-    accentName: '모노크롬 블랙 (#000000)',
-    borderClass: 'border-[#E5E5E5]',
-    hairlineClass: 'border-[#E5E5E5]',
-    hoverHighlight: 'hover:bg-[#F5F5F5]',
-    qrBg: 'bg-[#F5F5F5]',
-    dotColor: '#FFFFFF',
+    name: '매트 페이퍼 화이트 (Matte White)',
+    nameEn: 'Warm Matte Paper & Architectural Black',
+    description: '따뜻한 매트 페이퍼 표면(#FAFAFA)과 깊이 있는 블랙 활자, 섬세한 헤어라인 보더',
+    canvasBg: 'bg-[#FAFAFA]',
+    textPrimary: 'text-[#0A0A0B]',
+    textSecondary: 'text-zinc-600',
+    textMuted: 'text-neutral-500',
+    accent: '#0A0A0B',
+    accentName: '아키텍처럴 블랙 (#0A0A0B)',
+    borderClass: 'border-black/5',
+    hairlineClass: 'border-black/10',
+    hoverHighlight: 'hover:bg-black/5',
+    qrBg: 'bg-white',
+    dotColor: '#FAFAFA',
     isLight: true
   },
   {
     id: 'sumi_ink',
-    name: '수묵 인크 (Sumi Ink)',
-    nameEn: 'Sumi Ink & Champagne Brass',
-    description: '깊은 먹색 매트 캔버스(#0B0C10)와 웜 아이보리 텍스트, 샴페인 황동 액센트',
-    canvasBg: 'bg-[#0B0C10]',
-    textPrimary: 'text-[#F8F4EB]',
-    textSecondary: 'text-[#C5BEB3]',
-    textMuted: 'text-[#878072]',
-    accent: '#C5A880',
-    accentName: '샴페인 브라스 (#C5A880)',
-    borderClass: 'border-[#23242A]',
-    hairlineClass: 'border-[#23242A]/80',
-    hoverHighlight: 'hover:bg-[#1E1F26]',
-    qrBg: 'bg-[#15161D]',
-    dotColor: '#0B0C10',
+    name: '수묵 블랙 (Sumi Black)',
+    nameEn: 'Rich Carbon Black & Crisp White',
+    description: '깊은 카본 블랙 캔버스(#0A0A0B)와 매트 화이트 활자, 정제된 모노크롬 디테일',
+    canvasBg: 'bg-[#0A0A0B]',
+    textPrimary: 'text-[#FAFAFA]',
+    textSecondary: 'text-zinc-400',
+    textMuted: 'text-neutral-500',
+    accent: '#FAFAFA',
+    accentName: '매트 화이트 (#FAFAFA)',
+    borderClass: 'border-white/10',
+    hairlineClass: 'border-white/10',
+    hoverHighlight: 'hover:bg-white/10',
+    qrBg: 'bg-[#121214]',
+    dotColor: '#0A0A0B',
     isLight: false
   },
   {
     id: 'warm_paper',
-    name: '웜 페이퍼 (Warm Paper)',
-    nameEn: 'Fine Cotton Ivory & Monochrome',
-    description: '파인아트 코튼 아이보리(#F8F4EB)와 딥 차콜 텍스트, 럭셔리 모노크롬 액센트',
-    canvasBg: 'bg-[#F8F4EB]',
-    textPrimary: 'text-[#1F2023]',
-    textSecondary: 'text-[#4F4C47]',
-    textMuted: 'text-[#827D73]',
-    accent: '#111111',
-    accentName: '모노크롬 블랙 (#111111)',
-    borderClass: 'border-[#DFD7C7]',
-    hairlineClass: 'border-[#DFD7C7]/90',
-    hoverHighlight: 'hover:bg-[#ECE4D5]',
-    qrBg: 'bg-[#EFE8DC]',
-    dotColor: '#F8F4EB',
+    name: '파인 코튼 (Fine Cotton)',
+    nameEn: 'Soft Stone Paper & Deep Charcoal',
+    description: '차분한 코튼 스톤 지류(#F5F5F4)와 딥 차콜 활자, 모노크롬 블랙 액센트',
+    canvasBg: 'bg-[#F5F5F4]',
+    textPrimary: 'text-[#121214]',
+    textSecondary: 'text-zinc-600',
+    textMuted: 'text-neutral-500',
+    accent: '#121214',
+    accentName: '딥 차콜 (#121214)',
+    borderClass: 'border-black/5',
+    hairlineClass: 'border-black/10',
+    hoverHighlight: 'hover:bg-black/5',
+    qrBg: 'bg-[#FAFAFA]',
+    dotColor: '#F5F5F4',
     isLight: true
   },
   {
     id: 'deep_forest',
     name: '딥 포레스트 (Deep Forest)',
-    nameEn: 'Dark Forest Emerald & Antique Bronze',
-    description: '절제된 다크 에메랄드(#0D1F18)와 오프화이트 서체, 웜 앤틱 브론즈 디테일',
-    canvasBg: 'bg-[#0D1F18]',
-    textPrimary: 'text-[#F4F7F4]',
-    textSecondary: 'text-[#AEC2B4]',
-    textMuted: 'text-[#6F8776]',
-    accent: '#C2A478',
-    accentName: '앤틱 브론즈 (#C2A478)',
-    borderClass: 'border-[#1C362A]',
-    hairlineClass: 'border-[#1C362A]/80',
-    hoverHighlight: 'hover:bg-[#152B21]',
-    qrBg: 'bg-[#12261E]',
-    dotColor: '#0D1F18',
+    nameEn: 'Muted Obsidian Forest & Platinum',
+    description: '절제된 다크 포레스트(#0D1914)와 소프트 플래티넘 서체, 미니멀 실버 디테일',
+    canvasBg: 'bg-[#0D1914]',
+    textPrimary: 'text-[#FAFAFA]',
+    textSecondary: 'text-zinc-400',
+    textMuted: 'text-neutral-500',
+    accent: '#E4E4E7',
+    accentName: '소프트 플래티넘 (#E4E4E7)',
+    borderClass: 'border-white/10',
+    hairlineClass: 'border-white/10',
+    hoverHighlight: 'hover:bg-white/10',
+    qrBg: 'bg-[#121214]',
+    dotColor: '#0D1914',
     isLight: false
   },
   {
     id: 'classic_navy',
     name: '클래식 네이비 (Classic Navy)',
-    nameEn: 'Midnight Indigo & Platinum',
-    description: '미드나잇 인디고(#0A1128)와 실버화이트 활자, 플래티넘 림 힌트',
-    canvasBg: 'bg-[#0A1128]',
-    textPrimary: 'text-[#F0F4FC]',
-    textSecondary: 'text-[#A8BADB]',
-    textMuted: 'text-[#6277A2]',
-    accent: '#D0D9E8',
-    accentName: '플래티넘 실버 (#D0D9E8)',
-    borderClass: 'border-[#1E2C52]',
-    hairlineClass: 'border-[#1E2C52]/80',
-    hoverHighlight: 'hover:bg-[#131D3F]',
-    qrBg: 'bg-[#101938]',
-    dotColor: '#0A1128',
+    nameEn: 'Midnight Slate & Platinum',
+    description: '미드나잇 슬레이트(#0B101B)와 실버화이트 활자, 플래티넘 헤어라인',
+    canvasBg: 'bg-[#0B101B]',
+    textPrimary: 'text-[#FAFAFA]',
+    textSecondary: 'text-zinc-400',
+    textMuted: 'text-neutral-500',
+    accent: '#E4E4E7',
+    accentName: '플래티넘 실버 (#E4E4E7)',
+    borderClass: 'border-white/10',
+    hairlineClass: 'border-white/10',
+    hoverHighlight: 'hover:bg-white/10',
+    qrBg: 'bg-[#121214]',
+    dotColor: '#0B101B',
     isLight: false
   }
 ];
@@ -192,142 +168,123 @@ export interface ResolvedThemeStyle {
 }
 
 export function resolveThemeStyles(theme: CardTheme | undefined): ResolvedThemeStyle {
-  const t = theme || 'pure_white';
+  const t = (theme || 'pure_white') as string;
 
-  // Check luxury presets
-  if (t === 'pure_white' || t === 'burgundy') {
+  if (t === 'pure_white' || t === 'cotton') {
     return {
-      cardBg: 'bg-[#FFFFFF]',
-      border: 'border-[#E5E5E5] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.12),0_0_1px_1px_rgba(0,0,0,0.06)]',
-      textPrimary: 'text-[#111111]',
-      textSecondary: 'text-[#4A4A4A]',
-      textMuted: 'text-[#737373]',
-      accent: '#000000',
-      accentHairline: 'border-[#E5E5E5]',
-      tagline: 'text-[#111111]',
-      hoverHighlight: 'hover:bg-[#F5F5F5]',
-      sheen: 'from-black/[0.04] via-transparent to-transparent',
-      qrBg: 'bg-[#F5F5F5]',
+      cardBg: 'bg-[#FAFAFA]',
+      border: 'border-black/5 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.45),0_0_1px_1px_rgba(0,0,0,0.05)]',
+      textPrimary: 'text-[#0A0A0B]',
+      textSecondary: 'text-zinc-600',
+      textMuted: 'text-neutral-500',
+      accent: '#0A0A0B',
+      accentHairline: 'border-black/10',
+      tagline: 'text-[#0A0A0B]',
+      hoverHighlight: 'hover:bg-black/5',
+      sheen: 'from-black/[0.03] via-transparent to-transparent',
+      qrBg: 'bg-white',
       isLight: true
     };
   }
 
   if (t === 'sumi_ink') {
     return {
-      cardBg: 'bg-[#0B0C10]',
-      border: 'border-[#262420] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.85)]',
-      textPrimary: 'text-[#F8F4EB]',
-      textSecondary: 'text-[#C5BEB3]',
-      textMuted: 'text-[#878072]',
-      accent: '#C5A880',
-      accentHairline: 'border-[#262420]/80',
-      tagline: 'text-[#C5A880]',
-      hoverHighlight: 'hover:bg-[#1E1F26]',
-      sheen: 'from-amber-200/10 via-transparent to-transparent',
-      qrBg: 'bg-[#15161D]',
+      cardBg: 'bg-[#0A0A0B]',
+      border: 'border-white/10 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.85)]',
+      textPrimary: 'text-[#FAFAFA]',
+      textSecondary: 'text-zinc-400',
+      textMuted: 'text-neutral-500',
+      accent: '#FAFAFA',
+      accentHairline: 'border-white/10',
+      tagline: 'text-[#FAFAFA]',
+      hoverHighlight: 'hover:bg-white/10',
+      sheen: 'from-white/[0.04] via-transparent to-transparent',
+      qrBg: 'bg-[#121214]',
       isLight: false
     };
   }
 
-  if (t === 'warm_paper' || t === 'sand' || t === 'cotton') {
+  if (t === 'warm_paper' || t === 'sand') {
     return {
-      cardBg: 'bg-[#F8F4EB]',
-      border: 'border-[#DFD7C7] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.2),0_0_1px_1px_rgba(255,255,255,0.4)]',
-      textPrimary: 'text-[#1F2023]',
-      textSecondary: 'text-[#4F4C47]',
-      textMuted: 'text-[#827D73]',
-      accent: '#111111',
-      accentHairline: 'border-[#DFD7C7]',
-      tagline: 'text-[#1F2023]',
-      hoverHighlight: 'hover:bg-[#ECE4D5]',
-      sheen: 'from-white/70 via-transparent to-transparent',
-      qrBg: 'bg-[#EFE8DC]',
+      cardBg: 'bg-[#F5F5F4]',
+      border: 'border-black/5 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.35),0_0_1px_1px_rgba(0,0,0,0.05)]',
+      textPrimary: 'text-[#121214]',
+      textSecondary: 'text-zinc-600',
+      textMuted: 'text-neutral-500',
+      accent: '#121214',
+      accentHairline: 'border-black/10',
+      tagline: 'text-[#121214]',
+      hoverHighlight: 'hover:bg-black/5',
+      sheen: 'from-white/60 via-transparent to-transparent',
+      qrBg: 'bg-[#FAFAFA]',
       isLight: true
     };
   }
 
   if (t === 'deep_forest' || t === 'emerald') {
     return {
-      cardBg: 'bg-[#0D1F18]',
-      border: 'border-[#1C362A] ring-1 ring-[#1C362A]/40 shadow-2xl',
-      textPrimary: 'text-[#F4F7F4]',
-      textSecondary: 'text-[#AEC2B4]',
-      textMuted: 'text-[#6F8776]',
-      accent: '#C2A478',
-      accentHairline: 'border-[#1C362A]/80',
-      tagline: 'text-[#C2A478]',
-      hoverHighlight: 'hover:bg-[#152B21]',
-      sheen: 'from-emerald-800/15 via-transparent to-transparent',
-      qrBg: 'bg-[#12261E]',
+      cardBg: 'bg-[#0D1914]',
+      border: 'border-white/10 shadow-2xl',
+      textPrimary: 'text-[#FAFAFA]',
+      textSecondary: 'text-zinc-400',
+      textMuted: 'text-neutral-500',
+      accent: '#E4E4E7',
+      accentHairline: 'border-white/10',
+      tagline: 'text-[#FAFAFA]',
+      hoverHighlight: 'hover:bg-white/10',
+      sheen: 'from-white/[0.04] via-transparent to-transparent',
+      qrBg: 'bg-[#121214]',
       isLight: false
     };
   }
 
   if (t === 'classic_navy' || t === 'navy') {
     return {
-      cardBg: 'bg-[#0A1128]',
-      border: 'border-[#1E2C52] shadow-2xl',
-      textPrimary: 'text-[#F0F4FC]',
-      textSecondary: 'text-[#A8BADB]',
-      textMuted: 'text-[#6277A2]',
-      accent: '#D0D9E8',
-      accentHairline: 'border-[#1E2C52]/80',
-      tagline: 'text-[#D0D9E8]',
-      hoverHighlight: 'hover:bg-[#131D3F]',
-      sheen: 'from-blue-900/15 via-transparent to-transparent',
-      qrBg: 'bg-[#101938]',
+      cardBg: 'bg-[#0B101B]',
+      border: 'border-white/10 shadow-2xl',
+      textPrimary: 'text-[#FAFAFA]',
+      textSecondary: 'text-zinc-400',
+      textMuted: 'text-neutral-500',
+      accent: '#E4E4E7',
+      accentHairline: 'border-white/10',
+      tagline: 'text-zinc-200',
+      hoverHighlight: 'hover:bg-white/10',
+      sheen: 'from-white/[0.04] via-transparent to-transparent',
+      qrBg: 'bg-[#121214]',
       isLight: false
     };
   }
 
-  // Legacy Fallbacks
   if (t === 'obsidian' || t === 'titanium' || t === 'slate') {
     return {
-      cardBg: 'bg-[#0C0C0D]',
-      border: 'border-neutral-800/80 shadow-2xl',
-      textPrimary: 'text-neutral-100',
-      textSecondary: 'text-neutral-400',
+      cardBg: 'bg-[#121214]',
+      border: 'border-zinc-800/80 shadow-2xl',
+      textPrimary: 'text-[#FAFAFA]',
+      textSecondary: 'text-zinc-400',
       textMuted: 'text-neutral-500',
-      accent: '#C5A880',
-      accentHairline: 'border-neutral-800/60',
-      tagline: 'text-neutral-300',
-      hoverHighlight: 'hover:bg-neutral-800/40',
-      sheen: 'from-neutral-800/20 via-transparent to-transparent',
-      qrBg: 'bg-neutral-900/80',
+      accent: '#FAFAFA',
+      accentHairline: 'border-zinc-800/80',
+      tagline: 'text-zinc-300',
+      hoverHighlight: 'hover:bg-white/10',
+      sheen: 'from-white/[0.03] via-transparent to-transparent',
+      qrBg: 'bg-[#0A0A0B]',
       isLight: false
     };
   }
 
-  if (t === 'burgundy' || (t as string) === 'pure_white') {
-    return {
-      cardBg: 'bg-[#FFFFFF]',
-      border: 'border-[#E5E5E5] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.12),0_0_1px_1px_rgba(0,0,0,0.06)]',
-      textPrimary: 'text-[#111111]',
-      textSecondary: 'text-[#4A4A4A]',
-      textMuted: 'text-[#737373]',
-      accent: '#000000',
-      accentHairline: 'border-[#E5E5E5]',
-      tagline: 'text-[#111111]',
-      hoverHighlight: 'hover:bg-[#F5F5F5]',
-      sheen: 'from-black/[0.04] via-transparent to-transparent',
-      qrBg: 'bg-[#F5F5F5]',
-      isLight: true
-    };
-  }
-
-  // Default to pure_white
+  // Default fallback (including any retired legacy theme string) -> Warm Matte Paper (#FAFAFA)
   return {
-    cardBg: 'bg-[#FFFFFF]',
-    border: 'border-[#E5E5E5] shadow-[0_24px_50px_-12px_rgba(0,0,0,0.12),0_0_1px_1px_rgba(0,0,0,0.06)]',
-    textPrimary: 'text-[#111111]',
-    textSecondary: 'text-[#4A4A4A]',
-    textMuted: 'text-[#737373]',
-    accent: '#000000',
-    accentHairline: 'border-[#E5E5E5]',
-    tagline: 'text-[#111111]',
-    hoverHighlight: 'hover:bg-[#F5F5F5]',
-    sheen: 'from-black/[0.04] via-transparent to-transparent',
-    qrBg: 'bg-[#F5F5F5]',
+    cardBg: 'bg-[#FAFAFA]',
+    border: 'border-black/5 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.45),0_0_1px_1px_rgba(0,0,0,0.05)]',
+    textPrimary: 'text-[#0A0A0B]',
+    textSecondary: 'text-zinc-600',
+    textMuted: 'text-neutral-500',
+    accent: '#0A0A0B',
+    accentHairline: 'border-black/10',
+    tagline: 'text-[#0A0A0B]',
+    hoverHighlight: 'hover:bg-black/5',
+    sheen: 'from-black/[0.03] via-transparent to-transparent',
+    qrBg: 'bg-white',
     isLight: true
   };
 }
@@ -342,7 +299,6 @@ export const DEFAULT_CARD_FEATURES: CardFeatures = {
 
 export function generateMonogram(name: string, nameKr?: string): string {
   if (nameKr && nameKr.length >= 2) {
-    // Korean initial/full short monogram
     return nameKr.slice(0, 2);
   }
   if (!name) return 'KC';

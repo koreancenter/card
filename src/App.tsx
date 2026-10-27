@@ -227,7 +227,7 @@ export default function App() {
   const [printConfig, setPrintConfig] = useState<PrintConfig>({
     layout: 'single-card',
     size: 'kr-standard',
-    theme: 'cotton',
+    theme: 'pure_white',
     showCropMarks: true,
     scale: 1,
   });
@@ -414,19 +414,19 @@ export default function App() {
       {/* SCREEN UI CONTAINER */}
       <div 
         id="screen-app-container" 
-        className="min-h-[100dvh] bg-[#0B0C10] text-neutral-100 flex flex-col justify-between selection:bg-neutral-100 selection:text-neutral-950 font-sans pl-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)] overflow-x-hidden"
+        className="min-h-[100dvh] bg-[#0A0A0B] text-neutral-100 flex flex-col justify-between selection:bg-neutral-100 selection:text-neutral-950 font-sans pl-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)] overflow-x-hidden"
       >
         {/* Top Minimalist Luxury Header */}
-        <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#0B0C10]/90 backdrop-blur-xl px-4 sm:px-8 py-2.5 sm:py-3.5 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(0.75rem+env(safe-area-inset-top,0px))] pl-[calc(1rem+env(safe-area-inset-left,0px))] pr-[calc(1rem+env(safe-area-inset-right,0px))] flex items-center justify-between main-app-header">
+        <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-[#0A0A0B]/90 backdrop-blur-xl px-4 sm:px-8 py-2.5 sm:py-3.5 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(0.75rem+env(safe-area-inset-top,0px))] pl-[calc(1rem+env(safe-area-inset-left,0px))] pr-[calc(1rem+env(safe-area-inset-right,0px))] flex items-center justify-between main-app-header">
           {!isOwner ? (
             /* Public Visitor Header: Muted Brand Watermark Only */
             <>
               <div className="w-full flex items-center justify-center py-0.5 header-brand-mark">
-                <span className="text-xs text-white/30 tracking-widest uppercase font-medium select-none font-sans">
+                <span className="text-xs text-zinc-400 tracking-widest uppercase font-medium select-none font-sans">
                   GOGUMA CARD STUDIO
                 </span>
               </div>
-              <div className="hidden header-landscape-mini items-center bg-[#121318]/90 backdrop-blur-md border border-white/10 rounded-full px-3 py-1 shadow-2xl">
+              <div className="hidden header-landscape-mini items-center bg-[#121214]/90 backdrop-blur-md border border-white/10 rounded-full px-3 py-1 shadow-2xl">
                 <span className="text-[10px] font-semibold text-white/80 tracking-widest uppercase">GOGUMA</span>
               </div>
             </>
@@ -436,7 +436,7 @@ export default function App() {
               <div className="flex-1 flex items-center justify-start header-full-nav" />
 
               {/* Compressed Mini Icon in Landscape Mode */}
-              <div className="hidden header-landscape-mini items-center gap-1 bg-[#121318]/90 backdrop-blur-md border border-white/10 rounded-full p-1 shadow-2xl">
+              <div className="hidden header-landscape-mini items-center gap-1 bg-[#121214]/90 backdrop-blur-md border border-white/10 rounded-full p-1 shadow-2xl">
                 <button
                   onClick={() => {
                     if (activeTab === 'my-card') {
@@ -445,7 +445,7 @@ export default function App() {
                       setActiveTab('my-card');
                     }
                   }}
-                  className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-full text-zinc-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                   title={activeTab === 'my-card' ? '보관함으로 전환' : '내 명함으로 전환'}
                   aria-label="화면 전환"
                 >
@@ -457,7 +457,7 @@ export default function App() {
                       lockApp();
                       showToast('화면이 보안 잠금되었습니다.');
                     }}
-                    className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                    className="p-1.5 rounded-full text-zinc-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                     title="즉시 화면 잠금"
                     aria-label="화면 잠금"
                   >
@@ -466,7 +466,7 @@ export default function App() {
                 )}
                 <button
                   onClick={modals.toggleSettings}
-                  className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-full text-zinc-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                   title="설정"
                   aria-label="설정"
                 >
@@ -482,10 +482,10 @@ export default function App() {
                     const defaultCard = myCards.find(c => c.isDefault) || myCards[0];
                     if (defaultCard) setActiveCardId(defaultCard.id);
                   }}
-                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
                     activeTab === 'my-card'
-                      ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
-                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5'
+                      ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/20'
+                      : 'text-zinc-400 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <CreditCard className="w-3.5 h-3.5" />
@@ -498,10 +498,10 @@ export default function App() {
                       setActiveTab('vault');
                     });
                   }}
-                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
                     activeTab === 'vault'
-                      ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
-                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-white/5'
+                      ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/20'
+                      : 'text-zinc-400 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <FolderArchive className="w-3.5 h-3.5" />
@@ -509,7 +509,7 @@ export default function App() {
                   {isPinConfigured && isLocked && (
                     <Lock className="w-3 h-3 text-white" />
                   )}
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-white/5 border border-white/5 text-neutral-400">
+                  <span className="text-[10px] font-mono tabular-nums text-zinc-400">
                     {cards.length}
                   </span>
                 </button>
@@ -524,7 +524,7 @@ export default function App() {
                       lockApp();
                       showToast('화면이 보안 잠금되었습니다.');
                     }}
-                    className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer active:scale-95"
+                    className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
                     title="즉시 화면 잠금 (Lock Screen)"
                     aria-label="화면 잠금"
                   >
@@ -536,7 +536,7 @@ export default function App() {
                 <div className="relative">
                   <button
                     onClick={modals.toggleSettings}
-                    className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 border border-white/5 transition-all cursor-pointer active:scale-95"
+                    className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 border border-white/10 transition-all cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
                     title="보안 및 기기 설정"
                     aria-label="설정 메뉴"
                   >
@@ -544,13 +544,13 @@ export default function App() {
                   </button>
 
                   {modals.isSettingsOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#121318] border border-white/10 shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-xs">
+                    <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#121214] border border-white/10 shadow-2xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 text-xs">
                       <button
                         onClick={() => {
                           modals.closeSettings();
                           modals.openPinConfig(isPinConfigured ? 'change' : 'setup');
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 text-zinc-300 hover:text-white transition-colors cursor-pointer text-left"
                       >
                         <Lock className="w-3.5 h-3.5 text-white" />
                         <span>{isPinConfigured ? 'PIN 번호 변경 / 관리' : '4자리 PIN 보안 설정'}</span>
@@ -561,20 +561,20 @@ export default function App() {
                           modals.closeSettings();
                           modals.openBiometrics();
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 text-zinc-300 hover:text-white transition-colors cursor-pointer text-left"
                       >
                         <Fingerprint className="w-3.5 h-3.5 text-white" />
                         <span>생체 인증 (Face ID / 지문)</span>
                       </button>
 
-                      <div className="my-1 border-t border-white/5" />
+                      <div className="my-1 border-t border-white/10" />
 
                       <button
                         onClick={() => {
                           modals.closeSettings();
                           modals.openSync();
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-neutral-300 hover:text-white transition-colors cursor-pointer text-left"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/10 text-zinc-300 hover:text-white transition-colors cursor-pointer text-left"
                       >
                         <Smartphone className="w-3.5 h-3.5 text-white" />
                         <span>기기 연결 및 동기화</span>
@@ -802,14 +802,14 @@ export default function App() {
 
         {/* Footer */}
         {isOwner ? (
-          <footer className="border-t border-white/5 py-2.5 sm:py-6 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
+          <footer className="border-t border-white/10 py-2.5 sm:py-6 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
             <div className="max-w-xl mx-auto flex flex-col items-center justify-center text-center">
               {/* Luxury Legal Action Buttons (Icon-Only with Tooltips) */}
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1.5 sm:mb-3">
                 <button
                   type="button"
                   onClick={() => modals.openLegal('privacy')}
-                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/10 border border-white/10 hover:border-white/30 flex items-center justify-center text-zinc-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
                   title="개인정보처리방침"
                   aria-label="개인정보처리방침"
                 >
@@ -819,7 +819,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => modals.openLegal('terms')}
-                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/10 border border-white/10 hover:border-white/30 flex items-center justify-center text-zinc-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
                   title="서비스 이용약관"
                   aria-label="서비스 이용약관"
                 >
@@ -829,28 +829,28 @@ export default function App() {
                 <button
                   type="button"
                   onClick={modals.openReset}
-                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-rose-500/[0.08] border border-white/10 hover:border-rose-500/40 flex items-center justify-center text-neutral-400 hover:text-rose-300 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(244,63,94,0.15)] active:scale-95 group"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/10 border border-white/10 hover:border-white/30 flex items-center justify-center text-zinc-400 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
                   title="로컬 데이터 초기화"
                   aria-label="로컬 데이터 초기화"
                 >
-                  <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-400 group-hover:text-rose-400 group-hover:rotate-[-45deg] transition-all duration-200" />
+                  <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-400 group-hover:text-white group-hover:rotate-[-45deg] transition-all duration-200" />
                 </button>
               </div>
 
               {/* Centered Brand Copyright */}
-              <p className="text-[10px] sm:text-[11px] text-neutral-500 text-center tracking-wide font-sans">
+              <p className="text-[10px] sm:text-[11px] text-zinc-500 text-center tracking-wide font-sans">
                 © {new Date().getFullYear()} GOGUMA CARD STUDIO
               </p>
             </div>
           </footer>
         ) : (
-          <footer className="border-t border-white/5 py-2.5 sm:py-6 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
+          <footer className="border-t border-white/10 py-2.5 sm:py-6 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 font-sans text-xs">
             <div className="max-w-xl mx-auto flex flex-col items-center justify-center text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-3 mb-1.5 sm:mb-3">
                 <button
                   type="button"
                   onClick={() => modals.openLegal('privacy')}
-                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/10 border border-white/10 hover:border-white/30 flex items-center justify-center text-zinc-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
                   title="개인정보처리방침"
                   aria-label="개인정보처리방침"
                 >
@@ -860,7 +860,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => modals.openLegal('terms')}
-                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/40 flex items-center justify-center text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/[0.03] hover:bg-white/10 border border-white/10 hover:border-white/30 flex items-center justify-center text-zinc-300 hover:text-white transition-all duration-200 cursor-pointer shadow-sm active:scale-95 group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
                   title="서비스 이용약관"
                   aria-label="서비스 이용약관"
                 >
@@ -868,7 +868,7 @@ export default function App() {
                 </button>
               </div>
 
-              <p className="text-[10px] sm:text-[11px] text-neutral-600 text-center tracking-wide font-sans">
+              <p className="text-[10px] sm:text-[11px] text-zinc-600 text-center tracking-wide font-sans">
                 © {new Date().getFullYear()} GOGUMA CARD STUDIO
               </p>
             </div>
@@ -877,8 +877,8 @@ export default function App() {
 
         {/* Toast Notification */}
         {toastMessage && (
-          <div className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-neutral-900 border border-neutral-700/80 text-white text-xs font-medium shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
-            <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-[#121214] border border-white/15 text-white text-xs font-medium shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
+            <Check className="w-4 h-4 text-white shrink-0" />
             <span>{toastMessage}</span>
           </div>
         )}
