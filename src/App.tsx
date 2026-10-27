@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { PrintConfig, StoredCard } from './types/card';
 import {
   loadUserCards,
@@ -13,21 +13,20 @@ import {
   clearAllLocalData,
 } from './utils/initialCards';
 import { WelcomeCard } from './components/WelcomeCard';
+import { AppModals } from './components/AppModals';
+import { lazyWithRetry, LazyErrorBoundary } from './utils/lazyWithRetry';
 
-const CardContainer = lazy(() =>
+const CardContainer = lazyWithRetry(() =>
   import('./components/CardContainer').then((m) => ({ default: m.CardContainer }))
 );
-const CardNavigator = lazy(() =>
+const CardNavigator = lazyWithRetry(() =>
   import('./components/CardNavigator').then((m) => ({ default: m.CardNavigator }))
 );
-const PrintSheet = lazy(() =>
+const PrintSheet = lazyWithRetry(() =>
   import('./components/PrintSheet').then((m) => ({ default: m.PrintSheet }))
 );
-const VaultView = lazy(() =>
+const VaultView = lazyWithRetry(() =>
   import('./components/VaultView').then((m) => ({ default: m.VaultView }))
-);
-const AppModals = lazy(() =>
-  import('./components/AppModals').then((m) => ({ default: m.AppModals }))
 );
 import { APP_BASE_DOMAIN, resolveCardFromLocation, getCardShareUrl, getRouteSlug, isPublicSlugRoute } from './utils/domain';
 import { pullWalletFromEdge, pushWalletToEdge } from './utils/syncWallet';
@@ -612,32 +611,34 @@ export default function App() {
             /* ================= PUBLIC RECIPIENT VISITOR VIEW MODE ================= */
             <div className="w-full flex flex-col items-center animate-in fade-in duration-300">
               <div className="w-full max-w-[540px] flex justify-center">
-                <Suspense
-                  fallback={
-                    <div
-                      className="w-full aspect-[9/5] rounded-2xl bg-[#121214] border border-white/10"
-                      aria-hidden="true"
+                <LazyErrorBoundary resetKey={activeCard.id}>
+                  <Suspense
+                    fallback={
+                      <div
+                        className="w-full aspect-[9/5] rounded-2xl bg-[#121214] border border-white/10"
+                        aria-hidden="true"
+                      />
+                    }
+                  >
+                    <CardContainer 
+                      data={activeCard.data} 
+                      theme={activeCard.theme} 
+                      layout_type={activeCard.layout_type}
+                      card_features={activeCard.card_features}
+                      isPhotoCard={activeCard.isPhotoCard || activeCard.creation_mode === 'photo'}
+                      photoUrl={activeCard.scannedImage || activeCard.front_image_url}
+                      backPhotoUrl={activeCard.scannedImageBack || activeCard.back_image_url}
+                      html_front={activeCard.html_front}
+                      html_back={activeCard.html_back}
+                      isFlipped={isFlipped}
+                      onFlip={() => setIsFlipped(prev => !prev)}
+                      onOpenShare={handleShare}
+                      isOwner={false}
+                      cardUrl={getCardShareUrl(activeCard)}
+                      onShowToast={showToast}
                     />
-                  }
-                >
-                  <CardContainer 
-                    data={activeCard.data} 
-                    theme={activeCard.theme} 
-                    layout_type={activeCard.layout_type}
-                    card_features={activeCard.card_features}
-                    isPhotoCard={activeCard.isPhotoCard || activeCard.creation_mode === 'photo'}
-                    photoUrl={activeCard.scannedImage || activeCard.front_image_url}
-                    backPhotoUrl={activeCard.scannedImageBack || activeCard.back_image_url}
-                    html_front={activeCard.html_front}
-                    html_back={activeCard.html_back}
-                    isFlipped={isFlipped}
-                    onFlip={() => setIsFlipped(prev => !prev)}
-                    onOpenShare={handleShare}
-                    isOwner={false}
-                    cardUrl={getCardShareUrl(activeCard)}
-                    onShowToast={showToast}
-                  />
-                </Suspense>
+                  </Suspense>
+                </LazyErrorBoundary>
               </div>
 
               {/* Subtle Viral Footnote */}
@@ -700,28 +701,30 @@ export default function App() {
 
                   {/* Interactive Card Canvas */}
                   <div className="w-full max-w-[540px] flex justify-center">
-                    <Suspense
-                      fallback={
-                        <div
-                          className="w-full aspect-[9/5] rounded-2xl bg-[#121214] border border-white/10"
-                          aria-hidden="true"
+                    <LazyErrorBoundary resetKey={activeCard.id}>
+                      <Suspense
+                        fallback={
+                          <div
+                            className="w-full aspect-[9/5] rounded-2xl bg-[#121214] border border-white/10"
+                            aria-hidden="true"
+                          />
+                        }
+                      >
+                        <CardContainer 
+                          data={activeCard.data} 
+                          theme={activeCard.theme} 
+                          layout_type={activeCard.layout_type}
+                          card_features={activeCard.card_features}
+                          isPhotoCard={activeCard.isPhotoCard}
+                          photoUrl={activeCard.scannedImage}
+                          backPhotoUrl={activeCard.scannedImageBack}
+                          isFlipped={isFlipped}
+                          onFlip={() => setIsFlipped(prev => !prev)}
+                          onOpenShare={modals.openShare}
+                          onOpenEdit={handleOpenCreateModal}
                         />
-                      }
-                    >
-                      <CardContainer 
-                        data={activeCard.data} 
-                        theme={activeCard.theme} 
-                        layout_type={activeCard.layout_type}
-                        card_features={activeCard.card_features}
-                        isPhotoCard={activeCard.isPhotoCard}
-                        photoUrl={activeCard.scannedImage}
-                        backPhotoUrl={activeCard.scannedImageBack}
-                        isFlipped={isFlipped}
-                        onFlip={() => setIsFlipped(prev => !prev)}
-                        onOpenShare={modals.openShare}
-                        onOpenEdit={handleOpenCreateModal}
-                      />
-                    </Suspense>
+                      </Suspense>
+                    </LazyErrorBoundary>
                   </div>
                 </div>
               ) : !activeCard ? (
@@ -749,109 +752,115 @@ export default function App() {
                   </div>
 
                   <div className="w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px] flex justify-center">
-                    <Suspense
-                      fallback={
-                        <div
-                          className="w-full aspect-[9/5] rounded-2xl bg-[#121214] border border-white/10"
-                          aria-hidden="true"
+                    <LazyErrorBoundary resetKey={activeCard.id}>
+                      <Suspense
+                        fallback={
+                          <div
+                            className="w-full aspect-[9/5] rounded-2xl bg-[#121214] border border-white/10"
+                            aria-hidden="true"
+                          />
+                        }
+                      >
+                        <CardContainer 
+                          data={activeCard.data} 
+                          theme={activeCard.theme} 
+                          layout_type={activeCard.layout_type}
+                          card_features={activeCard.card_features}
+                          isPhotoCard={activeCard.isPhotoCard || activeCard.creation_mode === 'photo'}
+                          photoUrl={activeCard.scannedImage || activeCard.front_image_url}
+                          backPhotoUrl={activeCard.scannedImageBack || activeCard.back_image_url}
+                          html_front={activeCard.html_front}
+                          html_back={activeCard.html_back}
+                          isFlipped={isFlipped}
+                          onFlip={() => setIsFlipped(prev => !prev)}
+                          onOpenShare={modals.openShare}
+                          onOpenEdit={() => {
+                            requireUnlock(() => {
+                              modals.openEditor(activeCard, false);
+                            });
+                          }}
                         />
-                      }
-                    >
-                      <CardContainer 
-                        data={activeCard.data} 
-                        theme={activeCard.theme} 
-                        layout_type={activeCard.layout_type}
-                        card_features={activeCard.card_features}
-                        isPhotoCard={activeCard.isPhotoCard || activeCard.creation_mode === 'photo'}
-                        photoUrl={activeCard.scannedImage || activeCard.front_image_url}
-                        backPhotoUrl={activeCard.scannedImageBack || activeCard.back_image_url}
-                        html_front={activeCard.html_front}
-                        html_back={activeCard.html_back}
-                        isFlipped={isFlipped}
-                        onFlip={() => setIsFlipped(prev => !prev)}
-                        onOpenShare={modals.openShare}
-                        onOpenEdit={() => {
-                          requireUnlock(() => {
-                            modals.openEditor(activeCard, false);
-                          });
-                        }}
-                      />
-                    </Suspense>
+                      </Suspense>
+                    </LazyErrorBoundary>
                   </div>
                 </div>
               ) : (
                 /* Apple Wallet-Style Luxury Horizontal Card Carousel Deck with Ghost Add Card Slot */
-                <Suspense
-                  fallback={
-                    <div
-                      className="w-full max-w-[540px] aspect-[9/5] rounded-2xl bg-[#121214] border border-white/10"
-                      aria-hidden="true"
+                <LazyErrorBoundary resetKey={activeCard.id}>
+                  <Suspense
+                    fallback={
+                      <div
+                        className="w-full max-w-[540px] aspect-[9/5] rounded-2xl bg-[#121214] border border-white/10"
+                        aria-hidden="true"
+                      />
+                    }
+                  >
+                    <CardNavigator
+                      cards={myCards}
+                      activeCardId={activeCard.id}
+                      onSelectCard={handleSelectMyCard}
+                      onCreateNewCard={handleOpenCreateModal}
+                      onOpenEdit={(cardToEdit) => {
+                        requireUnlock(() => {
+                          modals.openEditor(cardToEdit, false);
+                        });
+                      }}
+                      onOpenShare={(cardToShare) => {
+                        setActiveCardId(cardToShare.id);
+                        modals.openShare();
+                      }}
+                      mode="carousel"
                     />
-                  }
-                >
-                  <CardNavigator
-                    cards={myCards}
-                    activeCardId={activeCard.id}
-                    onSelectCard={handleSelectMyCard}
-                    onCreateNewCard={handleOpenCreateModal}
-                    onOpenEdit={(cardToEdit) => {
-                      requireUnlock(() => {
-                        modals.openEditor(cardToEdit, false);
-                      });
-                    }}
-                    onOpenShare={(cardToShare) => {
-                      setActiveCardId(cardToShare.id);
-                      modals.openShare();
-                    }}
-                    mode="carousel"
-                  />
-                </Suspense>
+                  </Suspense>
+                </LazyErrorBoundary>
               )}
             </div>
           ) : (
             /* ================= VIEW 2: THE VAULT (CARD / LIST) ================= */
-            <Suspense fallback={<div className="w-full max-w-6xl min-h-[320px]" aria-hidden="true" />}>
-              <VaultView
-                cards={cards}
-                isLocked={isPinConfigured && isLocked}
-                onUnlockRequest={() => {
-                  lockApp();
-                }}
-                onSelectCard={(selected) => {
-                  setActiveCardId(selected.id);
-                  setActiveTab('my-card');
-                }}
-                onEditCard={(cardToEdit) => {
-                  requireUnlock(() => {
-                    modals.openEditor(cardToEdit, false);
-                  });
-                }}
-                onDeleteCard={(id) => {
-                  requireUnlock(() => {
-                    handleDeleteCard(id);
-                  });
-                }}
-                onExportCard={(cardToExport) => {
-                  setActiveCardId(cardToExport.id);
-                  modals.openExport();
-                }}
-                onOpenScan={() => {
-                  requireUnlock(() => {
-                    modals.openScan();
-                  });
-                }}
-                onOpenSync={modals.openSync}
-                onOpenEditor={() => {
-                  requireUnlock(() => {
-                    if (activeCard) {
-                      modals.openEditor(activeCard, false);
-                    } else {
-                      handleOpenCreateModal();
-                    }
-                  });
-                }}
-              />
-            </Suspense>
+            <LazyErrorBoundary resetKey={activeTab}>
+              <Suspense fallback={<div className="w-full max-w-6xl min-h-[320px]" aria-hidden="true" />}>
+                <VaultView
+                  cards={cards}
+                  isLocked={isPinConfigured && isLocked}
+                  onUnlockRequest={() => {
+                    lockApp();
+                  }}
+                  onSelectCard={(selected) => {
+                    setActiveCardId(selected.id);
+                    setActiveTab('my-card');
+                  }}
+                  onEditCard={(cardToEdit) => {
+                    requireUnlock(() => {
+                      modals.openEditor(cardToEdit, false);
+                    });
+                  }}
+                  onDeleteCard={(id) => {
+                    requireUnlock(() => {
+                      handleDeleteCard(id);
+                    });
+                  }}
+                  onExportCard={(cardToExport) => {
+                    setActiveCardId(cardToExport.id);
+                    modals.openExport();
+                  }}
+                  onOpenScan={() => {
+                    requireUnlock(() => {
+                      modals.openScan();
+                    });
+                  }}
+                  onOpenSync={modals.openSync}
+                  onOpenEditor={() => {
+                    requireUnlock(() => {
+                      if (activeCard) {
+                        modals.openEditor(activeCard, false);
+                      } else {
+                        handleOpenCreateModal();
+                      }
+                    });
+                  }}
+                />
+              </Suspense>
+            </LazyErrorBoundary>
           )}
 
         </main>
@@ -943,7 +952,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Declarative Centralized Modals Container (Lazy-loaded on demand) */}
+        {/* Declarative Centralized Modals Container (Per-modal lazy-loaded on demand) */}
         {((isLocked && isPinConfigured) ||
           modals.isShareOpen ||
           modals.isQrOpen ||
@@ -957,33 +966,33 @@ export default function App() {
           modals.isLazyPinOpen ||
           modals.isLegalOpen ||
           modals.isResetOpen) && (
-          <Suspense fallback={null}>
-            <AppModals
-              modals={modals}
-              activeCard={activeCard}
-              isOwner={isOwner}
-              printConfig={printConfig}
-              setPrintConfig={setPrintConfig}
-              onSaveCard={handleSaveCard}
-              onConfirmReset={handleConfirmReset}
-              isLocked={isLocked}
-              isPinConfigured={isPinConfigured}
-              unlockApp={unlockApp}
-              refreshPinStatus={refreshPinStatus}
-              setCards={setCards}
-              showToast={showToast}
-              onBiometricUnlock={handleBiometricUnlock}
-            />
-          </Suspense>
+          <AppModals
+            modals={modals}
+            activeCard={activeCard}
+            isOwner={isOwner}
+            printConfig={printConfig}
+            setPrintConfig={setPrintConfig}
+            onSaveCard={handleSaveCard}
+            onConfirmReset={handleConfirmReset}
+            isLocked={isLocked}
+            isPinConfigured={isPinConfigured}
+            unlockApp={unlockApp}
+            refreshPinStatus={refreshPinStatus}
+            setCards={setCards}
+            showToast={showToast}
+            onBiometricUnlock={handleBiometricUnlock}
+          />
         )}
 
       </div>
 
       {/* PRINT-ONLY VECTOR CONTAINER (Triggered on window.print()) */}
       {activeCard && (
-        <Suspense fallback={null}>
-          <PrintSheet data={activeCard.data} config={printConfig} />
-        </Suspense>
+        <LazyErrorBoundary variant="silent" resetKey={activeCard.id}>
+          <Suspense fallback={null}>
+            <PrintSheet data={activeCard.data} config={printConfig} />
+          </Suspense>
+        </LazyErrorBoundary>
       )}
     </>
   );
