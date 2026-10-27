@@ -33,9 +33,9 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
           </p>
           <div className="flex items-center justify-center gap-2 text-xs text-zinc-400">
             <span>개인정보 비수집</span>
-            <span aria-hidden="true" className="text-zinc-600">·</span>
+            <span aria-hidden="true" className="text-zinc-400">·</span>
             <span>기기 암호화</span>
-            <span aria-hidden="true" className="text-zinc-600">·</span>
+            <span aria-hidden="true" className="text-zinc-400">·</span>
             <span>3D 인터랙티브</span>
           </div>
         </div>

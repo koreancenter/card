@@ -838,7 +838,7 @@ export default function App() {
               </div>
 
               {/* Centered Brand Copyright */}
-              <p className="text-[10px] sm:text-[11px] text-zinc-500 text-center tracking-wide font-sans">
+              <p className="text-[10px] sm:text-[11px] text-zinc-400 text-center tracking-wide font-sans">
                 © {new Date().getFullYear()} GOGUMA CARD STUDIO
               </p>
             </div>
@@ -868,7 +868,7 @@ export default function App() {
                 </button>
               </div>
 
-              <p className="text-[10px] sm:text-[11px] text-zinc-600 text-center tracking-wide font-sans">
+              <p className="text-[10px] sm:text-[11px] text-zinc-400 text-center tracking-wide font-sans">
                 © {new Date().getFullYear()} GOGUMA CARD STUDIO
               </p>
             </div>

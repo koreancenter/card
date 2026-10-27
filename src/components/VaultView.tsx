@@ -111,7 +111,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="이름, 회사, 직함, 메모 검색..."
-          className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#121214] border border-white/10 text-xs text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 transition-colors"
+          className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#121214] border border-white/10 text-xs text-neutral-200 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 transition-colors"
         />
       </div>
 
@@ -136,7 +136,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
                 }`}
               >
                 <span>{cat}</span>
-                <span className={`ml-1.5 text-[10px] tabular-nums ${isSelected ? 'text-neutral-900/80 font-bold' : 'text-zinc-500'}`}>
+                <span className={`ml-1.5 text-[10px] tabular-nums ${isSelected ? 'text-neutral-900/80 font-bold' : 'text-zinc-400'}`}>
                   {count}
                 </span>
               </button>
@@ -189,7 +189,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
       {filteredCards.length === 0 ? (
         <div className="py-20 text-center space-y-3 p-8 rounded-3xl bg-neutral-900/40 border border-neutral-800/60">
           <p className="text-sm font-semibold text-neutral-300">검색 조건에 일치하는 명함이 없습니다.</p>
-          <p className="text-xs text-neutral-500">실물 명함 사진을 보관하거나 새로운 명함을 등록해 보세요.</p>
+          <p className="text-xs text-zinc-400">실물 명함 사진을 보관하거나 새로운 명함을 등록해 보세요.</p>
           <button
             onClick={onOpenScan}
             className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-black text-xs font-bold hover:bg-neutral-200 transition-colors cursor-pointer"
@@ -239,7 +239,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
                       </>
                     )}
                   </div>
-                  <span className="text-[10px] font-mono tabular-nums text-zinc-500">
+                  <span className="text-[10px] font-mono tabular-nums text-zinc-400">
                     {card.createdAt}
                   </span>
                 </div>
@@ -431,7 +431,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
                           <span>사진 보기</span>
                         </button>
                       ) : (
-                        <span className="text-[10px] text-zinc-600">-</span>
+                        <span className="text-[10px] text-zinc-400">-</span>
                       )}
                     </td>
                     <td className="py-3.5 px-4 text-zinc-400 font-mono tabular-nums text-[11px]">

@@ -178,13 +178,13 @@ export const BiometricsSettingModal: React.FC<BiometricsSettingModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4 text-xs pt-1">
             <div>
-              <span className="text-[11px] text-zinc-500 block mb-0.5">마지막 PIN 인증</span>
+              <span className="text-[11px] text-zinc-400 block mb-0.5">마지막 PIN 인증</span>
               <span className="text-xs font-medium text-zinc-200 tabular-nums">
                 {thresholdStatus?.formattedLastVerified || '기록 없음'}
               </span>
             </div>
             <div>
-              <span className="text-[11px] text-zinc-500 block mb-0.5">PIN 재인증 유효 기간</span>
+              <span className="text-[11px] text-zinc-400 block mb-0.5">PIN 재인증 유효 기간</span>
               <span className="text-xs font-semibold text-white tabular-nums">
                 {thresholdStatus?.isExpired 
                   ? '만료됨 (PIN 인증 필요)' 

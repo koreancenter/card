@@ -122,7 +122,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             {data.name} {data.title && <span className="text-zinc-400 font-normal">· {data.title}</span>}
           </h3>
           {data.organization && (
-            <p className="text-xs text-neutral-500 mt-0.5 truncate max-w-[280px]">
+            <p className="text-xs text-zinc-400 mt-0.5 truncate max-w-[280px]">
               {data.organization}
             </p>
           )}
@@ -136,19 +136,19 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             className={`transition cursor-pointer pb-1 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
               qrType === 'url'
                 ? 'text-white border-b-2 border-white font-medium'
-                : 'text-neutral-500 hover:text-zinc-300 border-b-2 border-transparent'
+                : 'text-zinc-400 hover:text-zinc-300 border-b-2 border-transparent'
             }`}
           >
             웹 링크 QR
           </button>
-          <span className="text-zinc-800 select-none">|</span>
+          <span className="text-zinc-400 select-none" aria-hidden="true">|</span>
           <button
             type="button"
             onClick={() => setQrType('vcard')}
             className={`transition cursor-pointer pb-1 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
               qrType === 'vcard'
                 ? 'text-white border-b-2 border-white font-medium'
-                : 'text-neutral-500 hover:text-zinc-300 border-b-2 border-transparent'
+                : 'text-zinc-400 hover:text-zinc-300 border-b-2 border-transparent'
             }`}
           >
             연락처 저장 QR

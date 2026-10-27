@@ -280,7 +280,7 @@ export class CardSerializer {
 <html lang="ko" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>${pageTitle}</title>
   <meta name="description" content="${pageDesc}">
   <meta property="og:title" content="${pageTitle}">

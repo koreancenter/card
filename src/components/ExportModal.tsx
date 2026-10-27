@@ -71,7 +71,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-zinc-500 hover:text-white transition cursor-pointer hover:bg-white/5"
+            className="p-1.5 rounded-full text-zinc-400 hover:text-white transition cursor-pointer hover:bg-white/5"
             title="닫기"
             aria-label="닫기"
           >
@@ -87,7 +87,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             className={`pb-2.5 font-medium transition-colors cursor-pointer border-b-2 ${
               activeTab === 'deploy'
                 ? 'border-white text-white'
-                : 'border-transparent text-zinc-500 hover:text-zinc-300'
+                : 'border-transparent text-zinc-400 hover:text-zinc-300'
             }`}
           >
             배포 가이드
@@ -98,7 +98,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             className={`pb-2.5 font-medium transition-colors cursor-pointer border-b-2 ${
               activeTab === 'code'
                 ? 'border-white text-white'
-                : 'border-transparent text-zinc-500 hover:text-zinc-300'
+                : 'border-transparent text-zinc-400 hover:text-zinc-300'
             }`}
           >
             HTML 소스코드 미리보기

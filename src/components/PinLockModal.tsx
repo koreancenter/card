@@ -406,7 +406,7 @@ export const PinLockModal: React.FC<PinLockModalProps> = ({
                   <Check className="w-3 h-3" /> 활성화됨
                 </span>
               ) : (
-                <span className="text-[11px] text-zinc-500">미등록</span>
+                <span className="text-[11px] text-zinc-400">미등록</span>
               )}
             </div>
 

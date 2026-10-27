@@ -69,7 +69,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                 <span className="text-[10px] font-mono tracking-widest uppercase text-zinc-400">
                   ARCHIVE
                 </span>
-                <span aria-hidden="true" className="text-zinc-600">·</span>
+                <span aria-hidden="true" className="text-zinc-400">·</span>
                 <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
                   {card.data.name} — 실물 명함 원본 아카이브
                 </h3>
@@ -154,7 +154,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                       className="w-full h-full object-cover select-none"
                     />
                   ) : (
-                    <div className="text-center p-6 text-neutral-500">
+                    <div className="text-center p-6 text-zinc-400">
                       실물 사진이 등록되지 않았습니다.
                     </div>
                   )}
@@ -185,7 +185,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-xs text-neutral-500">실물 사진 없음</span>
+                      <span className="text-xs text-zinc-400">실물 사진 없음</span>
                     )}
                   </div>
                 </div>
@@ -428,7 +428,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                           <span>앨범</span>
                         </button>
                       </div>
-                      <span className="text-[10px] text-zinc-500">실물 앞면</span>
+                      <span className="text-[10px] text-zinc-400">실물 앞면</span>
                     </div>
                   )}
                 </div>
@@ -486,7 +486,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                           <span>앨범</span>
                         </button>
                       </div>
-                      <span className="text-[10px] text-zinc-500">실물 뒷면</span>
+                      <span className="text-[10px] text-zinc-400">실물 뒷면</span>
                     </div>
                   )}
                 </div>

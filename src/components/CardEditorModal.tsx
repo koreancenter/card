@@ -323,7 +323,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
               <button
                 type="button"
                 onClick={handleResetSample}
-                className="p-2 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.04] cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+                className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04] cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
                 title="초기화"
                 aria-label="초기화"
               >
@@ -332,7 +332,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="p-2 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.04] cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+                className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04] cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
                 title="닫기"
                 aria-label="닫기"
               >
@@ -353,7 +353,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                   className={`relative pb-3.5 text-[13px] tracking-wide whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-none ${
                     isActive
                       ? 'text-[#F2F2F5] font-medium'
-                      : 'text-zinc-500 hover:text-zinc-300 font-normal'
+                      : 'text-zinc-400 hover:text-zinc-300 font-normal'
                   }`}
                 >
                   {mode.label}

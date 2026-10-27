@@ -18,7 +18,7 @@ interface PhotoArchivingEditorProps {
 }
 
 const INPUT_CLASS =
-  'w-full px-3.5 py-2.5 rounded-lg bg-[#161618] border border-white/[0.06] hover:border-white/[0.12] focus:outline-none focus:border-white/25 focus:bg-[#19191C] text-[#EDEDEF] placeholder:text-zinc-600 text-[13px]';
+  'w-full px-3.5 py-2.5 rounded-lg bg-[#161618] border border-white/[0.06] hover:border-white/[0.12] focus:outline-none focus:border-white/25 focus:bg-[#19191C] text-[#EDEDEF] placeholder:text-zinc-400 text-[13px]';
 
 export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
   frontImageUrl,
@@ -128,19 +128,19 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
               className={`text-xs tracking-wide cursor-pointer ${
                 activeSide === 'front'
                   ? 'text-[#F2F2F5] font-medium'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  : 'text-zinc-400 hover:text-zinc-300'
               }`}
             >
               앞면 사진
             </button>
-            <span className="text-zinc-700 text-xs select-none">/</span>
+            <span className="text-zinc-400 text-xs select-none" aria-hidden="true">/</span>
             <button
               type="button"
               onClick={() => setActiveSide('back')}
               className={`text-xs tracking-wide cursor-pointer ${
                 activeSide === 'back'
                   ? 'text-[#F2F2F5] font-medium'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  : 'text-zinc-400 hover:text-zinc-300'
               }`}
             >
               뒷면 사진
@@ -150,7 +150,7 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
           <button
             type="button"
             onClick={handleLoadSample}
-            className="text-xs text-zinc-500 hover:text-zinc-300 cursor-pointer"
+            className="text-xs text-zinc-400 hover:text-zinc-300 cursor-pointer"
           >
             샘플 불러오기
           </button>
@@ -204,7 +204,7 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center p-6 text-center space-y-2.5 pointer-events-none">
-              <Camera className="w-5 h-5 text-zinc-500 stroke-[1.5]" />
+              <Camera className="w-5 h-5 text-zinc-400 stroke-[1.5]" />
               <p className="text-xs text-zinc-400">
                 {isCompressing ? '이미지를 정리하는 중...' : '사진을 드래그하거나 클릭하여 업로드'}
               </p>
@@ -277,7 +277,7 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
           <div className="space-y-1.5">
             <label className="text-xs text-zinc-400 block">웹 주소</label>
             <div className="flex items-center rounded-lg bg-[#161618] border border-white/[0.06] focus-within:border-white/25 overflow-hidden">
-              <span className="px-3 py-2.5 text-zinc-500 font-mono text-xs shrink-0 border-r border-white/[0.06] select-none">
+              <span className="px-3 py-2.5 text-zinc-400 font-mono text-xs shrink-0 border-r border-white/[0.06] select-none">
                 {APP_BASE_DOMAIN}/
               </span>
               <input
@@ -285,7 +285,7 @@ export const PhotoArchivingEditor: React.FC<PhotoArchivingEditorProps> = ({
                 value={slug}
                 onChange={(e) => onChangeSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                 placeholder="slug"
-                className="w-full px-3 py-2.5 bg-transparent text-[#EDEDEF] placeholder:text-zinc-600 focus:outline-none font-mono text-[13px]"
+                className="w-full px-3 py-2.5 bg-transparent text-[#EDEDEF] placeholder:text-zinc-400 focus:outline-none font-mono text-[13px]"
               />
             </div>
           </div>

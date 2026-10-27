@@ -170,17 +170,17 @@ export const EditorPreviewPanel: React.FC<EditorPreviewPanelProps> = ({
           type="button"
           onClick={() => previewFace !== 'front' && onFlipPreviewFace()}
           className={`cursor-pointer tracking-wide ${
-            previewFace === 'front' ? 'text-[#EDEDEF] font-medium' : 'text-zinc-500 hover:text-zinc-300'
+            previewFace === 'front' ? 'text-[#EDEDEF] font-medium' : 'text-zinc-400 hover:text-zinc-300'
           }`}
         >
           앞면
         </button>
-        <span className="text-zinc-700 select-none">·</span>
+        <span className="text-zinc-400 select-none" aria-hidden="true">·</span>
         <button
           type="button"
           onClick={() => previewFace !== 'back' && onFlipPreviewFace()}
           className={`cursor-pointer tracking-wide ${
-            previewFace === 'back' ? 'text-[#EDEDEF] font-medium' : 'text-zinc-500 hover:text-zinc-300'
+            previewFace === 'back' ? 'text-[#EDEDEF] font-medium' : 'text-zinc-400 hover:text-zinc-300'
           }`}
         >
           뒷면

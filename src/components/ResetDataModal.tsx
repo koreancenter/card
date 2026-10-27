@@ -53,7 +53,7 @@ export const ResetDataModal: React.FC<ResetDataModalProps> = ({
           </ul>
         </div>
 
-        <p className="text-[11px] text-zinc-500 mt-3 text-center leading-normal">
+        <p className="text-[11px] text-zinc-400 mt-3 text-center leading-normal">
           삭제된 데이터는 복구할 수 없습니다. 초기화 후 서비스는 초기 방문자 상태로 되돌아갑니다.
         </p>
 

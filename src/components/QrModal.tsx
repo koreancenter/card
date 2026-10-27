@@ -85,7 +85,7 @@ export const QrModal: React.FC<QrModalProps> = ({ isOpen, onClose, data }) => {
             OFFICIAL CONNECT QR
           </p>
           <h3 className="text-lg font-bold text-white tracking-tight">디지털 명함 QR 코드</h3>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-zinc-400">
             스마트폰 카메라로 스캔하면 바로 연결됩니다
           </p>
         </div>

@@ -203,7 +203,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
                       key={i} 
                       className="border border-zinc-800 rounded flex flex-col justify-between p-1 bg-[#0A0A0B] text-[7px] leading-tight overflow-hidden"
                     >
-                      <div className="flex items-center justify-between text-zinc-500 font-mono tabular-nums text-[6px]">
+                      <div className="flex items-center justify-between text-zinc-400 font-mono tabular-nums text-[6px]">
                         <span>#{i + 1}</span>
                         <span>{widthDisplay}</span>
                       </div>
@@ -223,7 +223,7 @@ export const PrintModal: React.FC<PrintModalProps> = ({
 
         {/* Modal Bottom Actions */}
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-          <p className="text-xs text-zinc-500 font-sans">
+          <p className="text-xs text-zinc-400 font-sans">
             * 인쇄 시 브라우저 설정에서 <b>‘배경 그래픽 포함’</b> 옵션을 꼭 체크해 주세요.
           </p>
 

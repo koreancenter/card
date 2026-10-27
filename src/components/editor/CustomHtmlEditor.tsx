@@ -35,7 +35,7 @@ export const CLOUD_AI_QUIET_LUXURY_PROMPT = `너는 최고급 하이엔드 브�
 export const DEFAULT_LUXURY_HTML_FRONT = `<div class="w-full h-full aspect-[1.586/1] bg-[#121214] text-[#F2F2F5] p-7 flex flex-col justify-between border border-white/10 rounded-2xl relative overflow-hidden font-sans select-none">
   <div class="flex justify-between items-start">
     <div>
-      <span class="text-[10px] tracking-[0.22em] text-zinc-500 uppercase font-mono block mb-1.5">GOGUMA KNOWLEDGE OFFICE</span>
+      <span class="text-[10px] tracking-[0.22em] text-zinc-400 uppercase font-mono block mb-1.5">GOGUMA KNOWLEDGE OFFICE</span>
       <h2 class="text-xl font-semibold tracking-tight text-[#F4F4F6]">PARK, GIHONG</h2>
       <p class="text-xs text-zinc-400 font-normal mt-0.5">박기홍 · Principal Master</p>
     </div>
@@ -45,15 +45,15 @@ export const DEFAULT_LUXURY_HTML_FRONT = `<div class="w-full h-full aspect-[1.58
   </div>
   <div class="space-y-2 border-t border-white/[0.08] pt-4">
     <div class="flex justify-between items-center text-[11px]">
-      <span class="text-zinc-500 font-mono">OFFICE</span>
+      <span class="text-zinc-400 font-mono">OFFICE</span>
       <span class="text-zinc-300">고구마 지식 관리실</span>
     </div>
     <div class="flex justify-between items-center text-[11px]">
-      <span class="text-zinc-500 font-mono">TEL</span>
+      <span class="text-zinc-400 font-mono">TEL</span>
       <span class="text-[#EDEDEF] font-mono tabular-nums">+82 10-1234-5678</span>
     </div>
     <div class="flex justify-between items-center text-[11px]">
-      <span class="text-zinc-500 font-mono">MAIL</span>
+      <span class="text-zinc-400 font-mono">MAIL</span>
       <span class="text-zinc-400 font-mono">master@goguma.app</span>
     </div>
   </div>
@@ -64,14 +64,14 @@ export const DEFAULT_LUXURY_HTML_BACK = `<div class="w-full h-full aspect-[1.586
     PG
   </div>
   <h3 class="text-xs font-medium tracking-[0.2em] text-[#F2F2F5] uppercase font-sans">GOGUMA KNOWLEDGE OFFICE</h3>
-  <p class="text-[10px] tracking-[0.22em] uppercase text-zinc-500 mt-1.5 max-w-[260px] leading-relaxed">KOREAN CENTER GLOBAL NETWORK</p>
+  <p class="text-[10px] tracking-[0.22em] uppercase text-zinc-400 mt-1.5 max-w-[260px] leading-relaxed">KOREAN CENTER GLOBAL NETWORK</p>
   <span class="mt-4 text-[10px] font-mono text-zinc-400 tracking-wider">
     card.goguma.app/master
   </span>
 </div>`;
 
 const INPUT_CLASS =
-  'w-full px-3.5 py-2.5 rounded-lg bg-[#161618] border border-white/[0.06] hover:border-white/[0.12] focus:outline-none focus:border-white/25 focus:bg-[#19191C] text-[#EDEDEF] placeholder:text-zinc-600 text-[13px]';
+  'w-full px-3.5 py-2.5 rounded-lg bg-[#161618] border border-white/[0.06] hover:border-white/[0.12] focus:outline-none focus:border-white/25 focus:bg-[#19191C] text-[#EDEDEF] placeholder:text-zinc-400 text-[13px]';
 
 export const CustomHtmlEditor: React.FC<CustomHtmlEditorProps> = ({
   htmlFront,
@@ -154,19 +154,19 @@ export const CustomHtmlEditor: React.FC<CustomHtmlEditorProps> = ({
               className={`text-xs tracking-wide cursor-pointer ${
                 activeFace === 'front'
                   ? 'text-[#F2F2F5] font-medium'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  : 'text-zinc-400 hover:text-zinc-300'
               }`}
             >
               앞면 코드
             </button>
-            <span className="text-zinc-700 text-xs select-none">/</span>
+            <span className="text-zinc-400 text-xs select-none" aria-hidden="true">/</span>
             <button
               type="button"
               onClick={() => onChangeActiveFace('back')}
               className={`text-xs tracking-wide cursor-pointer ${
                 activeFace === 'back'
                   ? 'text-[#F2F2F5] font-medium'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  : 'text-zinc-400 hover:text-zinc-300'
               }`}
             >
               뒷면 코드
@@ -178,11 +178,11 @@ export const CustomHtmlEditor: React.FC<CustomHtmlEditorProps> = ({
             <button
               type="button"
               onClick={handleCopyPrompt}
-              className="text-zinc-500 hover:text-zinc-200 cursor-pointer whitespace-nowrap"
+              className="text-zinc-400 hover:text-zinc-200 cursor-pointer whitespace-nowrap"
             >
               {copiedPrompt ? '복사됨' : '프롬프트 복사'}
             </button>
-            <span className="text-zinc-700 select-none">·</span>
+            <span className="text-zinc-400 select-none" aria-hidden="true">·</span>
             <button
               type="button"
               onClick={handleGenerateDirectAi}
@@ -208,7 +208,7 @@ export const CustomHtmlEditor: React.FC<CustomHtmlEditorProps> = ({
         />
 
         {(aiStatus || detectedUnsafe.length > 0) && (
-          <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-0.5">
+          <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-0.5">
             {detectedUnsafe.length > 0 ? (
               <span>허용되지 않는 스크립트 속성은 자동으로 제외됩니다.</span>
             ) : (

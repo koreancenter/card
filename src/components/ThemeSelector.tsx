@@ -65,7 +65,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
         <span className="text-[11px] font-sans tracking-tight text-zinc-300">
           {activeTheme.label}
         </span>
-        <ChevronDown className={`w-3 h-3 text-neutral-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {/* Floating Bespoke Palette Popover */}
@@ -78,7 +78,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
           </div>
           
           <div className="space-y-0.5 max-h-72 overflow-y-auto no-scrollbar">
-            <div className="px-2 py-1 text-[9px] text-neutral-500 font-semibold uppercase tracking-wider">
+            <div className="px-2 py-1 text-[9px] text-zinc-400 font-semibold uppercase tracking-wider">
               프리미엄 모노크롬 팔레트
             </div>
             {THEMES.filter(t => t.isCurated).map((t) => {
@@ -102,7 +102,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
                     />
                     <div className="leading-tight">
                       <span className="text-xs text-white block">{t.label}</span>
-                      <span className="text-[9px] text-neutral-500 font-mono block">
+                      <span className="text-[9px] text-zinc-400 font-mono block">
                         Accent · {t.accent}
                       </span>
                     </div>
@@ -112,7 +112,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
               );
             })}
 
-            <div className="px-2 pt-2.5 pb-1 text-[9px] text-neutral-500 font-semibold uppercase tracking-wider border-t border-zinc-800/80 mt-1">
+            <div className="px-2 pt-2.5 pb-1 text-[9px] text-zinc-400 font-semibold uppercase tracking-wider border-t border-zinc-800/80 mt-1">
               아카이브 클래식
             </div>
             {THEMES.filter(t => !t.isCurated).map((t) => {

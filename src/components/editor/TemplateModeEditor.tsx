@@ -28,7 +28,7 @@ interface TemplateModeEditorProps {
 }
 
 const INPUT_CLASS =
-  'w-full px-3.5 py-2.5 rounded-lg bg-[#161618] border border-white/[0.06] hover:border-white/[0.12] focus:outline-none focus:border-white/25 focus:bg-[#19191C] text-[#EDEDEF] placeholder:text-zinc-600 text-[13px]';
+  'w-full px-3.5 py-2.5 rounded-lg bg-[#161618] border border-white/[0.06] hover:border-white/[0.12] focus:outline-none focus:border-white/25 focus:bg-[#19191C] text-[#EDEDEF] placeholder:text-zinc-400 text-[13px]';
 
 export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
   theme,
@@ -195,7 +195,7 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
           className={`py-2 rounded-md text-xs tracking-wide cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none ${
             subTab === 'visual_atelier'
               ? 'bg-[#222226] text-[#F2F2F5] font-medium'
-              : 'text-zinc-500 hover:text-zinc-300 font-normal'
+              : 'text-zinc-400 hover:text-zinc-300 font-normal'
           }`}
         >
           소재 및 구도
@@ -206,7 +206,7 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
           className={`py-2 rounded-md text-xs tracking-wide cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none ${
             subTab === 'identity_profile'
               ? 'bg-[#222226] text-[#F2F2F5] font-medium'
-              : 'text-zinc-500 hover:text-zinc-300 font-normal'
+              : 'text-zinc-400 hover:text-zinc-300 font-normal'
           }`}
         >
           인적 정보
@@ -284,7 +284,7 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                       >
                         {preset.name}
                       </span>
-                      <span className="text-[10px] font-mono tabular-nums text-zinc-500 shrink-0">
+                      <span className="text-[10px] font-mono tabular-nums text-zinc-400 shrink-0">
                         {preset.aspectRatio}
                       </span>
                     </div>
@@ -494,7 +494,7 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                     <button
                       type="button"
                       onClick={() => onChangeFeatures(prev => ({ ...prev, custom_logo: undefined }))}
-                      className="p-1 rounded-md text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.05] cursor-pointer"
+                      className="p-1 rounded-md text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.05] cursor-pointer"
                       title="삭제"
                       aria-label="삭제"
                     >
@@ -523,7 +523,7 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
             <div className="space-y-1.5">
               <label className="text-xs text-zinc-400 block">웹 주소</label>
               <div className="flex items-center rounded-lg bg-[#161618] border border-white/[0.06] focus-within:border-white/25 overflow-hidden">
-                <span className="px-3.5 py-2.5 text-zinc-500 font-mono select-none text-xs shrink-0 border-r border-white/[0.06]">
+                <span className="px-3.5 py-2.5 text-zinc-400 font-mono select-none text-xs shrink-0 border-r border-white/[0.06]">
                   {APP_BASE_DOMAIN}/
                 </span>
                 <input
@@ -531,7 +531,7 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                   value={slug}
                   onChange={(e) => onChangeSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                   placeholder="master"
-                  className="w-full px-3.5 py-2.5 bg-transparent text-[#EDEDEF] placeholder:text-zinc-600 focus:outline-none font-mono text-[13px]"
+                  className="w-full px-3.5 py-2.5 bg-transparent text-[#EDEDEF] placeholder:text-zinc-400 focus:outline-none font-mono text-[13px]"
                 />
               </div>
             </div>
