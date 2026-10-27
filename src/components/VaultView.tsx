@@ -1,29 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { StoredCard, CardCategory } from '../types/card';
-import { 
-  Search, 
-  Phone, 
-  Mail, 
-  Globe, 
-  UserPlus, 
-  Edit3, 
-  Trash2, 
-  Download, 
-  Layers, 
-  List, 
-  Eye, 
-  Sparkles,
+import {
+  Search,
+  Layers,
+  List,
   Camera,
-  MessageSquare,
   Lock,
   KeyRound,
-  Image as ImageIcon
+  X,
 } from 'lucide-react';
-import { BusinessCardFront } from './BusinessCardFront';
-import { isVerticalLayout } from '../constants/templates';
-import { downloadVCard } from '../utils/vcard';
 import { PhotoArchiveModal } from './PhotoArchiveModal';
-import { sanitizeHtml } from '../utils/sanitizeHtml';
+import { VaultCardItem, VaultCardListRow } from './VaultCardItem';
+
+const CATEGORIES: readonly CardCategory[] = [
+  '전체',
+  'VIP 파트너',
+  '글로벌 네트워크',
+  '공공·기관',
+  '투자·금융',
+  'IT·기술',
+];
+
+const SEARCH_DEBOUNCE_MS = 180;
 
 interface VaultViewProps {
   cards: StoredCard[];
@@ -45,41 +43,116 @@ export const VaultView: React.FC<VaultViewProps> = ({
   onDeleteCard,
   onExportCard,
   onOpenScan,
-  onOpenEditor,
-  onOpenSync,
   isLocked = false,
-  onUnlockRequest
+  onUnlockRequest,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>('');
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
   const [photoArchiveCard, setPhotoArchiveCard] = useState<StoredCard | null>(null);
 
-  const categories: CardCategory[] = [
-    '전체',
-    'VIP 파트너',
-    '글로벌 네트워크',
-    '공공·기관',
-    '투자·금융',
-    'IT·기술'
-  ];
+  // Debounce searchQuery updates to prevent full list re-filtering & item re-renders on every keystroke
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setDebouncedSearchQuery('');
+      return;
+    }
 
-  const filteredCards = cards.filter((c) => {
-    const matchesCategory = selectedCategory === '전체' || c.category === selectedCategory;
-    const q = searchQuery.toLowerCase().trim();
-    if (!q) return matchesCategory;
+    const timer = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, SEARCH_DEBOUNCE_MS);
 
-    const matchesSearch = 
-      c.data.name.toLowerCase().includes(q) ||
-      c.data.nameKr.toLowerCase().includes(q) ||
-      c.data.organization.toLowerCase().includes(q) ||
-      c.data.organizationKr.toLowerCase().includes(q) ||
-      c.data.title.toLowerCase().includes(q) ||
-      c.data.titleKr.toLowerCase().includes(q) ||
-      (c.notes && c.notes.toLowerCase().includes(q));
+    return () => window.clearTimeout(timer);
+  }, [searchQuery]);
 
-    return matchesCategory && matchesSearch;
+  // Keep latest prop callbacks in a ref so memoized item handlers maintain permanently stable identities
+  const latestHandlersRef = useRef({
+    onSelectCard,
+    onEditCard,
+    onDeleteCard,
+    onExportCard,
   });
+  latestHandlersRef.current = {
+    onSelectCard,
+    onEditCard,
+    onDeleteCard,
+    onExportCard,
+  };
+
+  const handleSelectCard = useCallback((card: StoredCard) => {
+    latestHandlersRef.current.onSelectCard(card);
+  }, []);
+
+  const handleEditCard = useCallback((card: StoredCard) => {
+    latestHandlersRef.current.onEditCard(card);
+  }, []);
+
+  const handleDeleteCard = useCallback((cardId: string) => {
+    latestHandlersRef.current.onDeleteCard(cardId);
+  }, []);
+
+  const handleExportCard = useCallback((card: StoredCard) => {
+    latestHandlersRef.current.onExportCard(card);
+  }, []);
+
+  const handleOpenPhotoArchive = useCallback((card: StoredCard) => {
+    setPhotoArchiveCard(card);
+  }, []);
+
+  const handleClosePhotoArchive = useCallback(() => {
+    setPhotoArchiveCard(null);
+  }, []);
+
+  const handleClearSearch = useCallback(() => {
+    setSearchQuery('');
+    setDebouncedSearchQuery('');
+  }, []);
+
+  // Single-pass memoized category counts (avoids 5 separate cards.filter scans per render)
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { 전체: cards.length };
+    for (const cat of CATEGORIES) {
+      if (cat !== '전체') counts[cat] = 0;
+    }
+    for (let i = 0; i < cards.length; i++) {
+      const cat = cards[i].category;
+      if (cat) {
+        counts[cat] = (counts[cat] || 0) + 1;
+      }
+    }
+    return counts;
+  }, [cards]);
+
+  // Memoized search + category filter using debounced search query
+  const filteredCards = useMemo(() => {
+    const q = debouncedSearchQuery.toLowerCase().trim();
+    const isAllCategories = selectedCategory === '전체';
+
+    if (isAllCategories && !q) {
+      return cards;
+    }
+
+    return cards.filter((c) => {
+      if (!isAllCategories && c.category !== selectedCategory) {
+        return false;
+      }
+      if (!q) {
+        return true;
+      }
+
+      const d = c.data;
+      return (
+        d.name.toLowerCase().includes(q) ||
+        d.nameKr.toLowerCase().includes(q) ||
+        d.organization.toLowerCase().includes(q) ||
+        d.organizationKr.toLowerCase().includes(q) ||
+        d.title.toLowerCase().includes(q) ||
+        d.titleKr.toLowerCase().includes(q) ||
+        Boolean(c.notes && c.notes.toLowerCase().includes(q))
+      );
+    });
+  }, [cards, selectedCategory, debouncedSearchQuery]);
 
   if (isLocked) {
     return (
@@ -88,10 +161,11 @@ export const VaultView: React.FC<VaultViewProps> = ({
           <Lock className="w-8 h-8" />
         </div>
         <h3 className="text-xl font-bold text-white mb-2 tracking-tight">명함 보관함이 잠겨 있습니다</h3>
-        <p className="text-xs text-white/60 max-w-sm mb-6 leading-relaxed">
+        <p className="text-xs text-zinc-400 max-w-sm mb-6 leading-relaxed">
           공용 기기 및 타인의 무단 열람을 방지하기 위해 보관함이 4자리 보안 PIN으로 보호되고 있습니다.
         </p>
         <button
+          type="button"
           onClick={onUnlockRequest}
           className="px-6 py-3 rounded-2xl bg-white hover:bg-neutral-200 text-black font-bold text-xs transition-all cursor-pointer shadow-lg active:scale-95 flex items-center gap-2"
         >
@@ -106,29 +180,40 @@ export const VaultView: React.FC<VaultViewProps> = ({
     <div className="w-full max-w-6xl mx-auto space-y-5 animate-in fade-in duration-300">
       {/* 1. Quiet Luxury Search Bar */}
       <div className="relative w-full max-w-md">
-        <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="이름, 회사, 직함, 메모 검색..."
-          className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#121214] border border-white/10 text-xs text-neutral-200 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 transition-colors"
+          aria-label="명함 보관함 검색"
+          className="w-full pl-9 pr-8 py-2 rounded-xl bg-[#121214] border border-white/10 text-xs text-neutral-200 placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 transition-colors"
         />
+        {searchQuery && (
+          <button
+            type="button"
+            onClick={handleClearSearch}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-zinc-400 hover:text-white hover:bg-white/10 cursor-pointer"
+            aria-label="검색어 지우기"
+            title="검색어 지우기"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       {/* 2. Wallet Toolbar (Categories on Left, View Mode & Primary Accent Button on Right) */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-2 border-b border-white/10">
         {/* Left: Category Filter Chips */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
-          {categories.map((cat) => {
+          {CATEGORIES.map((cat) => {
             const isSelected = selectedCategory === cat;
-            const count = cat === '전체' 
-              ? cards.length 
-              : cards.filter(c => c.category === cat).length;
+            const count = categoryCounts[cat] ?? 0;
 
             return (
               <button
                 key={cat}
+                type="button"
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-3 py-1.5 rounded-full whitespace-nowrap text-xs transition-all cursor-pointer font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
                   isSelected
@@ -150,11 +235,12 @@ export const VaultView: React.FC<VaultViewProps> = ({
           {/* View Mode Toggle */}
           <div className="flex items-center p-1 bg-[#121214] rounded-xl border border-zinc-800/80 text-xs">
             <button
+              type="button"
               onClick={() => setViewMode('cards')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors cursor-pointer ${
                 viewMode === 'cards'
                   ? 'bg-white/10 text-white font-semibold shadow-sm'
-                  : 'text-neutral-400 hover:text-neutral-200'
+                  : 'text-zinc-400 hover:text-neutral-200'
               }`}
               title="카드 갤러리 뷰"
             >
@@ -162,11 +248,12 @@ export const VaultView: React.FC<VaultViewProps> = ({
               <span className="hidden sm:inline">카드</span>
             </button>
             <button
+              type="button"
               onClick={() => setViewMode('list')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors cursor-pointer ${
                 viewMode === 'list'
                   ? 'bg-white/10 text-white font-semibold shadow-sm'
-                  : 'text-neutral-400 hover:text-neutral-200'
+                  : 'text-zinc-400 hover:text-neutral-200'
               }`}
               title="에디토리얼 리스트 뷰"
             >
@@ -177,6 +264,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
 
           {/* Primary Action Button: Photo Archive & Card Creation */}
           <button
+            type="button"
             onClick={onOpenScan}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-neutral-200 active:bg-neutral-300 text-neutral-950 text-xs font-bold transition-all shadow-md cursor-pointer active:scale-95 shrink-0"
           >
@@ -192,6 +280,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
           <p className="text-sm font-semibold text-neutral-300">검색 조건에 일치하는 명함이 없습니다.</p>
           <p className="text-xs text-zinc-400">실물 명함 사진을 보관하거나 새로운 명함을 등록해 보세요.</p>
           <button
+            type="button"
             onClick={onOpenScan}
             className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-black text-xs font-bold hover:bg-neutral-200 transition-colors cursor-pointer"
           >
@@ -202,180 +291,17 @@ export const VaultView: React.FC<VaultViewProps> = ({
       ) : viewMode === 'cards' ? (
         /* ================= CARDS GALLERY VIEW ================= */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredCards.map((card) => {
-            const hasPhoto = Boolean(card.scannedImage);
-
-            return (
-              <div
-                key={card.id}
-                className="group relative rounded-2xl bg-[#121214] border border-zinc-800/80 hover:border-white/20 overflow-hidden shadow-xl transition-all duration-200 flex flex-col justify-between hover:-translate-y-0.5"
-              >
-                {/* Card Header Info */}
-                <div className="p-3.5 sm:p-4 border-b border-zinc-800/80 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
-                    <span className="font-medium text-zinc-300">
-                      {card.category}
-                    </span>
-                    {card.isMyCard && (
-                      <>
-                        <span aria-hidden="true">·</span>
-                        <span className="font-semibold text-white">내 명함</span>
-                      </>
-                    )}
-                    {hasPhoto && (
-                      <>
-                        <span aria-hidden="true">·</span>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPhotoArchiveCard(card);
-                          }}
-                          className="font-medium text-zinc-300 hover:text-white transition-colors cursor-pointer inline-flex items-center gap-1 underline-offset-2 hover:underline"
-                          title="클릭하여 실물 명함 원본 사진 열람"
-                        >
-                          <Camera className="w-3 h-3" />
-                          <span>사진 보관</span>
-                        </button>
-                      </>
-                    )}
-                  </div>
-                  <span className="text-[10px] font-mono tabular-nums text-zinc-400">
-                    {card.createdAt}
-                  </span>
-                </div>
-
-                {/* Card Miniature Preview (Click to Open in 3D Viewport) */}
-                <div 
-                  onClick={() => onSelectCard(card)}
-                  className="p-4 cursor-pointer relative"
-                  title="클릭하여 3D 뷰어로 전체화면 열기"
-                >
-                  <div className={`w-full ${isVerticalLayout(card.layout_type) ? 'aspect-[5/8] max-w-[200px] mx-auto' : 'aspect-[9/5]'} rounded-xl overflow-hidden shadow-md ring-1 ring-white/10 group-hover:ring-white/30 transition-all pointer-events-none`}>
-                    <BusinessCardFront 
-                      data={card.data} 
-                      theme={card.theme} 
-                      layout_type={card.layout_type}
-                      card_features={card.card_features}
-                      isPhotoCard={card.isPhotoCard || card.creation_mode === 'photo'}
-                      photoUrl={card.scannedImage || card.front_image_url}
-                      html_front={card.html_front ? sanitizeHtml(card.html_front) : undefined}
-                      hideBorder={true}
-                    />
-                  </div>
-                  
-                  {/* Subtle overlay affordance on hover */}
-                  <div className="absolute inset-0 m-4 rounded-xl bg-black/40 opacity-0 group-hover:opacity-100 backdrop-blur-[2px] transition-opacity flex items-center justify-center gap-2 text-white font-semibold text-xs">
-                    <Eye className="w-4 h-4" />
-                    <span>3D 인터랙티브 뷰어로 열기</span>
-                  </div>
-                </div>
-
-                {/* Card Contact & Meta Info */}
-                <div className="px-4 pb-2 space-y-1 text-xs">
-                  <div className="flex items-baseline justify-between">
-                    <h4 className="font-bold text-white text-sm tracking-tight">{card.data.name}</h4>
-                    <span className="text-[11px] text-neutral-400">{card.data.titleKr || card.data.title}</span>
-                  </div>
-                  <p className="text-[11px] text-neutral-400 truncate">{card.data.organization}</p>
-                  {card.notes && (
-                    <p className="text-[10px] text-neutral-400 line-clamp-1 italic pt-0.5">"{card.notes}"</p>
-                  )}
-                </div>
-
-                {/* Action Rail Footer */}
-                <div className="p-3 border-t border-zinc-800/80 bg-[#0A0A0B] flex items-center justify-between text-zinc-400">
-                  <div className="flex items-center gap-1">
-                    {card.data.phoneRaw && (
-                      <>
-                        <a
-                          href={`tel:${card.data.phoneRaw}`}
-                          className="p-1.5 rounded-lg text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
-                          title="전화 통화 걸기"
-                        >
-                          <Phone className="w-3.5 h-3.5" />
-                        </a>
-                        <a
-                          href={`sms:${card.data.phoneRaw}`}
-                          className="p-1.5 rounded-lg text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
-                          title="문자 보내기"
-                        >
-                          <MessageSquare className="w-3.5 h-3.5" />
-                        </a>
-                      </>
-                    )}
-                    {card.data.email && (
-                      <a
-                        href={`mailto:${card.data.email}`}
-                        className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors"
-                        title="이메일 발송"
-                      >
-                        <Mail className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                    {card.data.website && (
-                      <a
-                        href={card.data.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors"
-                        title="공식 웹사이트"
-                      >
-                        <Globe className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                    <button
-                      onClick={() => downloadVCard(card.data)}
-                      className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                      title="주소록 저장 (.vcf)"
-                    >
-                      <UserPlus className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    {/* View Original Photo Archive */}
-                    {hasPhoto && (
-                      <button
-                        onClick={() => setPhotoArchiveCard(card)}
-                        className="p-1.5 rounded-lg text-zinc-200 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                        title="실물 명함 원본 사진 보기"
-                      >
-                        <Camera className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                    {/* HTML Export */}
-                    <button
-                      onClick={() => onExportCard(card)}
-                      className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                      title="독립형 HTML 코드 내보내기"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                    </button>
-                    {/* Edit */}
-                    <button
-                      onClick={() => onEditCard(card)}
-                      className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                      title="명함 정보 및 레이아웃 수정"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                    </button>
-                    {/* Delete (prevent deleting default my-card) */}
-                    {!card.isMyCard && (
-                      <button
-                        onClick={() => onDeleteCard(card.id)}
-                        className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                        title="명함 삭제"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-              </div>
-            );
-          })}
+          {filteredCards.map((card) => (
+            <VaultCardItem
+              key={card.id}
+              card={card}
+              onSelectCard={handleSelectCard}
+              onEditCard={handleEditCard}
+              onDeleteCard={handleDeleteCard}
+              onExportCard={handleExportCard}
+              onOpenPhotoArchive={handleOpenPhotoArchive}
+            />
+          ))}
         </div>
       ) : (
         /* ================= EDITORIAL LIST VIEW ================= */
@@ -395,78 +321,14 @@ export const VaultView: React.FC<VaultViewProps> = ({
               </thead>
               <tbody className="divide-y divide-zinc-800/80 text-neutral-300">
                 {filteredCards.map((card) => (
-                  <tr 
-                    key={card.id} 
-                    className="hover:bg-white/[0.04] transition-colors cursor-pointer group"
-                    onClick={() => onSelectCard(card)}
-                  >
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-white group-hover:underline underline-offset-2">{card.data.name}</span>
-                        {card.isMyCard && (
-                          <span className="text-[10px] text-zinc-400 font-medium">
-                            · 내 명함
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-4 text-zinc-400">
-                      {card.data.titleKr || card.data.title}
-                    </td>
-                    <td className="py-3.5 px-4 text-zinc-300">
-                      {card.data.organization}
-                    </td>
-                    <td className="py-3.5 px-4 text-zinc-400 text-[11px]">
-                      {card.category}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      {card.scannedImage ? (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPhotoArchiveCard(card);
-                          }}
-                          className="flex items-center gap-1 text-[10px] text-zinc-200 hover:text-white hover:underline cursor-pointer"
-                        >
-                          <Camera className="w-3 h-3" />
-                          <span>사진 보기</span>
-                        </button>
-                      ) : (
-                        <span className="text-[10px] text-zinc-400">-</span>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-4 text-zinc-400 font-mono tabular-nums text-[11px]">
-                      {card.data.phone || card.data.email || '-'}
-                    </td>
-                    <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center justify-end gap-1 text-zinc-400">
-                        <button
-                          onClick={() => downloadVCard(card.data)}
-                          className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                          title="vCard 다운로드"
-                        >
-                          <UserPlus className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => onEditCard(card)}
-                          className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                          title="수정"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                        {!card.isMyCard && (
-                          <button
-                            onClick={() => onDeleteCard(card.id)}
-                            className="p-1.5 rounded-lg hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                            title="삭제"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                  <VaultCardListRow
+                    key={card.id}
+                    card={card}
+                    onSelectCard={handleSelectCard}
+                    onEditCard={handleEditCard}
+                    onDeleteCard={handleDeleteCard}
+                    onOpenPhotoArchive={handleOpenPhotoArchive}
+                  />
                 ))}
               </tbody>
             </table>
@@ -478,7 +340,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
       <PhotoArchiveModal
         isOpen={Boolean(photoArchiveCard)}
         card={photoArchiveCard}
-        onClose={() => setPhotoArchiveCard(null)}
+        onClose={handleClosePhotoArchive}
       />
     </div>
   );

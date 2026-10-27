@@ -1,9 +1,15 @@
 import React, { useState, useRef } from 'react';
 import { StoredCard, CardCategory } from '../types/card';
-import { 
-  Camera, Upload, Check, X, RefreshCw, Smartphone, 
-  Trash2, Phone, User, Building, FileText, ArrowRight, Layers,
-  Download, Eye, RotateCcw, ExternalLink, Calendar, Tag
+import {
+  Camera,
+  Upload,
+  Check,
+  X,
+  RefreshCw,
+  User,
+  Layers,
+  Download,
+  Loader2,
 } from 'lucide-react';
 import { BusinessCardFront } from './BusinessCardFront';
 import { cropAndCompressCardImage } from '../utils/imageProcess';
@@ -41,6 +47,8 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const activeSlotRef = useRef<'front' | 'back'>('front');
+  const processingRef = useRef(false);
 
   if (!isOpen) return null;
 
@@ -174,7 +182,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
             {viewTab === 'compare' && (
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-5 items-center animate-in fade-in duration-150 max-w-4xl">
                 <div className="space-y-2">
-                  <span className="text-[11px] text-neutral-400 font-mono uppercase tracking-wider block text-center">
+                  <span className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider block text-center">
                     실물 촬영 아카이브
                   </span>
                   <div className="rounded-2xl overflow-hidden border border-white/15 shadow-xl bg-black/60 aspect-[9/5] w-full flex items-center justify-center">
@@ -227,7 +235,14 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
   }
 
   // CAPTURE / ARCHIVE INPUT MODE: Client-side canvas compression (WebP) & Quick Manual Contact Input (Name + Phone)
+  const handleSafeClose = () => {
+    if (isProcessing || processingRef.current) return;
+    onClose();
+  };
+
   const processImageToCardRatio = async (file: File, slot: 'front' | 'back') => {
+    if (processingRef.current) return;
+    processingRef.current = true;
     setIsProcessing(true);
     try {
       const result = await cropAndCompressCardImage(file, {
@@ -244,18 +259,22 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
     } catch (err) {
       console.error('Photo archiving error:', err);
     } finally {
+      processingRef.current = false;
       setIsProcessing(false);
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      processImageToCardRatio(file, activeSlot);
-    }
+    // Reset input value so re-capturing or re-selecting the same photo always fires onChange
+    e.target.value = '';
+    if (!file || isProcessing || processingRef.current) return;
+    void processImageToCardRatio(file, activeSlotRef.current);
   };
 
   const triggerUpload = (slot: 'front' | 'back', useCamera = false) => {
+    if (isProcessing || processingRef.current) return;
+    activeSlotRef.current = slot;
     setActiveSlot(slot);
     if (useCamera && cameraInputRef.current) {
       cameraInputRef.current.click();
@@ -265,6 +284,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
   };
 
   const handleSave = () => {
+    if (isProcessing || processingRef.current) return;
     if (!name.trim() || !phone.trim() || !onSaveCard) return;
 
     const rawPhone = phone.replace(/[^0-9+]/g, '');
@@ -303,6 +323,12 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
     };
 
     onSaveCard(newCard);
+    setFrontPhoto(null);
+    setBackPhoto(null);
+    setName('');
+    setPhone('');
+    setCompanyAndNote('');
+    setCategory('VIP 파트너');
     onClose();
   };
 
@@ -316,16 +342,46 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
-      <div 
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={handleSafeClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-busy={isProcessing}
         className="relative w-full max-w-2xl max-h-[92vh] flex flex-col rounded-3xl bg-[#121214] border border-white/10 text-neutral-100 shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Loading Overlay: blocks duplicate touches while cropAndCompressCardImage runs */}
+        {isProcessing && (
+          <div
+            role="status"
+            aria-live="assertive"
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            className="absolute inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col items-center justify-center gap-3.5 px-6 text-center select-none touch-none cursor-wait animate-in fade-in duration-150"
+          >
+            <div className="p-3.5 rounded-2xl bg-[#18181B] border border-white/15 shadow-2xl flex items-center justify-center">
+              <Loader2 className="w-7 h-7 text-white animate-spin" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-bold text-white tracking-tight">
+                {activeSlot === 'front' ? '명함 앞면' : '명함 뒷면'} 이미지를 최적화하고 있습니다...
+              </p>
+              <p className="text-xs text-zinc-400">
+                9:5 비율 크롭 및 WebP 압축 변환 중 · 잠시만 기다려 주세요
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Hidden inputs */}
         <input 
           type="file" 
           ref={fileInputRef} 
           accept="image/*" 
+          disabled={isProcessing}
           className="hidden" 
           onChange={handleFileChange} 
         />
@@ -334,6 +390,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
           ref={cameraInputRef} 
           accept="image/*" 
           capture="environment" 
+          disabled={isProcessing}
           className="hidden" 
           onChange={handleFileChange} 
         />
@@ -354,8 +411,10 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
             </p>
           </div>
           <button
-            onClick={onClose}
-            className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            type="button"
+            onClick={handleSafeClose}
+            disabled={isProcessing}
+            className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
             title="닫기"
           >
             <X className="w-5 h-5" />
@@ -383,8 +442,9 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                   {frontPhoto && (
                     <button
                       type="button"
+                      disabled={isProcessing}
                       onClick={() => setFrontPhoto(null)}
-                      className="text-zinc-300 hover:text-white hover:underline text-[10px] cursor-pointer"
+                      className="text-zinc-300 hover:text-white hover:underline disabled:opacity-40 disabled:pointer-events-none text-[10px] cursor-pointer"
                     >
                       삭제
                     </button>
@@ -401,8 +461,9 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                       />
                       <button
                         type="button"
+                        disabled={isProcessing}
                         onClick={() => triggerUpload('front')}
-                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white font-medium cursor-pointer"
+                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 disabled:pointer-events-none transition-opacity flex items-center justify-center gap-1.5 text-white font-medium cursor-pointer"
                       >
                         <RefreshCw className="w-4 h-4" />
                         <span>다시 등록</span>
@@ -413,16 +474,18 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
+                          disabled={isProcessing}
                           onClick={() => triggerUpload('front', true)}
-                          className="px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-neutral-950 flex items-center gap-1.5 cursor-pointer font-semibold transition-colors"
+                          className="px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-200 disabled:opacity-40 disabled:pointer-events-none text-neutral-950 flex items-center gap-1.5 cursor-pointer font-semibold transition-colors"
                         >
                           <Camera className="w-3.5 h-3.5" />
                           <span>촬영</span>
                         </button>
                         <button
                           type="button"
+                          disabled={isProcessing}
                           onClick={() => triggerUpload('front', false)}
-                          className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 flex items-center gap-1.5 cursor-pointer transition-colors"
+                          className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none text-zinc-300 border border-white/10 flex items-center gap-1.5 cursor-pointer transition-colors"
                         >
                           <Upload className="w-3.5 h-3.5" />
                           <span>앨범</span>
@@ -441,8 +504,9 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                   {backPhoto && (
                     <button
                       type="button"
+                      disabled={isProcessing}
                       onClick={() => setBackPhoto(null)}
-                      className="text-zinc-300 hover:text-white hover:underline text-[10px] cursor-pointer"
+                      className="text-zinc-300 hover:text-white hover:underline disabled:opacity-40 disabled:pointer-events-none text-[10px] cursor-pointer"
                     >
                       삭제
                     </button>
@@ -459,8 +523,9 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                       />
                       <button
                         type="button"
+                        disabled={isProcessing}
                         onClick={() => triggerUpload('back')}
-                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white font-medium cursor-pointer"
+                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 disabled:pointer-events-none transition-opacity flex items-center justify-center gap-1.5 text-white font-medium cursor-pointer"
                       >
                         <RefreshCw className="w-4 h-4" />
                         <span>다시 등록</span>
@@ -471,16 +536,18 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
+                          disabled={isProcessing}
                           onClick={() => triggerUpload('back', true)}
-                          className="px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-neutral-950 flex items-center gap-1.5 cursor-pointer font-semibold transition-colors"
+                          className="px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-200 disabled:opacity-40 disabled:pointer-events-none text-neutral-950 flex items-center gap-1.5 cursor-pointer font-semibold transition-colors"
                         >
                           <Camera className="w-3.5 h-3.5" />
                           <span>촬영</span>
                         </button>
                         <button
                           type="button"
+                          disabled={isProcessing}
                           onClick={() => triggerUpload('back', false)}
-                          className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 flex items-center gap-1.5 cursor-pointer transition-colors"
+                          className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none text-zinc-300 border border-white/10 flex items-center gap-1.5 cursor-pointer transition-colors"
                         >
                           <Upload className="w-3.5 h-3.5" />
                           <span>앨범</span>
@@ -509,9 +576,10 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                 <input
                   type="text"
                   value={name}
+                  disabled={isProcessing}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="예: 김민수 대표"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121214] border border-white/10 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none text-white text-xs"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121214] border border-white/10 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none disabled:opacity-50 text-white text-xs"
                 />
               </div>
 
@@ -522,9 +590,10 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                 <input
                   type="text"
                   value={phone}
+                  disabled={isProcessing}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="예: 010-1234-5678"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121214] border border-white/10 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none text-white text-xs font-mono tabular-nums"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#121214] border border-white/10 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none disabled:opacity-50 text-white text-xs font-mono tabular-nums"
                 />
               </div>
             </div>
@@ -536,9 +605,10 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
               <input
                 type="text"
                 value={companyAndNote}
+                disabled={isProcessing}
                 onChange={(e) => setCompanyAndNote(e.target.value)}
                 placeholder="예: 글로벌 디자인 랩 / 2026 파트너십 미팅"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#121214] border border-white/10 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none text-white text-xs"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#121214] border border-white/10 focus:border-white/20 focus:ring-1 focus:ring-white/20 focus:outline-none disabled:opacity-50 text-white text-xs"
               />
             </div>
 
@@ -550,8 +620,9 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
                   <button
                     key={cat}
                     type="button"
+                    disabled={isProcessing}
                     onClick={() => setCategory(cat)}
-                    className={`px-2.5 py-1 rounded-full text-[10px] transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                    className={`px-2.5 py-1 rounded-full text-[10px] disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                       category === cat
                         ? 'bg-white text-neutral-950 font-bold'
                         : 'bg-[#121214] text-zinc-400 hover:text-white hover:bg-white/10 border border-white/10'
@@ -570,8 +641,9 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
         <div className="p-4 sm:p-5 border-t border-white/10 bg-[#0A0A0B] flex items-center justify-between shrink-0">
           <button
             type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer text-xs"
+            disabled={isProcessing}
+            onClick={handleSafeClose}
+            className="px-4 py-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer text-xs"
           >
             취소
           </button>
@@ -580,7 +652,7 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
             type="button"
             onClick={handleSave}
             disabled={!name.trim() || !phone.trim() || isProcessing}
-            className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-white hover:bg-zinc-200 disabled:opacity-40 disabled:hover:bg-white text-neutral-950 font-bold text-xs transition-all cursor-pointer shadow-lg active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+            className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-white hover:bg-zinc-200 disabled:opacity-40 disabled:pointer-events-none disabled:hover:bg-white text-neutral-950 font-bold text-xs transition-all cursor-pointer shadow-lg active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
           >
             <Check className="w-4 h-4" />
             <span>보관함에 실물 명함 저장</span>
