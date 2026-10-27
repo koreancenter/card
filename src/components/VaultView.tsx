@@ -20,6 +20,7 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 import { BusinessCardFront } from './BusinessCardFront';
+import { isVerticalLayout } from '../constants/templates';
 import { downloadVCard } from '../utils/vcard';
 import { PhotoArchiveModal } from './PhotoArchiveModal';
 
@@ -249,7 +250,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
                   className="p-4 cursor-pointer relative"
                   title="클릭하여 3D 뷰어로 전체화면 열기"
                 >
-                  <div className={`w-full ${card.layout_type === 'vertical_atelier' ? 'aspect-[5/8] max-w-[200px] mx-auto' : 'aspect-[9/5]'} rounded-xl overflow-hidden shadow-md ring-1 ring-white/10 group-hover:ring-white/30 transition-all pointer-events-none`}>
+                  <div className={`w-full ${isVerticalLayout(card.layout_type) ? 'aspect-[5/8] max-w-[200px] mx-auto' : 'aspect-[9/5]'} rounded-xl overflow-hidden shadow-md ring-1 ring-white/10 group-hover:ring-white/30 transition-all pointer-events-none`}>
                     <BusinessCardFront 
                       data={card.data} 
                       theme={card.theme} 

@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  StoredCard, 
-  CardTheme, 
-  CardData, 
-  CardLayoutType, 
-  CardFeatures, 
-  CardCategory,
-  CardCreationMode 
+import {
+  StoredCard,
+  CardTheme,
+  CardData,
+  CardLayoutType,
+  CardFeatures,
+  CardCreationMode
 } from '../types/card';
-import { 
-  X, Check, RotateCcw,
-  Palette, Camera, Code2
-} from 'lucide-react';
+import { X, RotateCcw } from 'lucide-react';
 import { APP_BASE_DOMAIN, normalizeDomain } from '../utils/domain';
 import { CARD_DATA } from '../utils/vcard';
 import { TemplateModeEditor } from './editor/TemplateModeEditor';
-import { CustomHtmlEditor, DEFAULT_LUXURY_HTML_FRONT, DEFAULT_LUXURY_HTML_BACK } from './editor/CustomHtmlEditor';
+import {
+  CustomHtmlEditor,
+  DEFAULT_LUXURY_HTML_FRONT,
+  DEFAULT_LUXURY_HTML_BACK
+} from './editor/CustomHtmlEditor';
 import { PhotoArchivingEditor } from './editor/PhotoArchivingEditor';
 import { EditorPreviewPanel } from './editor/EditorPreviewPanel';
 
@@ -37,60 +37,38 @@ export const THEME_OPTIONS: {
 }[] = [
   {
     id: 'pure_white',
-    name: '럭셔리 퓨어 화이트',
-    description: '순백 매트 코튼 & 모노크롬 블랙',
-    dotColor: '#FAFAFA',
-    accent: '#0A0A0B'
+    name: '매트 페이퍼',
+    description: 'Matte Paper',
+    dotColor: '#F5F5F3',
+    accent: '#141416'
+  },
+  {
+    id: 'warm_paper',
+    name: '파인 코튼',
+    description: 'Warm Cotton',
+    dotColor: '#EAE7E0',
+    accent: '#1C1C1F'
   },
   {
     id: 'sumi_ink',
     name: '수묵 인크',
-    description: '깊은 수묵 매트 & 크리스프 화이트',
-    dotColor: '#0A0A0B',
-    accent: '#FAFAFA'
-  },
-  {
-    id: 'warm_paper',
-    name: '웜 페이퍼',
-    description: '파인아트 코튼 & 차콜 블랙',
-    dotColor: '#F5F5F4',
-    accent: '#18181B'
-  },
-  {
-    id: 'deep_forest',
-    name: '딥 슬레이트',
-    description: '아키텍처 차콜 & 실버 모노',
-    dotColor: '#121214',
-    accent: '#D4D4D8'
-  },
-  {
-    id: 'classic_navy',
-    name: '미드나잇 스틸',
-    description: '다크 스틸 & 플래티넘 화이트',
-    dotColor: '#0F1115',
-    accent: '#E4E4E7'
+    description: 'Sumi Ink',
+    dotColor: '#141416',
+    accent: '#EAEAE6'
   },
   {
     id: 'obsidian',
-    name: '옵시디언 블랙',
-    description: '옵시디언 매트 & 퓨어 화이트',
-    dotColor: '#121214',
-    accent: '#FAFAFA'
-  },
-  {
-    id: 'sand',
-    name: '샌드 캐시미어',
-    description: '린넨 매트 & 징크 차콜',
-    dotColor: '#F4F4F5',
-    accent: '#27272A'
-  },
-  {
-    id: 'titanium',
-    name: '티타늄 그레이',
-    description: '정밀 티타늄 & 크롬 실버',
-    dotColor: '#18181B',
-    accent: '#A1A1AA'
+    name: '웜 슬레이트',
+    description: 'Warm Slate',
+    dotColor: '#202024',
+    accent: '#D4D4D8'
   }
+];
+
+const CREATION_MODES: { id: CardCreationMode; label: string }[] = [
+  { id: 'template', label: '디자인 템플릿' },
+  { id: 'photo', label: '실물 사진' },
+  { id: 'custom_html', label: '커스텀 코드' }
 ];
 
 export const CardEditorModal: React.FC<CardEditorModalProps> = ({
@@ -101,7 +79,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
   isMyCardMode = false,
   isCreating = false
 }) => {
-  // Primary 3-Way Creation Mode: 'template' | 'photo' | 'custom_html'
+  // Primary Creation Mode: 'template' | 'photo' | 'custom_html'
   const [creationMode, setCreationMode] = useState<CardCreationMode>(
     card.creation_mode || (card.isPhotoCard ? 'photo' : card.html_front ? 'custom_html' : 'template')
   );
@@ -149,18 +127,18 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
   // Sync state whenever card or isOpen changes
   useEffect(() => {
     if (isOpen) {
-      const mode: CardCreationMode = 
+      const mode: CardCreationMode =
         card.creation_mode || (card.isPhotoCard ? 'photo' : card.html_front ? 'custom_html' : 'template');
       setCreationMode(mode);
 
-      const initialAddressEn = 
-        card.data.address_en || 
-        card.details?.address_en || 
-        card.data.details?.address_en || 
+      const initialAddressEn =
+        card.data.address_en ||
+        card.details?.address_en ||
+        card.data.details?.address_en ||
         (card.data.addressLines && card.data.addressLines.length > 0 ? card.data.addressLines.join(', ') : '');
-      const cleanAddressEn = 
+      const cleanAddressEn =
         initialAddressEn.includes('77 Cheongdam-ro') && (initialAddressEn.includes('06015') || initialAddressEn.includes('Republic of Korea'))
-          ? '' 
+          ? ''
           : initialAddressEn;
 
       const initialData: CardData = {
@@ -240,10 +218,18 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
 
   const cleanCustomDomain = customDomain ? normalizeDomain(customDomain) : '';
   const cleanSlug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '') || 'card';
-  const effectiveUrl = cleanCustomDomain 
-    ? `https://${cleanCustomDomain}` 
+  const effectiveUrl = cleanCustomDomain
+    ? `https://${cleanCustomDomain}`
     : `https://${APP_BASE_DOMAIN}/${cleanSlug}`;
   const effectiveDisplayUrl = cleanCustomDomain || `${APP_BASE_DOMAIN}/${cleanSlug}`;
+
+  const handleResetSample = () => {
+    setFormData({ ...CARD_DATA });
+    setSlug('master');
+    setTheme('pure_white');
+    setLayoutType('editorial_minimal');
+    setCreationMode('template');
+  };
 
   const handleSave = () => {
     const finalAddressEn = formData.address_en ?? formData.details?.address_en ?? '';
@@ -280,13 +266,9 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
       customDomain: cleanCustomDomain || undefined,
       isDefault: isMyCardMode ? isDefault : false,
       isMyCard: isMyCardMode || card.isMyCard,
-      
-      // 3-Way Discriminated Union Architecture Integration
       creation_mode: creationMode,
       owner_key: card.owner_key || `key_${Date.now()}`,
       created_at: card.created_at || new Date().toISOString(),
-
-      // Template details
       details: {
         en_name: formData.nameKr,
         sub_org: formData.subOrg,
@@ -296,12 +278,8 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
         show_address: features.show_address ?? true,
         show_en_name: features.show_en_name ?? true
       },
-
-      // Custom HTML
       html_front: isHtmlMode ? htmlFront : undefined,
       html_back: isHtmlMode ? htmlBack : undefined,
-
-      // Photo
       front_image_url: isPhotoMode ? frontImageUrl : undefined,
       back_image_url: isPhotoMode ? backImageUrl : undefined,
       scannedImage: isPhotoMode ? frontImageUrl : undefined,
@@ -314,112 +292,84 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#0B0B0D]/80 backdrop-blur-xl animate-in fade-in duration-200"
+      onClick={onClose}
+    >
       <style>{`
-        .editor-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .editor-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
         .editor-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .editor-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 9999px; }
-        .editor-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
-        .editor-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.12) transparent; }
+        .editor-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 9999px; }
+        .editor-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.18); }
+        .editor-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.08) transparent; }
       `}</style>
-      <div 
-        className="CardEditorModal relative w-full max-w-6xl h-[90vh] max-h-[880px] flex flex-col rounded-3xl bg-[#121214] border border-white/10 text-neutral-100 shadow-2xl overflow-hidden"
+
+      <div
+        className="CardEditorModal relative w-full max-w-6xl h-[90vh] max-h-[880px] flex flex-col rounded-2xl bg-[#121214] border border-white/[0.08] text-[#E8E8EC] shadow-[0_32px_80px_-20px_rgba(0,0,0,0.75)] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="px-6 py-3.5 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#0A0A0B]">
-          <div className="space-y-0.5">
-            <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
-              {isCreating 
-                ? '새로운 럭셔리 디지털 명함 생성' 
-                : isMyCardMode 
-                  ? '내 디지털 명함 커스터마이징' 
-                  : '명함 정보 & 디자인 에디터'}
+        {/* Header & Typographic Mode Tab Strip */}
+        <header className="px-6 sm:px-9 pt-6 border-b border-white/[0.06] bg-[#121214] shrink-0">
+          <div className="flex items-center justify-between gap-4 pb-5">
+            <h3 className="text-base sm:text-[17px] font-medium text-[#F2F2F5] tracking-tight">
+              {isCreating
+                ? '새 명함 만들기'
+                : isMyCardMode
+                  ? '내 명함 편집'
+                  : '명함 편집'}
             </h3>
-            <p className="text-xs text-zinc-400">
-              3-Way 생성 방식: 디자인 템플릿, 실물 명함 사진 보관, 커스텀 HTML/Tailwind 주입
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-            title="닫기"
-            aria-label="닫기"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
 
-        {/* STEP 2: PRIMARY 3-WAY CREATION MODE SEGMENTED SWITCH */}
-        <div className="px-6 py-2.5 border-b border-white/10 bg-[#0A0A0B] shrink-0 flex items-center justify-between gap-3 overflow-x-auto">
-          <div className="inline-flex p-1 rounded-2xl bg-[#121214] border border-zinc-800/80 gap-1 text-xs">
-            {/* 1. 디자인 템플릿 */}
-            <button
-              type="button"
-              onClick={() => setCreationMode('template')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
-                creationMode === 'template'
-                  ? 'bg-white text-neutral-950 font-bold shadow-sm'
-                  : 'text-zinc-400 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <Palette className="w-4 h-4" />
-              <span>디자인 템플릿</span>
-            </button>
-
-            {/* 2. 실물 명함 사진 */}
-            <button
-              type="button"
-              onClick={() => setCreationMode('photo')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
-                creationMode === 'photo'
-                  ? 'bg-white text-neutral-950 font-bold shadow-sm'
-                  : 'text-zinc-400 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <Camera className="w-4 h-4" />
-              <span>실물 명함 사진</span>
-            </button>
-
-            {/* 3. 커스텀 HTML */}
-            <button
-              type="button"
-              onClick={() => setCreationMode('custom_html')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
-                creationMode === 'custom_html'
-                  ? 'bg-white text-neutral-950 font-bold shadow-sm'
-                  : 'text-zinc-400 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <Code2 className="w-4 h-4" />
-              <span>커스텀 HTML</span>
-            </button>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={handleResetSample}
+                className="p-2 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.04] cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+                title="초기화"
+                aria-label="초기화"
+              >
+                <RotateCcw className="w-4 h-4 stroke-[1.5]" />
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-2 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.04] cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+                title="닫기"
+                aria-label="닫기"
+              >
+                <X className="w-4 h-4 stroke-[1.5]" />
+              </button>
+            </div>
           </div>
 
-          {/* Quick Sample Reset Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setFormData({ ...CARD_DATA });
-              setSlug('master');
-              setTheme('pure_white');
-              setLayoutType('editorial_minimal');
-              setCreationMode('template');
-            }}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer shrink-0"
-            title="샘플 데이터 복원"
-            aria-label="샘플 데이터 복원"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
-        </div>
+          {/* Minimal Border-Bottom Typographic Mode Switcher */}
+          <nav className="flex items-center gap-7 overflow-x-auto no-scrollbar" aria-label="생성 방식">
+            {CREATION_MODES.map((mode) => {
+              const isActive = creationMode === mode.id;
+              return (
+                <button
+                  key={mode.id}
+                  type="button"
+                  onClick={() => setCreationMode(mode.id)}
+                  className={`relative pb-3.5 text-[13px] tracking-wide whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-none ${
+                    isActive
+                      ? 'text-[#F2F2F5] font-medium'
+                      : 'text-zinc-500 hover:text-zinc-300 font-normal'
+                  }`}
+                >
+                  {mode.label}
+                  {isActive && (
+                    <span className="absolute inset-x-0 bottom-0 h-[1.5px] bg-[#E4E4E7]" />
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </header>
 
-        {/* Main Content Area: Split View (Left Inputs 5 cols / Right Live Hero Preview 7 cols) */}
+        {/* Main Split Workspace */}
         <div className="flex-1 grid grid-cols-12 overflow-y-auto lg:overflow-hidden editor-scrollbar">
-          
-          {/* ================= LEFT PANEL: INSPECTOR (Selected Creation Mode) ================= */}
-          <div className="order-2 lg:order-1 col-span-12 lg:col-span-5 h-auto lg:h-full lg:overflow-y-auto p-5 sm:p-6 lg:p-7 editor-scrollbar space-y-6">
-            
+          {/* Left Inspector Panel */}
+          <div className="order-2 lg:order-1 col-span-12 lg:col-span-5 h-auto lg:h-full lg:overflow-y-auto px-6 py-7 sm:px-9 sm:py-8 editor-scrollbar">
             {creationMode === 'template' && (
               <TemplateModeEditor
                 theme={theme}
@@ -471,10 +421,9 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
                 onChangeActiveFace={setHtmlEditorActiveFace}
               />
             )}
-
           </div>
 
-          {/* ================= RIGHT PANEL: DECOMPOSED GALLERY EXHIBITION ================= */}
+          {/* Right Live Gallery Stage */}
           <EditorPreviewPanel
             creationMode={creationMode}
             layoutType={layoutType}
@@ -490,29 +439,26 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
             previewFace={previewFace}
             onFlipPreviewFace={() => setPreviewFace(prev => (prev === 'front' ? 'back' : 'front'))}
           />
-
         </div>
 
-        {/* Modal Footer */}
-        <div className="px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] border-t border-white/10 bg-[#0A0A0B] flex items-center justify-between shrink-0">
+        {/* Restrained Footer */}
+        <footer className="px-6 sm:px-9 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] border-t border-white/[0.06] bg-[#121214] flex items-center justify-end gap-3 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer text-xs"
+            className="px-5 py-2.5 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.03] cursor-pointer text-[13px] font-normal whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
           >
             취소
           </button>
-          
+
           <button
             type="button"
             onClick={handleSave}
-            className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-neutral-950 font-bold text-xs transition-all cursor-pointer shadow-lg active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+            className="px-6 py-2.5 rounded-lg bg-[#EAEAE6] hover:bg-[#F3F3F0] text-[#121214] font-medium text-[13px] tracking-wide cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
           >
-            <Check className="w-4 h-4" />
-            <span>{isCreating ? '새 럭셔리 명함 등록' : '수정 사항 저장'}</span>
+            {isCreating ? '등록' : '저장'}
           </button>
-        </div>
-
+        </footer>
       </div>
     </div>
   );

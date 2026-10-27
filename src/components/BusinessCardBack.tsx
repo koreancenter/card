@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { CardData, CardTheme, CardOrientation, CardLayoutType } from '../types/card';
-import { resolveThemeStyles } from '../constants/templates';
+import { resolveThemeStyles, isVerticalLayout } from '../constants/templates';
 import { SandboxedCardRenderer } from './SandboxedCardRenderer';
 import { sanitizeSvg } from '../utils/sanitizer';
 
@@ -30,8 +30,8 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
 
   const themeStyles = resolveThemeStyles(theme);
   const isLight = themeStyles.isLight;
-  const isVerticalAtelier = layout_type === 'vertical_atelier';
-  const isPortrait = isVerticalAtelier || orientation === 'portrait';
+  const isVerticalCard = isVerticalLayout(layout_type);
+  const isPortrait = isVerticalCard || orientation === 'portrait';
 
   // Custom HTML / Tailwind Injection Back Face Rendering with Sandboxed Zero-Trust Isolation
   if (html_back) {

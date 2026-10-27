@@ -26,6 +26,10 @@ export interface LayoutPresetDefinition {
   description: string;
 }
 
+export function isVerticalLayout(layoutType?: CardLayoutType): boolean {
+  return layoutType === 'vertical_atelier' || layoutType === 'serenity_vertical';
+}
+
 export const LAYOUT_PRESETS: LayoutPresetDefinition[] = [
   {
     id: 'editorial_minimal',
@@ -40,12 +44,6 @@ export const LAYOUT_PRESETS: LayoutPresetDefinition[] = [
     description: '상단 중앙 실(Seal) 모노그램과 클래식 세리프 중심의 임원용 대칭 구도'
   },
   {
-    id: 'vertical_atelier',
-    name: '버티컬 아틀리에',
-    aspectRatio: '5:8',
-    description: '건축가·디렉터·크리에이터를 위한 절제된 수직형 아틀리에 포맷'
-  },
-  {
     id: 'swiss_typo_bold',
     name: '스위스 타이포 볼드',
     aspectRatio: '9:5',
@@ -56,6 +54,18 @@ export const LAYOUT_PRESETS: LayoutPresetDefinition[] = [
     name: '매트 오가닉 페이퍼',
     aspectRatio: '9:5',
     description: '여백의 미와 매트 파인아트 지류 감성을 극대화한 정제된 밸런스'
+  },
+  {
+    id: 'vertical_atelier',
+    name: '버티컬 아틀리에',
+    aspectRatio: '5:8',
+    description: '건축가·디렉터·크리에이터를 위한 절제된 수직형 아틀리에 포맷'
+  },
+  {
+    id: 'serenity_vertical',
+    name: '세레니티 버티컬',
+    aspectRatio: '5:8',
+    description: '여백의 미와 타이포그래피에 집중한 절제된 세로형 구도의 프리셋'
   }
 ];
 

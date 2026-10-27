@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { CardTheme, CardLayoutType, CardFeatures, CardData, CardCategory } from '../../types/card';
 import { LAYOUT_PRESETS } from '../../constants/templates';
-import { Palette, User, Upload, Trash2, CheckCircle2, RotateCcw } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { THEME_OPTIONS } from '../CardEditorModal';
 import { APP_BASE_DOMAIN } from '../../utils/domain';
 
@@ -26,6 +26,9 @@ interface TemplateModeEditorProps {
   subTab: 'visual_atelier' | 'identity_profile';
   onChangeSubTab: (tab: 'visual_atelier' | 'identity_profile') => void;
 }
+
+const INPUT_CLASS =
+  'w-full px-3.5 py-2.5 rounded-lg bg-[#161618] border border-white/[0.06] hover:border-white/[0.12] focus:outline-none focus:border-white/25 focus:bg-[#19191C] text-[#EDEDEF] placeholder:text-zinc-600 text-[13px]';
 
 export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
   theme,
@@ -62,23 +65,23 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
   };
 
   const renderLayoutMiniWireframe = (id: CardLayoutType, isSelected: boolean) => {
-    const strokeClass = isSelected ? 'bg-white' : 'bg-zinc-600';
-    const subClass = isSelected ? 'bg-zinc-400' : 'bg-zinc-700';
+    const strokeClass = isSelected ? 'bg-[#E4E4E7]' : 'bg-zinc-600';
+    const subClass = isSelected ? 'bg-zinc-500' : 'bg-zinc-700/80';
 
     if (id === 'editorial_minimal') {
       return (
-        <div className="w-full aspect-[9/5] p-2 rounded-lg bg-[#0A0A0B] border border-white/10 flex flex-col justify-between">
+        <div className="w-full aspect-[9/5] p-2.5 rounded-md bg-[#121214] border border-white/[0.05] flex flex-col justify-between">
           <div className="space-y-1">
-            <div className={`w-12 h-1 rounded ${subClass}`} />
-            <div className={`w-20 h-1.5 rounded ${strokeClass}`} />
+            <div className={`w-10 h-[3px] rounded-full ${subClass}`} />
+            <div className={`w-16 h-1 rounded-full ${strokeClass}`} />
           </div>
           <div className="space-y-1 my-auto">
-            <div className={`w-16 h-2 rounded ${strokeClass}`} />
-            <div className={`w-10 h-1 rounded ${subClass}`} />
+            <div className={`w-14 h-1.5 rounded-full ${strokeClass}`} />
+            <div className={`w-9 h-[3px] rounded-full ${subClass}`} />
           </div>
-          <div className="flex justify-between items-end pt-1 border-t border-white/10">
-            <div className={`w-12 h-1 rounded ${subClass}`} />
-            <div className={`w-8 h-1 rounded ${subClass}`} />
+          <div className="flex justify-between items-end pt-1.5 border-t border-white/[0.05]">
+            <div className={`w-10 h-[3px] rounded-full ${subClass}`} />
+            <div className={`w-7 h-[3px] rounded-full ${subClass}`} />
           </div>
         </div>
       );
@@ -86,36 +89,54 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
 
     if (id === 'monogram_executive') {
       return (
-        <div className="w-full aspect-[9/5] p-2 rounded-lg bg-[#0A0A0B] border border-white/10 flex flex-col justify-between items-center text-center">
+        <div className="w-full aspect-[9/5] p-2.5 rounded-md bg-[#121214] border border-white/[0.05] flex flex-col justify-between items-center text-center">
           <div className="flex flex-col items-center gap-1">
-            <div className={`w-4 h-4 rounded-full border border-dashed flex items-center justify-center ${isSelected ? 'border-white' : 'border-zinc-600'}`}>
-              <div className={`w-1.5 h-1.5 rounded-full ${strokeClass}`} />
+            <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${isSelected ? 'border-zinc-400' : 'border-zinc-700'}`}>
+              <div className={`w-1 h-1 rounded-full ${strokeClass}`} />
             </div>
-            <div className={`w-14 h-1 rounded ${subClass}`} />
+            <div className={`w-12 h-[3px] rounded-full ${subClass}`} />
           </div>
-          <div className="space-y-1 my-auto">
-            <div className={`w-16 h-2 rounded ${strokeClass}`} />
-            <div className={`w-12 h-1 rounded ${subClass}`} />
+          <div className="space-y-1 my-auto flex flex-col items-center">
+            <div className={`w-14 h-1.5 rounded-full ${strokeClass}`} />
+            <div className={`w-10 h-[3px] rounded-full ${subClass}`} />
           </div>
-          <div className={`w-24 h-1 rounded ${subClass}`} />
+          <div className={`w-20 h-[3px] rounded-full ${subClass}`} />
         </div>
       );
     }
 
     if (id === 'vertical_atelier') {
       return (
-        <div className="w-full aspect-[5/8] p-2 rounded-lg bg-black/40 border border-white/5 flex flex-col justify-between items-center text-center">
-          <div className="space-y-1 w-full flex flex-col items-center">
-            <div className={`w-10 h-1 rounded ${subClass}`} />
-            <div className={`w-12 h-1.5 rounded ${strokeClass}`} />
+        <div className="w-[68%] mx-auto aspect-[5/8] p-2.5 rounded-md bg-[#121214] border border-white/[0.05] flex flex-col justify-between">
+          <div className="space-y-1 pb-1.5 border-b border-white/[0.05]">
+            <div className={`w-7 h-[2px] rounded-full ${subClass}`} />
+            <div className={`w-11 h-[3px] rounded-full ${strokeClass}`} />
           </div>
-          <div className="space-y-1.5 my-auto w-full flex flex-col items-center">
-            <div className={`w-14 h-2 rounded ${strokeClass}`} />
-            <div className={`w-8 h-1 rounded ${subClass}`} />
+          <div className="space-y-1 my-auto">
+            <div className={`w-14 h-1.5 rounded-full ${strokeClass}`} />
+            <div className={`w-9 h-[3px] rounded-full ${subClass}`} />
           </div>
-          <div className="space-y-1 w-full pt-1 border-t border-white/5 flex flex-col items-center">
-            <div className={`w-12 h-1 rounded ${subClass}`} />
-            <div className={`w-10 h-1 rounded ${subClass}`} />
+          <div className="space-y-1 pt-1.5 border-t border-white/[0.05]">
+            <div className={`w-12 h-[2px] rounded-full ${subClass}`} />
+            <div className={`w-9 h-[2px] rounded-full ${subClass}`} />
+          </div>
+        </div>
+      );
+    }
+
+    if (id === 'serenity_vertical') {
+      return (
+        <div className="w-[68%] mx-auto aspect-[5/8] p-2.5 rounded-md bg-[#121214] border border-white/[0.05] flex flex-col justify-between">
+          <div className="space-y-1">
+            <div className={`w-13 h-1.5 rounded-full ${strokeClass}`} />
+            <div className={`w-8 h-[3px] rounded-full ${subClass}`} />
+            <div className={`w-10 h-[2px] rounded-full ${subClass} mt-1`} />
+          </div>
+          <div className="flex-1" />
+          <div className="space-y-1 pt-2 border-t border-white/[0.05]">
+            <div className={`w-10 h-[2px] rounded-full ${subClass}`} />
+            <div className={`w-13 h-[2px] rounded-full ${subClass}`} />
+            <div className={`w-8 h-[2px] rounded-full ${subClass}`} />
           </div>
         </div>
       );
@@ -123,37 +144,33 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
 
     if (id === 'swiss_typo_bold') {
       return (
-        <div className="w-full aspect-[9/5] p-2 rounded-lg bg-black/40 border border-white/5 flex flex-col justify-between">
-          <div className={`w-24 h-1.5 rounded font-black ${strokeClass}`} />
+        <div className="w-full aspect-[9/5] p-2.5 rounded-md bg-[#121214] border border-white/[0.05] flex flex-col justify-between">
+          <div className={`w-20 h-1 rounded-full ${strokeClass}`} />
           <div className="space-y-1 my-auto">
-            <div className={`w-20 h-2.5 rounded ${strokeClass}`} />
-            <div className="flex items-center gap-1">
-              <div className={`w-2 h-1 rounded ${strokeClass}`} />
-              <div className={`w-12 h-1 rounded ${subClass}`} />
-            </div>
+            <div className={`w-16 h-2 rounded-full ${strokeClass}`} />
+            <div className={`w-10 h-[3px] rounded-full ${subClass}`} />
           </div>
-          <div className="grid grid-cols-2 gap-1 pt-1 border-t border-white/5">
-            <div className={`w-10 h-1 rounded ${subClass}`} />
-            <div className={`w-8 h-1 rounded ${subClass}`} />
+          <div className="grid grid-cols-2 gap-1 pt-1.5 border-t border-white/[0.05]">
+            <div className={`w-9 h-[3px] rounded-full ${subClass}`} />
+            <div className={`w-7 h-[3px] rounded-full ${subClass}`} />
           </div>
         </div>
       );
     }
 
-    // warm_organic
     return (
-      <div className="w-full aspect-[9/5] p-2.5 rounded-lg bg-black/40 border border-white/5 flex flex-col justify-between">
+      <div className="w-full aspect-[9/5] p-2.5 rounded-md bg-[#121214] border border-white/[0.05] flex flex-col justify-between">
         <div className="flex justify-between items-start">
-          <div className={`w-14 h-1 rounded ${subClass}`} />
-          <div className={`w-2 h-2 rounded-full ${strokeClass}`} />
+          <div className={`w-12 h-[3px] rounded-full ${subClass}`} />
+          <div className={`w-1.5 h-1.5 rounded-full ${strokeClass}`} />
         </div>
         <div className="space-y-1 my-auto">
-          <div className={`w-16 h-1.5 rounded ${strokeClass}`} />
-          <div className={`w-10 h-1 rounded ${subClass}`} />
+          <div className={`w-14 h-1 rounded-full ${strokeClass}`} />
+          <div className={`w-9 h-[3px] rounded-full ${subClass}`} />
         </div>
-        <div className="flex justify-between items-center pt-1 border-t border-white/5">
-          <div className={`w-10 h-1 rounded ${subClass}`} />
-          <div className={`w-6 h-1 rounded ${subClass}`} />
+        <div className="flex justify-between items-center pt-1.5 border-t border-white/[0.05]">
+          <div className={`w-9 h-[3px] rounded-full ${subClass}`} />
+          <div className={`w-5 h-[3px] rounded-full ${subClass}`} />
         </div>
       </div>
     );
@@ -169,51 +186,43 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Sub-tab navigation: Visual Atelier vs Identity Profile */}
-      <div className="flex items-center gap-2 p-1 rounded-xl bg-[#0A0A0B] border border-zinc-800/80 text-xs">
+    <div className="space-y-8">
+      {/* Understated Typographic Sub-Tab Switcher */}
+      <div className="grid grid-cols-2 p-1 rounded-lg bg-[#161618] border border-white/[0.06]">
         <button
           type="button"
           onClick={() => onChangeSubTab('visual_atelier')}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+          className={`py-2 rounded-md text-xs tracking-wide cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none ${
             subTab === 'visual_atelier'
-              ? 'bg-white text-neutral-950 font-bold shadow-sm'
-              : 'text-zinc-400 hover:text-white hover:bg-white/10'
+              ? 'bg-[#222226] text-[#F2F2F5] font-medium'
+              : 'text-zinc-500 hover:text-zinc-300 font-normal'
           }`}
         >
-          <Palette className="w-3.5 h-3.5" />
-          <span>소재 & 레이아웃</span>
+          소재 및 구도
         </button>
         <button
           type="button"
           onClick={() => onChangeSubTab('identity_profile')}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+          className={`py-2 rounded-md text-xs tracking-wide cursor-pointer whitespace-nowrap shrink-0 focus-visible:outline-none ${
             subTab === 'identity_profile'
-              ? 'bg-white text-neutral-950 font-bold shadow-sm'
-              : 'text-zinc-400 hover:text-white hover:bg-white/10'
+              ? 'bg-[#222226] text-[#F2F2F5] font-medium'
+              : 'text-zinc-500 hover:text-zinc-300 font-normal'
           }`}
         >
-          <User className="w-3.5 h-3.5" />
-          <span>인적사항 & 활자</span>
+          인적 정보
         </button>
       </div>
 
-      {/* SUB-TAB 1: Visual Atelier */}
+      {/* SUB-TAB 1: Curated Materials & Layout */}
       {subTab === 'visual_atelier' && (
-        <div className="space-y-6 animate-in fade-in duration-150">
-          {/* Theme Palette */}
-          <div className="space-y-3">
-            <div className="space-y-0.5">
-              <label className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-                <span className="text-zinc-400 font-mono">01.</span>
-                <span>소재 & 테마 팔레트</span>
-              </label>
-              <p className="text-[11px] text-zinc-400">
-                퓨어 화이트, 수묵 인크, 옵시디언, 티타늄 등 엄선된 모노크롬 매트 팔레트입니다.
-              </p>
-            </div>
+        <div className="space-y-8 animate-in fade-in duration-150">
+          {/* Curated Material Presets (4 Quiet Luxury Finishes) */}
+          <section className="space-y-3.5">
+            <h4 className="text-xs font-medium text-zinc-400 tracking-wide">
+              지류 및 마감
+            </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <div className="grid grid-cols-2 gap-3">
               {THEME_OPTIONS.map((t) => {
                 const isSelected = theme === t.id;
                 return (
@@ -221,55 +230,36 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                     key={t.id}
                     type="button"
                     onClick={() => onChangeTheme(t.id)}
-                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center gap-3.5 group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
+                    className={`px-4 py-3.5 rounded-xl border text-left cursor-pointer flex items-center gap-3.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
                       isSelected
-                        ? 'bg-white/10 border-white/30 ring-1 ring-white/20 shadow-md'
-                        : 'bg-[#0A0A0B] border-zinc-800/80 hover:border-white/20 hover:bg-white/5'
+                        ? 'bg-[#1A1A1E] border-white/25'
+                        : 'bg-[#161618] border-white/[0.06] hover:border-white/[0.14]'
                     }`}
                   >
-                    <div 
-                      className="relative w-9 h-9 rounded-full border border-white/20 shrink-0 shadow-lg flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105"
+                    <span
+                      className="w-5 h-5 rounded-md border border-white/15 shrink-0"
                       style={{ backgroundColor: t.dotColor }}
+                    />
+                    <span
+                      className={`text-[13px] truncate ${
+                        isSelected ? 'text-[#F2F2F5] font-medium' : 'text-zinc-400 font-normal'
+                      }`}
                     >
-                      <div 
-                        className="w-3 h-3 rounded-full shadow-md border border-black/20"
-                        style={{ backgroundColor: t.accent }}
-                      />
-                      {isSelected && (
-                        <div className="absolute inset-0 ring-2 ring-white ring-offset-2 ring-offset-[#121214] rounded-full" />
-                      )}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className={`font-bold text-xs truncate ${isSelected ? 'text-white' : 'text-zinc-200'}`}>
-                          {t.name}
-                        </span>
-                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-white shrink-0" />}
-                      </div>
-                      <p className="text-[10px] text-zinc-400 truncate mt-0.5">
-                        {t.description}
-                      </p>
-                    </div>
+                      {t.name}
+                    </span>
                   </button>
                 );
               })}
             </div>
-          </div>
+          </section>
 
-          {/* Architecture Layouts */}
-          <div className="border-t border-white/10 pt-5 space-y-3">
-            <div className="space-y-0.5">
-              <label className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-                <span className="text-zinc-400 font-mono">02.</span>
-                <span>아키텍처 레이아웃</span>
-              </label>
-              <p className="text-[11px] text-zinc-400">
-                비례 그리드와 직함 성격에 맞는 레이아웃을 선택합니다.
-              </p>
-            </div>
+          {/* Architectural Layouts */}
+          <section className="border-t border-white/[0.06] pt-8 space-y-3.5">
+            <h4 className="text-xs font-medium text-zinc-400 tracking-wide">
+              레이아웃
+            </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="grid grid-cols-2 gap-3">
               {LAYOUT_PRESETS.map((preset) => {
                 const isSelected = layoutType === preset.id;
                 return (
@@ -277,257 +267,263 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                     key={preset.id}
                     type="button"
                     onClick={() => onChangeLayout(preset.id)}
-                    className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
+                    className={`p-3.5 rounded-xl border text-left cursor-pointer flex flex-col justify-between focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 ${
                       isSelected
-                        ? 'bg-white/10 border-white/30 shadow-md ring-1 ring-white/20'
-                        : 'bg-[#0A0A0B] border-zinc-800/80 hover:border-white/20 hover:bg-white/5'
+                        ? 'bg-[#1A1A1E] border-white/25'
+                        : 'bg-[#161618] border-white/[0.06] hover:border-white/[0.14]'
                     }`}
                   >
                     <div className="mb-3 w-full">
                       {renderLayoutMiniWireframe(preset.id, isSelected)}
                     </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1 gap-2">
-                        <span className={`font-bold text-xs truncate ${isSelected ? 'text-white' : 'text-zinc-200'}`}>
-                          {preset.name}
-                        </span>
-                        <span className="text-[9px] font-mono tabular-nums text-zinc-400 shrink-0 font-medium">
-                          {preset.aspectRatio}
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-zinc-400 line-clamp-2 leading-relaxed">
-                        {preset.description}
-                      </p>
+                    <div className="flex items-center justify-between gap-2 w-full">
+                      <span
+                        className={`text-xs truncate ${
+                          isSelected ? 'text-[#F2F2F5] font-medium' : 'text-zinc-400 font-normal'
+                        }`}
+                      >
+                        {preset.name}
+                      </span>
+                      <span className="text-[10px] font-mono tabular-nums text-zinc-500 shrink-0">
+                        {preset.aspectRatio}
+                      </span>
                     </div>
                   </button>
                 );
               })}
             </div>
-          </div>
+          </section>
         </div>
       )}
 
       {/* SUB-TAB 2: Identity Profile */}
       {subTab === 'identity_profile' && (
-        <div className="space-y-6 animate-in fade-in duration-150">
-          {/* 1. Affiliation */}
-          <div className="space-y-3">
-            <label className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-              <span className="text-zinc-400 font-mono">01.</span>
-              <span>소속 및 직함</span>
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">소속 기관명 (국문)</label>
-                <input
-                  type="text"
-                  value={formData.organizationKr}
-                  onChange={(e) => onChangeFormField('organizationKr', e.target.value)}
-                  placeholder="예: 고구마 AI 스튜디오"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">소속 기관명 (영문)</label>
-                <input
-                  type="text"
-                  value={formData.organization}
-                  onChange={(e) => onChangeFormField('organization', e.target.value)}
-                  placeholder="예: GOGUMA AI STUDIO"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">직책 / 역할 (국문)</label>
-                <input
-                  type="text"
-                  value={formData.titleKr}
-                  onChange={(e) => onChangeFormField('titleKr', e.target.value)}
-                  placeholder="예: 대표 마스터"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">직책 / 역할 (영문)</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => onChangeFormField('title', e.target.value)}
-                  placeholder="예: Principal Master"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs"
-                />
-              </div>
-            </div>
-          </div>
+        <div className="space-y-8 animate-in fade-in duration-150">
+          {/* Name & Display Toggles */}
+          <section className="space-y-4">
+            <h4 className="text-xs font-medium text-zinc-400 tracking-wide">
+              성명
+            </h4>
 
-          {/* 2. Name */}
-          <div className="border-t border-white/10 pt-5 space-y-3">
-            <label className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-              <span className="text-zinc-400 font-mono">02.</span>
-              <span>성명 표기 및 상세 옵션</span>
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">주 성명 (Primary Name)</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">성명</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => onChangeFormField('name', e.target.value)}
-                  placeholder="예: PARK, GIHONG"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs font-semibold"
+                  placeholder="PARK, GIHONG"
+                  className={INPUT_CLASS}
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">보조 국문 성명 (Sub Name)</label>
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">보조 성명</label>
                 <input
                   type="text"
                   value={formData.nameKr}
                   onChange={(e) => onChangeFormField('nameKr', e.target.value)}
-                  placeholder="예: 박 기 홍"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs"
+                  placeholder="박 기 홍"
+                  className={INPUT_CLASS}
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-              <label className="flex items-center gap-2.5 p-2 rounded-xl bg-[#0A0A0B] border border-zinc-800/80 cursor-pointer">
+            <div className="flex flex-wrap items-center gap-6 pt-1">
+              <label className="inline-flex items-center gap-2.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={features.show_en_name !== false}
                   onChange={(e) => onChangeFeatures(prev => ({ ...prev, show_en_name: e.target.checked }))}
-                  className="w-4 h-4 rounded accent-white cursor-pointer"
+                  className="w-3.5 h-3.5 rounded accent-zinc-200 cursor-pointer"
                 />
-                <span className="text-[11px] text-zinc-300">영문/보조 성명 서브텍스트 표기</span>
+                <span className="text-xs text-zinc-400">보조 성명 표기</span>
               </label>
-              <label className="flex items-center gap-2.5 p-2 rounded-xl bg-[#0A0A0B] border border-zinc-800/80 cursor-pointer">
+              <label className="inline-flex items-center gap-2.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={features.show_sub_org !== false}
                   onChange={(e) => onChangeFeatures(prev => ({ ...prev, show_sub_org: e.target.checked }))}
-                  className="w-4 h-4 rounded accent-white cursor-pointer"
+                  className="w-3.5 h-3.5 rounded accent-zinc-200 cursor-pointer"
                 />
-                <span className="text-[11px] text-zinc-300">소속 기관 보조 표기 유지</span>
+                <span className="text-xs text-zinc-400">영문 소속 병기</span>
               </label>
             </div>
-          </div>
+          </section>
 
-          {/* 3. Direct Contact */}
-          <div className="border-t border-white/10 pt-5 space-y-3">
-            <label className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-              <span className="text-zinc-400 font-mono">03.</span>
-              <span>직통 연락 채널</span>
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">전화번호</label>
+          {/* Affiliation & Title */}
+          <section className="border-t border-white/[0.06] pt-8 space-y-4">
+            <h4 className="text-xs font-medium text-zinc-400 tracking-wide">
+              소속 및 직함
+            </h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">소속</label>
+                <input
+                  type="text"
+                  value={formData.organizationKr}
+                  onChange={(e) => onChangeFormField('organizationKr', e.target.value)}
+                  placeholder="고구마 스튜디오"
+                  className={INPUT_CLASS}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">영문 소속</label>
+                <input
+                  type="text"
+                  value={formData.organization}
+                  onChange={(e) => onChangeFormField('organization', e.target.value)}
+                  placeholder="GOGUMA STUDIO"
+                  className={INPUT_CLASS}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">직함</label>
+                <input
+                  type="text"
+                  value={formData.titleKr}
+                  onChange={(e) => onChangeFormField('titleKr', e.target.value)}
+                  placeholder="대표"
+                  className={INPUT_CLASS}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">영문 직함</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => onChangeFormField('title', e.target.value)}
+                  placeholder="Principal"
+                  className={INPUT_CLASS}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Direct Contact */}
+          <section className="border-t border-white/[0.06] pt-8 space-y-4">
+            <h4 className="text-xs font-medium text-zinc-400 tracking-wide">
+              연락처 및 주소
+            </h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">연락처</label>
                 <input
                   type="text"
                   value={formData.phone}
                   onChange={(e) => onChangeFormField('phone', e.target.value)}
                   placeholder="+82 10-1234-5678"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs font-mono tabular-nums"
+                  className={`${INPUT_CLASS} font-mono tabular-nums`}
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">공식 이메일</label>
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">이메일</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => onChangeFormField('email', e.target.value)}
-                  placeholder="master@goguma.app"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs"
+                  placeholder="name@domain.com"
+                  className={INPUT_CLASS}
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">사업장 주소 (국문)</label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">주소</label>
                 <input
                   type="text"
                   value={formData.addressKr}
                   onChange={(e) => onChangeFormField('addressKr', e.target.value)}
                   placeholder="서울특별시 강남구 테헤란로 152"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs"
+                  className={INPUT_CLASS}
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">사업장 주소 (영문, Address EN)</label>
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">영문 주소</label>
                 <input
                   type="text"
                   value={formData.address_en ?? formData.details?.address_en ?? ''}
                   onChange={(e) => onChangeFormField('address_en', e.target.value)}
-                  placeholder="예: 77 Cheongdam-ro, Gangnam-gu, Seoul"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs"
+                  placeholder="152 Teheran-ro, Gangnam-gu, Seoul"
+                  className={INPUT_CLASS}
                 />
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* 4. Monogram & Logo */}
-          <div className="border-t border-white/10 pt-5 space-y-3">
-            <label className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-              <span className="text-zinc-400 font-mono">04.</span>
-              <span>모노그램 및 커스텀 로고</span>
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">텍스트 모노그램 (2~4자)</label>
+          {/* Monogram & Mark */}
+          <section className="border-t border-white/[0.06] pt-8 space-y-4">
+            <h4 className="text-xs font-medium text-zinc-400 tracking-wide">
+              모노그램 및 심볼
+            </h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">모노그램</label>
                 <input
                   type="text"
                   maxLength={4}
                   value={features.monogram_text || ''}
                   onChange={(e) => onChangeFeatures(prev => ({ ...prev, monogram_text: e.target.value.toUpperCase() }))}
-                  placeholder="예: PG"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs font-mono uppercase tracking-widest"
+                  placeholder="PG"
+                  className={`${INPUT_CLASS} font-mono uppercase tracking-widest`}
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">커스텀 기업/개인 로고</label>
-                <input 
-                  type="file" 
-                  ref={logoInputRef} 
-                  accept="image/*" 
-                  className="hidden" 
-                  onChange={handleLogoUpload} 
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">로고 이미지</label>
+                <input
+                  type="file"
+                  ref={logoInputRef}
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleLogoUpload}
                 />
                 {features.custom_logo ? (
-                  <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#0A0A0B] border border-white/10">
-                    <img src={features.custom_logo} alt="Logo" className="h-6 w-auto max-w-[80px] object-contain rounded" />
+                  <div className="flex items-center justify-between px-3.5 py-2 rounded-lg bg-[#161618] border border-white/[0.06]">
+                    <img
+                      src={features.custom_logo}
+                      alt="로고"
+                      referrerPolicy="no-referrer"
+                      className="h-6 w-auto max-w-[80px] object-contain rounded"
+                    />
                     <button
                       type="button"
                       onClick={() => onChangeFeatures(prev => ({ ...prev, custom_logo: undefined }))}
-                      className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 cursor-pointer"
-                      title="로고 삭제"
+                      className="p-1 rounded-md text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.05] cursor-pointer"
+                      title="삭제"
+                      aria-label="삭제"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-3.5 h-3.5 stroke-[1.5]" />
                     </button>
                   </div>
                 ) : (
                   <button
                     type="button"
                     onClick={() => logoInputRef.current?.click()}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-dashed border-white/15 hover:border-white/30 hover:bg-white/5 text-zinc-400 hover:text-white cursor-pointer flex items-center justify-center gap-1.5 text-xs transition-colors"
+                    className="w-full px-3.5 py-2.5 rounded-lg bg-[#161618] border border-dashed border-white/[0.1] hover:border-white/25 text-zinc-400 hover:text-zinc-200 cursor-pointer text-xs text-center"
                   >
-                    <Upload className="w-3.5 h-3.5" />
-                    <span>로고 이미지 첨부</span>
+                    이미지 선택
                   </button>
                 )}
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* 5. Domain & Category */}
-          <div className="border-t border-white/10 pt-5 space-y-3">
-            <label className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-              <span className="text-zinc-400 font-mono">05.</span>
-              <span>웹 주소 슬러그 및 보관 정보</span>
-            </label>
-            <div className="space-y-1">
-              <label className="text-[11px] text-zinc-400">전용 웹 주소 슬러그</label>
-              <div className="flex rounded-xl bg-[#0A0A0B] border border-white/10 focus-within:ring-1 focus-within:ring-white/20 focus-within:border-white/20 overflow-hidden text-xs">
-                <span className="px-3 py-2.5 bg-zinc-900 text-zinc-400 font-mono select-none text-[11px] shrink-0 border-r border-white/10">
+          {/* Address Slug & Classification */}
+          <section className="border-t border-white/[0.06] pt-8 space-y-4">
+            <h4 className="text-xs font-medium text-zinc-400 tracking-wide">
+              고유 주소 및 분류
+            </h4>
+
+            <div className="space-y-1.5">
+              <label className="text-xs text-zinc-400 block">웹 주소</label>
+              <div className="flex items-center rounded-lg bg-[#161618] border border-white/[0.06] focus-within:border-white/25 overflow-hidden">
+                <span className="px-3.5 py-2.5 text-zinc-500 font-mono select-none text-xs shrink-0 border-r border-white/[0.06]">
                   {APP_BASE_DOMAIN}/
                 </span>
                 <input
@@ -535,48 +531,52 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                   value={slug}
                   onChange={(e) => onChangeSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                   placeholder="master"
-                  className="w-full px-3 py-2.5 bg-transparent text-white focus:outline-none font-mono text-xs"
+                  className="w-full px-3.5 py-2.5 bg-transparent text-[#EDEDEF] placeholder:text-zinc-600 focus:outline-none font-mono text-[13px]"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">독립 커스텀 도메인 (선택)</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">커스텀 도메인</label>
                 <input
                   type="text"
                   value={customDomain}
                   onChange={(e) => onChangeCustomDomain(e.target.value)}
-                  placeholder="card.yourdomain.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs font-mono"
+                  placeholder="card.domain.com"
+                  className={`${INPUT_CLASS} font-mono`}
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[11px] text-zinc-400">분류 카테고리</label>
+              <div className="space-y-1.5">
+                <label className="text-xs text-zinc-400 block">분류</label>
                 <select
                   value={category}
                   onChange={(e) => onChangeCategory(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 text-white text-xs cursor-pointer"
+                  className={`${INPUT_CLASS} cursor-pointer`}
                 >
                   {categories.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
+                    <option key={cat} value={cat} className="bg-[#161618] text-[#EDEDEF]">
+                      {cat}
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
 
             {isMyCardMode && (
-              <label className="flex items-center gap-2.5 p-2 rounded-xl bg-[#0A0A0B] border border-zinc-800/80 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={isDefault}
-                  onChange={(e) => onChangeIsDefault(e.target.checked)}
-                  className="w-4 h-4 rounded accent-white cursor-pointer"
-                />
-                <span className="text-[11px] text-zinc-300">기본 대표 명함으로 지정 (앱 접속 시 우선 노출)</span>
-              </label>
+              <div className="pt-1">
+                <label className="inline-flex items-center gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={isDefault}
+                    onChange={(e) => onChangeIsDefault(e.target.checked)}
+                    className="w-3.5 h-3.5 rounded accent-zinc-200 cursor-pointer"
+                  />
+                  <span className="text-xs text-zinc-400">대표 명함으로 설정</span>
+                </label>
+              </div>
             )}
-          </div>
+          </section>
         </div>
       )}
     </div>

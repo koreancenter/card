@@ -16,7 +16,7 @@ export interface BaseCard {
 
 export interface TemplateCard extends BaseCard {
   creation_mode: 'template';
-  layout_type: 'editorial_minimal' | 'monogram_executive' | 'vertical_atelier' | 'swiss_typo_bold' | 'warm_organic';
+  layout_type: 'editorial_minimal' | 'monogram_executive' | 'swiss_typo_bold' | 'warm_organic' | 'vertical_atelier' | 'serenity_vertical';
   theme_preset: 'pure_white' | 'sumi_ink' | 'warm_paper' | 'deep_forest' | 'classic_navy';
   details: {
     en_name?: string;
@@ -65,9 +65,10 @@ export type CardTheme = ThemePreset | LegacyTheme;
 export type CardLayoutType =
   | 'editorial_minimal'   // Asymmetric two-column, Korean/English duality, structured grid
   | 'monogram_executive'  // Centered alignment, elegant serif/monogram initials at top, concise executive typography
-  | 'vertical_atelier'    // Vertical-oriented card format ideal for architects, consultants, and artists
   | 'swiss_typo_bold'     // Modern high-contrast grotesque sans-serif with bold name presence and clean micro-metadata
-  | 'warm_organic';       // Soft paper/canvas aesthetic with expansive negative space and refined classical proportions
+  | 'warm_organic'        // Soft paper/canvas aesthetic with expansive negative space and refined classical proportions
+  | 'vertical_atelier'    // Vertical-oriented card format ideal for architects, consultants, and artists
+  | 'serenity_vertical';  // Quiet luxury vertical layout focused on undisturbed negative space and typographic restraint
 
 export interface CardFeatures {
   show_en_name?: boolean;       // Toggle English name subtext

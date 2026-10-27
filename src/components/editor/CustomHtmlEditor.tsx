@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { Copy, Check, Sparkles, Code, RefreshCw, Wand2, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { CardData } from '../../types/card';
 import { sanitizeCardHtml, detectUnsafePatterns } from '../../utils/sanitizer';
 
@@ -28,49 +27,51 @@ export const CLOUD_AI_QUIET_LUXURY_PROMPT = `너는 최고급 하이엔드 브�
 2. 카드 규격은 가로형 명함 표준 비율(1.586:1)을 유지할 수 있도록 \`w-full h-full aspect-[1.586/1]\` 클래스를 사용하세요.
 3. 스타일링은 오직 Tailwind CSS 유틸리티 클래스만 사용하세요.
 4. 테마 및 색상:
-   - 배경: 딥 블랙(bg-[#0A0A0B] 또는 bg-[#121214])
-   - 주 텍스트: 매트 화이트(text-[#FAFAFA] 또는 text-white)
-   - 보조 및 보더: 크리스프 모노크롬(text-zinc-400 및 border-white/10)
+   - 배경: 매트 옵시디언(bg-[#121214] 또는 bg-[#161618])
+   - 주 텍스트: 소프트 오프화이트(text-[#F2F2F5])
+   - 보조 및 보더: 섬세한 헤어라인(text-zinc-400 및 border-white/10)
 5. 오직 HTML 코드 블록(\`\`\`html ... \`\`\`)만 출력하고 불필요한 설명은 생략하세요.`;
 
-export const DEFAULT_LUXURY_HTML_FRONT = `<div class="w-full h-full aspect-[1.586/1] bg-[#0A0A0B] text-[#FAFAFA] p-7 flex flex-col justify-between border border-white/10 rounded-2xl relative overflow-hidden font-sans shadow-2xl select-none">
-  <div class="absolute -right-12 -bottom-12 w-48 h-48 rounded-full bg-white/[0.03] blur-2xl pointer-events-none"></div>
+export const DEFAULT_LUXURY_HTML_FRONT = `<div class="w-full h-full aspect-[1.586/1] bg-[#121214] text-[#F2F2F5] p-7 flex flex-col justify-between border border-white/10 rounded-2xl relative overflow-hidden font-sans select-none">
   <div class="flex justify-between items-start">
     <div>
-      <span class="text-[10px] tracking-[0.25em] text-zinc-400 uppercase font-mono block mb-1">GLOBAL PARTNER</span>
-      <h2 class="text-xl font-bold tracking-tight text-white">PARK, GIHONG</h2>
-      <p class="text-xs text-zinc-400 font-light mt-0.5">박기홍 · Principal Master</p>
+      <span class="text-[10px] tracking-[0.22em] text-zinc-500 uppercase font-mono block mb-1.5">GLOBAL PARTNER</span>
+      <h2 class="text-xl font-semibold tracking-tight text-[#F4F4F6]">PARK, GIHONG</h2>
+      <p class="text-xs text-zinc-400 font-normal mt-0.5">박기홍 · Principal</p>
     </div>
-    <div class="w-10 h-10 rounded-xl border border-white/15 flex items-center justify-center text-white font-serif font-bold text-sm bg-white/[0.03]">
+    <div class="w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center text-[#EAEAE6] font-serif text-xs bg-white/[0.02]">
       PG
     </div>
   </div>
-  <div class="space-y-2 border-t border-white/10 pt-4">
+  <div class="space-y-2 border-t border-white/[0.08] pt-4">
     <div class="flex justify-between items-center text-[11px]">
-      <span class="text-zinc-500 font-mono">ORGANIZATION</span>
-      <span class="text-zinc-200 font-medium">GOGUMA AI STUDIO</span>
+      <span class="text-zinc-500 font-mono">STUDIO</span>
+      <span class="text-zinc-300">GOGUMA STUDIO</span>
     </div>
     <div class="flex justify-between items-center text-[11px]">
       <span class="text-zinc-500 font-mono">DIRECT</span>
-      <span class="text-white font-mono">+82 10-1234-5678</span>
+      <span class="text-[#EDEDEF] font-mono tabular-nums">+82 10-1234-5678</span>
     </div>
     <div class="flex justify-between items-center text-[11px]">
-      <span class="text-zinc-500 font-mono">ENCRYPTED</span>
+      <span class="text-zinc-500 font-mono">MAIL</span>
       <span class="text-zinc-400 font-mono">master@goguma.app</span>
     </div>
   </div>
 </div>`;
 
-export const DEFAULT_LUXURY_HTML_BACK = `<div class="w-full h-full aspect-[1.586/1] bg-[#0A0A0B] text-[#FAFAFA] p-8 flex flex-col items-center justify-center border border-white/10 rounded-2xl text-center relative overflow-hidden select-none">
-  <div class="w-14 h-14 rounded-full border border-white/15 flex items-center justify-center text-white font-serif font-bold text-lg mb-3 shadow-inner bg-white/[0.02]">
+export const DEFAULT_LUXURY_HTML_BACK = `<div class="w-full h-full aspect-[1.586/1] bg-[#121214] text-[#F2F2F5] p-8 flex flex-col items-center justify-center border border-white/10 rounded-2xl text-center relative overflow-hidden select-none">
+  <div class="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center text-[#EAEAE6] font-serif text-base mb-3.5 bg-white/[0.02]">
     PG
   </div>
-  <h3 class="text-sm font-bold tracking-wider text-white uppercase font-sans">GOGUMA GLOBAL NETWORK</h3>
-  <p class="text-[11px] text-zinc-400 mt-1 max-w-[260px] leading-relaxed">Pioneering Privacy-First Local Encrypted Digital Identities</p>
-  <div class="mt-4 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-zinc-300">
+  <h3 class="text-xs font-medium tracking-[0.2em] text-[#F2F2F5] uppercase font-sans">GOGUMA GLOBAL NETWORK</h3>
+  <p class="text-[11px] text-zinc-500 mt-1.5 max-w-[240px] leading-relaxed">Private Digital Identity Archive</p>
+  <span class="mt-4 text-[10px] font-mono text-zinc-400 tracking-wider">
     card.goguma.app/master
-  </div>
+  </span>
 </div>`;
+
+const INPUT_CLASS =
+  'w-full px-3.5 py-2.5 rounded-lg bg-[#161618] border border-white/[0.06] hover:border-white/[0.12] focus:outline-none focus:border-white/25 focus:bg-[#19191C] text-[#EDEDEF] placeholder:text-zinc-600 text-[13px]';
 
 export const CustomHtmlEditor: React.FC<CustomHtmlEditorProps> = ({
   htmlFront,
@@ -87,23 +88,22 @@ export const CustomHtmlEditor: React.FC<CustomHtmlEditorProps> = ({
   const [aiStatus, setAiStatus] = useState<string | null>(null);
 
   const handleCopyPrompt = () => {
-    // Dynamically insert current card details if present, or use standard prompt
     let promptText = CLOUD_AI_QUIET_LUXURY_PROMPT;
     if (cardData.name || cardData.organizationKr) {
       promptText = promptText.replace(
         '[명함 정보]\n- 회사/조직명: (예: 고구마 스튜디오)\n- 이름 및 직함: (예: 홍길동 / 수석 디자이너)\n- 연락처: (예: 010-1234-5678 / contact@example.com)\n- 슬로건 또는 웹사이트: (예: goguma.app)',
-        `[명함 정보]\n- 회사/조직명: ${cardData.organizationKr || cardData.organization || '고구마 AI 스튜디오'}\n- 이름 및 직함: ${cardData.name || '홍길동'} / ${cardData.titleKr || cardData.title || '수석 마스터'}\n- 연락처: ${cardData.phone || '010-1234-5678'} / ${cardData.email || 'contact@goguma.app'}\n- 슬로건 또는 웹사이트: ${cardData.website || 'card.goguma.app'}`
+        `[명함 정보]\n- 회사/조직명: ${cardData.organizationKr || cardData.organization || '고구마 스튜디오'}\n- 이름 및 직함: ${cardData.name || '홍길동'} / ${cardData.titleKr || cardData.title || '수석 디자이너'}\n- 연락처: ${cardData.phone || '010-1234-5678'} / ${cardData.email || 'contact@goguma.app'}\n- 슬로건 또는 웹사이트: ${cardData.website || 'card.goguma.app'}`
       );
     }
 
     navigator.clipboard.writeText(promptText);
     setCopiedPrompt(true);
-    setTimeout(() => setCopiedPrompt(false), 2200);
+    setTimeout(() => setCopiedPrompt(false), 2000);
   };
 
   const handleGenerateDirectAi = async () => {
     setIsGeneratingAi(true);
-    setAiStatus('Cloud AI(Gemini 3.8 Flash)로 명함 HTML 코드를 생성 중입니다...');
+    setAiStatus('코드를 구성하는 중...');
     try {
       const res = await fetch('/api/generate-card-html', {
         method: 'POST',
@@ -112,7 +112,7 @@ export const CustomHtmlEditor: React.FC<CustomHtmlEditorProps> = ({
           prompt: CLOUD_AI_QUIET_LUXURY_PROMPT,
           profileData: {
             name: cardData.name || '홍길동',
-            company: cardData.organizationKr || cardData.organization || '고구마 AI 스튜디오',
+            company: cardData.organizationKr || cardData.organization || '고구마 스튜디오',
             title: cardData.titleKr || cardData.title || '수석 디자이너',
             phone: cardData.phone || '010-1234-5678',
             email: cardData.email || 'contact@example.com',
@@ -122,204 +122,134 @@ export const CustomHtmlEditor: React.FC<CustomHtmlEditorProps> = ({
       });
       const data = await res.json();
       if (data.success && data.html) {
-        const sanitizedAiHtml = sanitizeCardHtml(data.html);
-        onChangeFront(sanitizedAiHtml);
-        setAiStatus('✓ AI 생성 코드가 검증 및 새니타이즈되어 안전하게 적용되었습니다.');
+        onChangeFront(sanitizeCardHtml(data.html));
+        setAiStatus('새로운 코드가 적용되었습니다.');
       } else {
         onChangeFront(sanitizeCardHtml(DEFAULT_LUXURY_HTML_FRONT));
         onChangeBack(sanitizeCardHtml(DEFAULT_LUXURY_HTML_BACK));
-        setAiStatus('✓ 콰이어트 럭셔리 마스터 코드가 적용되었습니다.');
+        setAiStatus('기본 템플릿이 적용되었습니다.');
       }
     } catch {
       onChangeFront(sanitizeCardHtml(DEFAULT_LUXURY_HTML_FRONT));
-      setAiStatus('✓ 기본 콰이어트 럭셔리 코드가 적용되었습니다.');
+      setAiStatus('기본 템플릿이 적용되었습니다.');
     } finally {
       setIsGeneratingAi(false);
-      setTimeout(() => setAiStatus(null), 3500);
+      setTimeout(() => setAiStatus(null), 2800);
     }
   };
 
-  // Inspect current face HTML for unsafe tags
   const currentHtml = activeFace === 'front' ? htmlFront : htmlBack;
   const detectedUnsafe = useMemo(() => detectUnsafePatterns(currentHtml), [currentHtml]);
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-200">
-      {/* 1. Built-in Cloud AI Prompt Helper Banner */}
-      <div className="p-4 rounded-2xl bg-[#0A0A0B] border border-zinc-800/80 shadow-lg space-y-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="space-y-1">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-white">
-              <Sparkles className="w-4 h-4 text-zinc-400" />
-              <span>AI 프롬프트 헬퍼</span>
-            </div>
-            <p className="text-[11px] text-zinc-400 leading-relaxed">
-              Quiet Luxury 표준 규격(1.586:1, 딥 블랙·매트 화이트 모노크롬 테마)이 정의된 프롬프트를 복사합니다.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleCopyPrompt}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 shadow-md active:scale-95 whitespace-nowrap ${
-              copiedPrompt
-                ? 'bg-zinc-200 text-neutral-950'
-                : 'bg-white hover:bg-zinc-200 text-neutral-950'
-            }`}
-          >
-            {copiedPrompt ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copiedPrompt ? '복사 완료' : 'AI 프롬프트 복사'}</span>
-          </button>
-        </div>
-
-        {/* Quick direct AI render button & status */}
-        <div className="flex items-center justify-between pt-2 border-t border-white/10 text-[11px]">
-          <span className="text-zinc-500 font-mono">외부 LLM 붙여넣기 호환 규격</span>
-          <button
-            type="button"
-            onClick={handleGenerateDirectAi}
-            disabled={isGeneratingAi}
-            className="flex items-center gap-1 text-zinc-300 hover:text-white hover:underline cursor-pointer disabled:opacity-50"
-          >
-            {isGeneratingAi ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
-            <span>{isGeneratingAi ? '생성 중...' : '프리셋 코드 즉시 적용'}</span>
-          </button>
-        </div>
-        {aiStatus && (
-          <p className="text-[11px] text-zinc-300 font-mono animate-in fade-in duration-150">
-            {aiStatus}
-          </p>
-        )}
-      </div>
-
-      {/* 2. Code Editor Area */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <label className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-            <span className="text-zinc-400 font-mono">01.</span>
-            <span>커스텀 HTML / Tailwind 코드 입력</span>
-          </label>
-          {/* Front / Back Toggle for Editor */}
-          <div className="flex items-center p-0.5 rounded-lg bg-[#0A0A0B] border border-zinc-800/80 text-xs">
+    <div className="space-y-8 animate-in fade-in duration-150">
+      {/* Code Editor Section */}
+      <section className="space-y-3.5">
+        <div className="flex items-center justify-between gap-4">
+          {/* Pure Typographic Face Switcher */}
+          <div className="flex items-center gap-4">
             <button
               type="button"
               onClick={() => onChangeActiveFace('front')}
-              className={`px-3 py-1 rounded font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 ${
-                activeFace === 'front' 
-                  ? 'bg-white text-neutral-950 font-bold' 
-                  : 'text-zinc-400 hover:text-white hover:bg-white/10'
+              className={`text-xs tracking-wide cursor-pointer ${
+                activeFace === 'front'
+                  ? 'text-[#F2F2F5] font-medium'
+                  : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
-              앞면 (Front)
+              앞면 코드
             </button>
+            <span className="text-zinc-700 text-xs select-none">/</span>
             <button
               type="button"
               onClick={() => onChangeActiveFace('back')}
-              className={`px-3 py-1 rounded font-medium transition-all cursor-pointer whitespace-nowrap shrink-0 ${
-                activeFace === 'back' 
-                  ? 'bg-white text-neutral-950 font-bold' 
-                  : 'text-zinc-400 hover:text-white hover:bg-white/10'
+              className={`text-xs tracking-wide cursor-pointer ${
+                activeFace === 'back'
+                  ? 'text-[#F2F2F5] font-medium'
+                  : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
-              뒷면 (Back)
+              뒷면 코드
+            </button>
+          </div>
+
+          {/* Quiet Utility Actions */}
+          <div className="flex items-center gap-3 text-xs shrink-0">
+            <button
+              type="button"
+              onClick={handleCopyPrompt}
+              className="text-zinc-500 hover:text-zinc-200 cursor-pointer whitespace-nowrap"
+            >
+              {copiedPrompt ? '복사됨' : '프롬프트 복사'}
+            </button>
+            <span className="text-zinc-700 select-none">·</span>
+            <button
+              type="button"
+              onClick={handleGenerateDirectAi}
+              disabled={isGeneratingAi}
+              className="text-zinc-400 hover:text-[#F2F2F5] cursor-pointer disabled:opacity-50 whitespace-nowrap"
+            >
+              {isGeneratingAi ? '적용 중...' : '기본 코드 적용'}
             </button>
           </div>
         </div>
 
-        {activeFace === 'front' ? (
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-[11px] text-zinc-400">
-              <span className="font-mono">앞면 HTML (w-full h-full aspect-[1.586/1])</span>
-              <span className="text-[10px] text-zinc-500 font-mono">Tailwind CSS Classes</span>
-            </div>
-            <textarea
-              rows={11}
-              value={htmlFront}
-              onChange={(e) => onChangeFront(e.target.value)}
-              placeholder="<div class=&quot;w-full h-full aspect-[1.586/1] bg-[#0A0A0B] text-[#FAFAFA] p-7 ...&quot;>...</div>"
-              className="w-full p-3.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:ring-1 focus:ring-white/20 focus:border-white/20 focus:outline-none text-zinc-100 text-xs font-mono leading-relaxed resize-y selection:bg-white/20"
-              spellCheck={false}
-            />
-          </div>
-        ) : (
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-[11px] text-zinc-400">
-              <span className="font-mono">뒷면 HTML (선택 사항)</span>
-              <span className="text-[10px] text-zinc-500 font-mono">비워둘 경우 기본 QR 카드 뒷면 적용</span>
-            </div>
-            <textarea
-              rows={11}
-              value={htmlBack}
-              onChange={(e) => onChangeBack(e.target.value)}
-              placeholder="<div class=&quot;w-full h-full aspect-[1.586/1] bg-[#0A0A0B] ...&quot;>...</div>"
-              className="w-full p-3.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:ring-1 focus:ring-white/20 focus:border-white/20 focus:outline-none text-zinc-100 text-xs font-mono leading-relaxed resize-y selection:bg-white/20"
-              spellCheck={false}
-            />
+        <textarea
+          rows={12}
+          value={activeFace === 'front' ? htmlFront : htmlBack}
+          onChange={(e) =>
+            activeFace === 'front'
+              ? onChangeFront(e.target.value)
+              : onChangeBack(e.target.value)
+          }
+          placeholder="<div class=&quot;w-full h-full aspect-[1.586/1] bg-[#121214] text-[#F2F2F5] p-7 ...&quot;>...</div>"
+          className="w-full p-4 rounded-xl bg-[#161618] border border-white/[0.06] hover:border-white/[0.12] focus:border-white/25 focus:bg-[#19191C] focus:outline-none text-zinc-200 text-xs font-mono leading-relaxed resize-y selection:bg-white/15 editor-scrollbar"
+          spellCheck={false}
+        />
+
+        {(aiStatus || detectedUnsafe.length > 0) && (
+          <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-0.5">
+            {detectedUnsafe.length > 0 ? (
+              <span>허용되지 않는 스크립트 속성은 자동으로 제외됩니다.</span>
+            ) : (
+              <span>{aiStatus}</span>
+            )}
           </div>
         )}
+      </section>
 
-        {/* Zero-Trust Security & Sanitization Status */}
-        <div className="flex items-center justify-between pt-1">
-          {detectedUnsafe.length > 0 ? (
-            <div className="flex items-center gap-1.5 text-[10px] text-zinc-200 bg-white/5 border border-white/15 px-2.5 py-1 rounded-lg">
-              <AlertTriangle className="w-3 h-3 shrink-0 text-white" />
-              <span>잠재적 위험 감지: {detectedUnsafe.join(', ')} (샌드박스 렌더러에서 완전 무력화됨)</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5 text-[10px] text-zinc-400 font-mono">
-              <ShieldCheck className="w-3.5 h-3.5 text-zinc-300" />
-              <span>Zero-Trust Sandboxed: DOMPurify 검증 및 스크립트 실행 완전 차단</span>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Essential Contact Metadata */}
+      <section className="border-t border-white/[0.06] pt-8 space-y-4">
+        <h4 className="text-xs font-medium text-zinc-400 tracking-wide">
+          연결 정보
+        </h4>
 
-      {/* 3. Action Metadata Fields */}
-      <div className="border-t border-white/10 pt-5 space-y-3">
-        <div className="space-y-0.5">
-          <label className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-            <span className="text-zinc-400 font-mono">02.</span>
-            <span>액션바 연동 메타데이터</span>
-          </label>
-          <p className="text-[11px] text-zinc-400">
-            커스텀 HTML 명함 하단의 원클릭 전화걸기, vCard 저장, 문자 전송 버튼과 매핑됩니다.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-          {/* 성명 (Name) */}
-          <div className="space-y-1">
-            <label className="text-[11px] text-zinc-300 font-medium flex items-center gap-1">
-              <span>성명 (Name)</span>
-              <span className="text-zinc-400 font-bold">*</span>
-            </label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-xs text-zinc-400 block">성명</label>
             <input
               type="text"
               required
               value={cardData.name}
               onChange={(e) => onChangeCardData('name', e.target.value)}
-              placeholder="예: 홍길동 또는 John Doe"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:ring-1 focus:ring-white/20 focus:border-white/20 focus:outline-none text-white text-xs font-semibold"
+              placeholder="박기홍"
+              className={INPUT_CLASS}
             />
           </div>
 
-          {/* 대표 전화번호 (Phone) */}
-          <div className="space-y-1">
-            <label className="text-[11px] text-zinc-300 font-medium flex items-center gap-1">
-              <span>전화번호 (Phone)</span>
-              <span className="text-zinc-400 font-bold">*</span>
-            </label>
+          <div className="space-y-1.5">
+            <label className="text-xs text-zinc-400 block">연락처</label>
             <input
               type="text"
               required
               value={cardData.phone}
               onChange={(e) => onChangeCardData('phone', e.target.value)}
               placeholder="010-1234-5678"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-[#0A0A0B] border border-white/10 focus:ring-1 focus:ring-white/20 focus:border-white/20 focus:outline-none text-white text-xs font-mono tabular-nums"
+              className={`${INPUT_CLASS} font-mono tabular-nums`}
             />
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

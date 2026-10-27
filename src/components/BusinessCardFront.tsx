@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CardData, CardTheme, CardOrientation, CardLayoutType, CardFeatures } from '../types/card';
-import { resolveThemeStyles, generateMonogram } from '../constants/templates';
+import { resolveThemeStyles, generateMonogram, isVerticalLayout } from '../constants/templates';
 import { Phone, Mail, Globe, MapPin, Check, Copy, ArrowUpRight } from 'lucide-react';
 import { SandboxedCardRenderer } from './SandboxedCardRenderer';
 
@@ -40,8 +40,8 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
     setTimeout(() => setCopiedKey(null), 1800);
   };
 
-  const isVerticalAtelier = layout_type === 'vertical_atelier';
-  const isPortrait = isVerticalAtelier || orientation === 'portrait';
+  const isVerticalCard = isVerticalLayout(layout_type);
+  const isPortrait = isVerticalCard || orientation === 'portrait';
   const themeStyles = resolveThemeStyles(theme);
 
   // Custom HTML / Tailwind Injection Face Rendering with Sandboxed Zero-Trust Isolation
@@ -374,6 +374,105 @@ export const BusinessCardFront: React.FC<BusinessCardFrontProps> = ({
               {enAddress && <p className={`${themeStyles.textPrimary} truncate`}>{enAddress}</p>}
               {data.addressKr && <p className="truncate">{data.addressKr}</p>}
             </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // 2B. SERENITY VERTICAL LAYOUT (5:8 Quiet Luxury, vast negative space)
+  // =========================================================================
+  if (layout_type === 'serenity_vertical') {
+    return (
+      <div
+        className={`relative w-full h-full select-none flex flex-col justify-between p-6 sm:p-8 ${themeStyles.cardBg} ${
+          isPrintPreview || hideBorder ? 'border-0' : `border ${themeStyles.border}`
+        } transition-colors duration-300 font-sans`}
+        style={{ aspectRatio: '5 / 8' }}
+      >
+        {textureOverlay}
+
+        {/* Top Section (~25%): Primary Name, Sub-Name & Title/Role */}
+        <div className="relative z-10 flex items-start justify-between gap-3">
+          <div className="min-w-0 space-y-2">
+            <div className="space-y-0.5">
+              <h1 className={`text-xl sm:text-2xl font-medium tracking-tight leading-snug ${themeStyles.textPrimary} truncate`}>
+                {data.name}
+              </h1>
+              {showEnName && data.nameKr && (
+                <p className={`text-xs sm:text-[13px] font-normal tracking-wide leading-relaxed ${themeStyles.textSecondary} truncate`}>
+                  {data.nameKr}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-0.5 leading-relaxed">
+              {(data.title || data.titleKr) && (
+                <p className={`text-[11px] sm:text-xs font-normal tracking-wide leading-relaxed ${themeStyles.textSecondary} truncate`}>
+                  {data.title}
+                  {data.title && data.titleKr && (
+                    <span className={`mx-1.5 ${themeStyles.textMuted}`}>·</span>
+                  )}
+                  {data.titleKr && (
+                    <span className={themeStyles.textMuted}>{data.titleKr}</span>
+                  )}
+                </p>
+              )}
+              {showSubOrg && (data.organizationKr || data.organization) && (
+                <p className={`text-[10px] sm:text-[11px] tracking-wider leading-relaxed ${themeStyles.textMuted} truncate`}>
+                  {data.organizationKr || data.organization}
+                </p>
+              )}
+            </div>
+          </div>
+          {cornerMark}
+        </div>
+
+        {/* Center Section: Vast, Undisturbed Negative Space */}
+        <div className="flex-1 min-h-[36%]" aria-hidden="true" />
+
+        {/* Bottom Section (~25%): Hairline Divider & Compact Tabular Micro-Contacts */}
+        <div className={`relative z-10 border-t ${themeStyles.accentHairline} pt-3.5 sm:pt-4 space-y-1`}>
+          <div className="space-y-1 font-mono tabular-nums text-[10px] sm:text-[11px] leading-relaxed">
+            {data.phone && (
+              <div>
+                <a
+                  href={`tel:${data.phoneRaw}`}
+                  className={`inline-block whitespace-nowrap tracking-tight ${themeStyles.textPrimary} hover:opacity-75 transition-opacity`}
+                >
+                  {data.phone}
+                </a>
+              </div>
+            )}
+            {data.email && (
+              <div>
+                <a
+                  href={`mailto:${data.email}`}
+                  className={`inline-block max-w-full truncate tracking-tight ${themeStyles.textSecondary} hover:opacity-75 transition-opacity align-bottom`}
+                >
+                  {data.email}
+                </a>
+              </div>
+            )}
+            {data.website && (
+              <div>
+                <a
+                  href={data.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-block max-w-full truncate tracking-tight ${themeStyles.textMuted} hover:opacity-75 transition-opacity align-bottom`}
+                >
+                  {data.websiteDisplay}
+                </a>
+              </div>
+            )}
+          </div>
+
+          {showAddress && (enAddress || data.addressKr) && (
+            <p className={`pt-1 text-[8.5px] sm:text-[9px] font-sans ${themeStyles.textMuted} truncate leading-normal`}>
+              {enAddress || data.addressKr}
+            </p>
           )}
         </div>
       </div>

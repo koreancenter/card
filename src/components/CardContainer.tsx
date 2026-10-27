@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CardData, CardTheme, CardOrientation, CardLayoutType, CardFeatures } from '../types/card';
-import { resolveThemeStyles } from '../constants/templates';
+import { resolveThemeStyles, isVerticalLayout } from '../constants/templates';
 import { BusinessCardFront } from './BusinessCardFront';
 import { BusinessCardBack } from './BusinessCardBack';
 import { ActionButtons } from './ActionButtons';
@@ -45,14 +45,12 @@ export const CardContainer: React.FC<CardContainerProps> = ({
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [orientation, setOrientation] = useState<CardOrientation>(() => 
-    layout_type === 'vertical_atelier' ? 'portrait' : 'landscape'
+    isVerticalLayout(layout_type) ? 'portrait' : 'landscape'
   );
 
-  // Sync orientation if layout changes to vertical atelier
+  // Sync orientation when layout changes between vertical (5:8) and landscape (9:5) presets
   useEffect(() => {
-    if (layout_type === 'vertical_atelier') {
-      setOrientation('portrait');
-    }
+    setOrientation(isVerticalLayout(layout_type) ? 'portrait' : 'landscape');
   }, [layout_type]);
 
   // Touch swipe handling
@@ -87,8 +85,8 @@ export const CardContainer: React.FC<CardContainerProps> = ({
     touchStartX.current = null;
   };
 
-  const isVerticalAtelier = layout_type === 'vertical_atelier';
-  const isPortrait = isVerticalAtelier || orientation === 'portrait';
+  const isVerticalCard = isVerticalLayout(layout_type);
+  const isPortrait = isVerticalCard || orientation === 'portrait';
 
   return (
     <motion.div 
@@ -186,7 +184,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
           onOpenShare={onOpenShare}
           isPhotoCard={isPhotoCard}
           orientation={orientation}
-          onToggleOrientation={!isVerticalAtelier && isOwner ? () => setOrientation(prev => prev === 'portrait' ? 'landscape' : 'portrait') : undefined}
+          onToggleOrientation={!isVerticalCard && isOwner ? () => setOrientation(prev => prev === 'portrait' ? 'landscape' : 'portrait') : undefined}
           cardUrl={cardUrl}
           onShowToast={onShowToast}
         />
