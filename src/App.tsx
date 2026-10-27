@@ -3,16 +3,32 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { PrintConfig, StoredCard } from './types/card';
-import { loadUserCards, saveUserCards, loadStoredCards, saveStoredCards } from './utils/initialCards';
-import { CardContainer } from './components/CardContainer';
-import { CardNavigator } from './components/CardNavigator';
-import { PrintSheet } from './components/PrintSheet';
-import { VaultView } from './components/VaultView';
+import {
+  loadUserCards,
+  saveUserCards,
+  saveStoredCards,
+  SAMPLE_CARDS,
+  clearAllLocalData,
+} from './utils/initialCards';
 import { WelcomeCard } from './components/WelcomeCard';
-import { AppModals } from './components/AppModals';
-import { SAMPLE_CARDS, clearAllLocalData } from './utils/initialCards';
+
+const CardContainer = lazy(() =>
+  import('./components/CardContainer').then((m) => ({ default: m.CardContainer }))
+);
+const CardNavigator = lazy(() =>
+  import('./components/CardNavigator').then((m) => ({ default: m.CardNavigator }))
+);
+const PrintSheet = lazy(() =>
+  import('./components/PrintSheet').then((m) => ({ default: m.PrintSheet }))
+);
+const VaultView = lazy(() =>
+  import('./components/VaultView').then((m) => ({ default: m.VaultView }))
+);
+const AppModals = lazy(() =>
+  import('./components/AppModals').then((m) => ({ default: m.AppModals }))
+);
 import { APP_BASE_DOMAIN, resolveCardFromLocation, getCardShareUrl, getRouteSlug, isPublicSlugRoute } from './utils/domain';
 import { pullWalletFromEdge, pushWalletToEdge } from './utils/syncWallet';
 import { useAutoLock } from './hooks/useAutoLock';
@@ -475,7 +491,7 @@ export default function App() {
               </div>
 
               {/* Center Navigation: Switcher (내 명함 vs 보관함) */}
-              <nav className="flex items-center gap-1 sm:gap-1.5 header-full-nav">
+              <nav aria-label="주요 메뉴" className="flex items-center gap-1 sm:gap-1.5 header-full-nav">
                 <button
                   onClick={() => {
                     setActiveTab('my-card');
@@ -536,6 +552,8 @@ export default function App() {
                 <div className="relative">
                   <button
                     onClick={modals.toggleSettings}
+                    aria-expanded={modals.isSettingsOpen}
+                    aria-haspopup="menu"
                     className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 border border-white/10 transition-all cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
                     title="보안 및 기기 설정"
                     aria-label="설정 메뉴"
@@ -594,23 +612,32 @@ export default function App() {
             /* ================= PUBLIC RECIPIENT VISITOR VIEW MODE ================= */
             <div className="w-full flex flex-col items-center animate-in fade-in duration-300">
               <div className="w-full max-w-[540px] flex justify-center">
-                <CardContainer 
-                  data={activeCard.data} 
-                  theme={activeCard.theme} 
-                  layout_type={activeCard.layout_type}
-                  card_features={activeCard.card_features}
-                  isPhotoCard={activeCard.isPhotoCard || activeCard.creation_mode === 'photo'}
-                  photoUrl={activeCard.scannedImage || activeCard.front_image_url}
-                  backPhotoUrl={activeCard.scannedImageBack || activeCard.back_image_url}
-                  html_front={activeCard.html_front}
-                  html_back={activeCard.html_back}
-                  isFlipped={isFlipped}
-                  onFlip={() => setIsFlipped(prev => !prev)}
-                  onOpenShare={handleShare}
-                  isOwner={false}
-                  cardUrl={getCardShareUrl(activeCard)}
-                  onShowToast={showToast}
-                />
+                <Suspense
+                  fallback={
+                    <div
+                      className="w-full aspect-[9/5] rounded-2xl bg-[#121214] border border-white/10"
+                      aria-hidden="true"
+                    />
+                  }
+                >
+                  <CardContainer 
+                    data={activeCard.data} 
+                    theme={activeCard.theme} 
+                    layout_type={activeCard.layout_type}
+                    card_features={activeCard.card_features}
+                    isPhotoCard={activeCard.isPhotoCard || activeCard.creation_mode === 'photo'}
+                    photoUrl={activeCard.scannedImage || activeCard.front_image_url}
+                    backPhotoUrl={activeCard.scannedImageBack || activeCard.back_image_url}
+                    html_front={activeCard.html_front}
+                    html_back={activeCard.html_back}
+                    isFlipped={isFlipped}
+                    onFlip={() => setIsFlipped(prev => !prev)}
+                    onOpenShare={handleShare}
+                    isOwner={false}
+                    cardUrl={getCardShareUrl(activeCard)}
+                    onShowToast={showToast}
+                  />
+                </Suspense>
               </div>
 
               {/* Subtle Viral Footnote */}
@@ -621,7 +648,7 @@ export default function App() {
                     e.preventDefault();
                     handleCreateMyOwnCard();
                   }}
-                  className="inline-flex items-center gap-2 text-xs text-white/80 hover:text-white transition-all tracking-wide py-2.5 px-5 rounded-full border border-white/20 hover:border-white/40 hover:bg-white/[0.04] active:scale-95 group cursor-pointer shadow-lg"
+                  className="inline-flex items-center gap-2 text-xs text-zinc-200 hover:text-white transition-all tracking-wide py-2.5 px-5 rounded-full border border-white/20 hover:border-white/40 hover:bg-white/[0.04] active:scale-95 group cursor-pointer shadow-lg"
                 >
                   <span>나만의 럭셔리 디지털 명함 만들기</span>
                   <span className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 font-sans">↗</span>
@@ -645,8 +672,8 @@ export default function App() {
                 <div className="w-full flex flex-col items-center space-y-2 sm:space-y-4">
                   {/* Luxury Minimalist Showcase Top Bar */}
                   <div className="w-full max-w-[540px] px-1 py-0.5 flex items-center justify-between text-xs animate-in fade-in duration-200">
-                    <div className="flex items-center gap-1.5 text-xs text-white/50 font-normal">
-                      <span className="text-white text-[8px] leading-none">●</span>
+                    <div className="flex items-center gap-1.5 text-xs text-zinc-400 font-normal">
+                      <span className="text-white text-[8px] leading-none" aria-hidden="true">●</span>
                       <span>샘플 모드</span>
                     </div>
 
@@ -662,7 +689,7 @@ export default function App() {
 
                       <button
                         onClick={() => setIsSamplePreview(false)}
-                        className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/5 transition-all cursor-pointer active:scale-90 flex items-center justify-center"
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer active:scale-90 flex items-center justify-center"
                         title="시작 화면으로"
                         aria-label="시작 화면으로"
                       >
@@ -673,19 +700,28 @@ export default function App() {
 
                   {/* Interactive Card Canvas */}
                   <div className="w-full max-w-[540px] flex justify-center">
-                    <CardContainer 
-                      data={activeCard.data} 
-                      theme={activeCard.theme} 
-                      layout_type={activeCard.layout_type}
-                      card_features={activeCard.card_features}
-                      isPhotoCard={activeCard.isPhotoCard}
-                      photoUrl={activeCard.scannedImage}
-                      backPhotoUrl={activeCard.scannedImageBack}
-                      isFlipped={isFlipped}
-                      onFlip={() => setIsFlipped(prev => !prev)}
-                      onOpenShare={modals.openShare}
-                      onOpenEdit={handleOpenCreateModal}
-                    />
+                    <Suspense
+                      fallback={
+                        <div
+                          className="w-full aspect-[9/5] rounded-2xl bg-[#121214] border border-white/10"
+                          aria-hidden="true"
+                        />
+                      }
+                    >
+                      <CardContainer 
+                        data={activeCard.data} 
+                        theme={activeCard.theme} 
+                        layout_type={activeCard.layout_type}
+                        card_features={activeCard.card_features}
+                        isPhotoCard={activeCard.isPhotoCard}
+                        photoUrl={activeCard.scannedImage}
+                        backPhotoUrl={activeCard.scannedImageBack}
+                        isFlipped={isFlipped}
+                        onFlip={() => setIsFlipped(prev => !prev)}
+                        onOpenShare={modals.openShare}
+                        onOpenEdit={handleOpenCreateModal}
+                      />
+                    </Suspense>
                   </div>
                 </div>
               ) : !activeCard ? (
@@ -702,100 +738,120 @@ export default function App() {
                   <div className="flex items-center justify-between w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px] text-xs">
                     <button
                       onClick={() => setActiveTab('vault')}
-                      className="flex items-center gap-1.5 text-neutral-400 hover:text-white transition-colors cursor-pointer py-1"
+                      className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer py-1"
                     >
                       <ArrowLeft className="w-3.5 h-3.5" />
                       <span>보관함 목록으로</span>
                     </button>
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-[#121318] border border-white/5 text-neutral-400 font-mono">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-[#121318] border border-white/5 text-zinc-400 font-mono">
                       보관 명함 ({activeCard.category})
                     </span>
                   </div>
 
                   <div className="w-full max-w-[460px] sm:max-w-[500px] md:max-w-[540px] flex justify-center">
-                    <CardContainer 
-                      data={activeCard.data} 
-                      theme={activeCard.theme} 
-                      layout_type={activeCard.layout_type}
-                      card_features={activeCard.card_features}
-                      isPhotoCard={activeCard.isPhotoCard || activeCard.creation_mode === 'photo'}
-                      photoUrl={activeCard.scannedImage || activeCard.front_image_url}
-                      backPhotoUrl={activeCard.scannedImageBack || activeCard.back_image_url}
-                      html_front={activeCard.html_front}
-                      html_back={activeCard.html_back}
-                      isFlipped={isFlipped}
-                      onFlip={() => setIsFlipped(prev => !prev)}
-                      onOpenShare={modals.openShare}
-                      onOpenEdit={() => {
-                        requireUnlock(() => {
-                          modals.openEditor(activeCard, false);
-                        });
-                      }}
-                    />
+                    <Suspense
+                      fallback={
+                        <div
+                          className="w-full aspect-[9/5] rounded-2xl bg-[#121214] border border-white/10"
+                          aria-hidden="true"
+                        />
+                      }
+                    >
+                      <CardContainer 
+                        data={activeCard.data} 
+                        theme={activeCard.theme} 
+                        layout_type={activeCard.layout_type}
+                        card_features={activeCard.card_features}
+                        isPhotoCard={activeCard.isPhotoCard || activeCard.creation_mode === 'photo'}
+                        photoUrl={activeCard.scannedImage || activeCard.front_image_url}
+                        backPhotoUrl={activeCard.scannedImageBack || activeCard.back_image_url}
+                        html_front={activeCard.html_front}
+                        html_back={activeCard.html_back}
+                        isFlipped={isFlipped}
+                        onFlip={() => setIsFlipped(prev => !prev)}
+                        onOpenShare={modals.openShare}
+                        onOpenEdit={() => {
+                          requireUnlock(() => {
+                            modals.openEditor(activeCard, false);
+                          });
+                        }}
+                      />
+                    </Suspense>
                   </div>
                 </div>
               ) : (
                 /* Apple Wallet-Style Luxury Horizontal Card Carousel Deck with Ghost Add Card Slot */
-                <CardNavigator
-                  cards={myCards}
-                  activeCardId={activeCard.id}
-                  onSelectCard={handleSelectMyCard}
-                  onCreateNewCard={handleOpenCreateModal}
-                  onOpenEdit={(cardToEdit) => {
-                    requireUnlock(() => {
-                      modals.openEditor(cardToEdit, false);
-                    });
-                  }}
-                  onOpenShare={(cardToShare) => {
-                    setActiveCardId(cardToShare.id);
-                    modals.openShare();
-                  }}
-                  mode="carousel"
-                />
+                <Suspense
+                  fallback={
+                    <div
+                      className="w-full max-w-[540px] aspect-[9/5] rounded-2xl bg-[#121214] border border-white/10"
+                      aria-hidden="true"
+                    />
+                  }
+                >
+                  <CardNavigator
+                    cards={myCards}
+                    activeCardId={activeCard.id}
+                    onSelectCard={handleSelectMyCard}
+                    onCreateNewCard={handleOpenCreateModal}
+                    onOpenEdit={(cardToEdit) => {
+                      requireUnlock(() => {
+                        modals.openEditor(cardToEdit, false);
+                      });
+                    }}
+                    onOpenShare={(cardToShare) => {
+                      setActiveCardId(cardToShare.id);
+                      modals.openShare();
+                    }}
+                    mode="carousel"
+                  />
+                </Suspense>
               )}
             </div>
           ) : (
             /* ================= VIEW 2: THE VAULT (CARD / LIST) ================= */
-            <VaultView
-              cards={cards}
-              isLocked={isPinConfigured && isLocked}
-              onUnlockRequest={() => {
-                lockApp();
-              }}
-              onSelectCard={(selected) => {
-                setActiveCardId(selected.id);
-                setActiveTab('my-card');
-              }}
-              onEditCard={(cardToEdit) => {
-                requireUnlock(() => {
-                  modals.openEditor(cardToEdit, false);
-                });
-              }}
-              onDeleteCard={(id) => {
-                requireUnlock(() => {
-                  handleDeleteCard(id);
-                });
-              }}
-              onExportCard={(cardToExport) => {
-                setActiveCardId(cardToExport.id);
-                modals.openExport();
-              }}
-              onOpenScan={() => {
-                requireUnlock(() => {
-                  modals.openScan();
-                });
-              }}
-              onOpenSync={modals.openSync}
-              onOpenEditor={() => {
-                requireUnlock(() => {
-                  if (activeCard) {
-                    modals.openEditor(activeCard, false);
-                  } else {
-                    handleOpenCreateModal();
-                  }
-                });
-              }}
-            />
+            <Suspense fallback={<div className="w-full max-w-6xl min-h-[320px]" aria-hidden="true" />}>
+              <VaultView
+                cards={cards}
+                isLocked={isPinConfigured && isLocked}
+                onUnlockRequest={() => {
+                  lockApp();
+                }}
+                onSelectCard={(selected) => {
+                  setActiveCardId(selected.id);
+                  setActiveTab('my-card');
+                }}
+                onEditCard={(cardToEdit) => {
+                  requireUnlock(() => {
+                    modals.openEditor(cardToEdit, false);
+                  });
+                }}
+                onDeleteCard={(id) => {
+                  requireUnlock(() => {
+                    handleDeleteCard(id);
+                  });
+                }}
+                onExportCard={(cardToExport) => {
+                  setActiveCardId(cardToExport.id);
+                  modals.openExport();
+                }}
+                onOpenScan={() => {
+                  requireUnlock(() => {
+                    modals.openScan();
+                  });
+                }}
+                onOpenSync={modals.openSync}
+                onOpenEditor={() => {
+                  requireUnlock(() => {
+                    if (activeCard) {
+                      modals.openEditor(activeCard, false);
+                    } else {
+                      handleOpenCreateModal();
+                    }
+                  });
+                }}
+              />
+            </Suspense>
           )}
 
         </main>
@@ -877,34 +933,58 @@ export default function App() {
 
         {/* Toast Notification */}
         {toastMessage && (
-          <div className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-[#121214] border border-white/15 text-white text-xs font-medium shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div
+            role="status"
+            aria-live="polite"
+            className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-[#121214] border border-white/15 text-white text-xs font-medium shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200"
+          >
             <Check className="w-4 h-4 text-white shrink-0" />
             <span>{toastMessage}</span>
           </div>
         )}
 
-        {/* Declarative Centralized Modals Container */}
-        <AppModals
-          modals={modals}
-          activeCard={activeCard}
-          isOwner={isOwner}
-          printConfig={printConfig}
-          setPrintConfig={setPrintConfig}
-          onSaveCard={handleSaveCard}
-          onConfirmReset={handleConfirmReset}
-          isLocked={isLocked}
-          isPinConfigured={isPinConfigured}
-          unlockApp={unlockApp}
-          refreshPinStatus={refreshPinStatus}
-          setCards={setCards}
-          showToast={showToast}
-          onBiometricUnlock={handleBiometricUnlock}
-        />
+        {/* Declarative Centralized Modals Container (Lazy-loaded on demand) */}
+        {((isLocked && isPinConfigured) ||
+          modals.isShareOpen ||
+          modals.isQrOpen ||
+          modals.isPrintOpen ||
+          modals.isExportOpen ||
+          modals.isScanOpen ||
+          modals.isEditorOpen ||
+          modals.isSyncOpen ||
+          modals.isPinConfigOpen ||
+          modals.isBiometricsOpen ||
+          modals.isLazyPinOpen ||
+          modals.isLegalOpen ||
+          modals.isResetOpen) && (
+          <Suspense fallback={null}>
+            <AppModals
+              modals={modals}
+              activeCard={activeCard}
+              isOwner={isOwner}
+              printConfig={printConfig}
+              setPrintConfig={setPrintConfig}
+              onSaveCard={handleSaveCard}
+              onConfirmReset={handleConfirmReset}
+              isLocked={isLocked}
+              isPinConfigured={isPinConfigured}
+              unlockApp={unlockApp}
+              refreshPinStatus={refreshPinStatus}
+              setCards={setCards}
+              showToast={showToast}
+              onBiometricUnlock={handleBiometricUnlock}
+            />
+          </Suspense>
+        )}
 
       </div>
 
       {/* PRINT-ONLY VECTOR CONTAINER (Triggered on window.print()) */}
-      {activeCard && <PrintSheet data={activeCard.data} config={printConfig} />}
+      {activeCard && (
+        <Suspense fallback={null}>
+          <PrintSheet data={activeCard.data} config={printConfig} />
+        </Suspense>
+      )}
     </>
   );
 }
