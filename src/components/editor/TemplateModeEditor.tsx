@@ -312,17 +312,17 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                   type="text"
                   value={formData.name}
                   onChange={(e) => onChangeFormField('name', e.target.value)}
-                  placeholder="PARK, GIHONG"
+                  placeholder="박기홍"
                   className={INPUT_CLASS}
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs text-zinc-400 block">보조 성명</label>
+                <label className="text-xs text-zinc-400 block">영문 · 보조 성명</label>
                 <input
                   type="text"
-                  value={formData.nameKr}
-                  onChange={(e) => onChangeFormField('nameKr', e.target.value)}
-                  placeholder="박기홍"
+                  value={formData.nameEn ?? ''}
+                  onChange={(e) => onChangeFormField('nameEn', e.target.value)}
+                  placeholder="PARK, GIHONG"
                   className={INPUT_CLASS}
                 />
               </div>
@@ -336,7 +336,7 @@ export const TemplateModeEditor: React.FC<TemplateModeEditorProps> = ({
                   onChange={(e) => onChangeFeatures(prev => ({ ...prev, show_en_name: e.target.checked }))}
                   className="w-3.5 h-3.5 rounded accent-zinc-200 cursor-pointer"
                 />
-                <span className="text-xs text-zinc-400">보조 성명 표기</span>
+                <span className="text-xs text-zinc-400">영문 · 보조 성명 표기</span>
               </label>
               <label className="inline-flex items-center gap-2.5 cursor-pointer select-none">
                 <input

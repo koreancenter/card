@@ -307,14 +307,27 @@ export const DEFAULT_CARD_FEATURES: CardFeatures = {
   monogram_text: ''
 };
 
-export function generateMonogram(name: string, nameKr?: string): string {
-  if (nameKr && nameKr.length >= 2) {
-    return nameKr.slice(0, 2);
+export function generateMonogram(name: string, subName?: string): string {
+  const candidates = [name, subName].map((s) => (s || '').trim()).filter(Boolean);
+  if (candidates.length === 0) return 'GC';
+
+  for (const text of candidates) {
+    const latinParts = text
+      .replace(/[^a-zA-Z\s]/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    if (latinParts.length >= 2) {
+      return (latinParts[0][0] + latinParts[latinParts.length - 1][0]).toUpperCase();
+    }
+    if (latinParts.length === 1 && latinParts[0].length >= 1) {
+      return latinParts[0].slice(0, 2).toUpperCase();
+    }
   }
-  if (!name) return 'KC';
-  const parts = name.replace(/[^a-zA-Z\s]/g, '').trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+
+  const primary = candidates[0].replace(/\s+/g, '');
+  if (primary.length >= 3) {
+    return primary.slice(-2);
   }
-  return parts[0].slice(0, 2).toUpperCase();
+  return primary.slice(0, 2) || 'GC';
 }

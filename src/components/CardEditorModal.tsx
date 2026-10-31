@@ -86,7 +86,9 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
   );
 
   // Template Mode states
-  const [templateSubTab, setTemplateSubTab] = useState<'visual_atelier' | 'identity_profile'>('visual_atelier');
+  const [templateSubTab, setTemplateSubTab] = useState<'visual_atelier' | 'identity_profile'>(
+    isCreating ? 'identity_profile' : 'visual_atelier'
+  );
   const [theme, setTheme] = useState<CardTheme>(card.theme || 'pure_white');
   const [layoutType, setLayoutType] = useState<CardLayoutType>(card.layout_type || 'editorial_minimal');
   const [features, setFeatures] = useState<CardFeatures>({
@@ -98,7 +100,10 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
   });
 
   // Common Profile Data
-  const [formData, setFormData] = useState<CardData>({ ...card.data });
+  const [formData, setFormData] = useState<CardData>({
+    ...card.data,
+    nameEn: card.data.nameEn ?? ''
+  });
   const [category, setCategory] = useState<string>(card.category || '글로벌 네트워크');
   const [notes, setNotes] = useState<string>(card.notes || '');
   const [slug, setSlug] = useState<string>(card.slug || 'master');
@@ -131,38 +136,100 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
       const mode: CardCreationMode =
         card.creation_mode || (card.isPhotoCard ? 'photo' : card.html_front ? 'custom_html' : 'template');
       setCreationMode(mode);
+      setTemplateSubTab(isCreating ? 'identity_profile' : 'visual_atelier');
 
-      const initialAddressEn =
+      const initialAddressEn = (
         card.data.address_en ||
         card.details?.address_en ||
         card.data.details?.address_en ||
-        (card.data.addressLines && card.data.addressLines.length > 0 ? card.data.addressLines.join(', ') : '');
+        (card.data.addressLines && card.data.addressLines.length > 0 ? card.data.addressLines.join(', ') : '')
+      ).trim();
+      const rawAddressKr = (card.data.addressKr ?? '').trim();
+      const isPlaceholderAddressEn =
+        initialAddressEn.includes('77 Cheongdam-ro') &&
+        (initialAddressEn.includes('06015') || initialAddressEn.includes('Republic of Korea'));
       const cleanAddressEn =
-        initialAddressEn.includes('77 Cheongdam-ro') && (initialAddressEn.includes('06015') || initialAddressEn.includes('Republic of Korea'))
+        isPlaceholderAddressEn ||
+        (initialAddressEn && initialAddressEn.toLowerCase() === rawAddressKr.toLowerCase())
           ? ''
           : initialAddressEn;
 
+      const primaryName = isCreating
+        ? (card.data.name ?? '')
+        : (card.data.name || card.data.nameKr || '');
+
+      const rawSubName = isCreating
+        ? ''
+        : (
+            card.data.nameEn ??
+            card.data.details?.en_name ??
+            card.details?.en_name ??
+            (card.data.name ? card.data.nameKr : '') ??
+            ''
+          ).trim();
+      const cleanNameEn =
+        rawSubName && rawSubName.toLowerCase() !== primaryName.trim().toLowerCase()
+          ? rawSubName
+          : '';
+
+      const rawOrg = card.data.organization ?? '';
+      const rawOrgKr = card.data.organizationKr ?? '';
+      const cleanOrg =
+        isCreating
+          ? ''
+          : rawOrg.trim() && rawOrgKr.trim() && rawOrg.trim().toLowerCase() === rawOrgKr.trim().toLowerCase()
+            ? ''
+            : rawOrg;
+      const cleanOrgKr = isCreating ? (card.data.organizationKr ?? '') : rawOrgKr;
+
+      const rawTitle = card.data.title ?? '';
+      const rawTitleKr = card.data.titleKr ?? '';
+      const cleanTitle =
+        isCreating
+          ? ''
+          : rawTitle.trim() && rawTitleKr.trim() && rawTitle.trim().toLowerCase() === rawTitleKr.trim().toLowerCase()
+            ? ''
+            : rawTitle;
+      const cleanTitleKr = isCreating ? (card.data.titleKr ?? '') : rawTitleKr;
+
+      const rawSubOrg = card.data.subOrg ?? card.data.details?.sub_org ?? card.details?.sub_org ?? '';
+      const cleanSubOrg =
+        rawSubOrg.trim() &&
+        rawSubOrg.trim().toLowerCase() !== cleanOrg.trim().toLowerCase() &&
+        rawSubOrg.trim().toLowerCase() !== cleanOrgKr.trim().toLowerCase()
+          ? rawSubOrg
+          : '';
+
       const initialData: CardData = {
-        ...CARD_DATA,
         ...card.data,
-        name: card.data.name || CARD_DATA.name,
-        nameKr: card.data.nameKr || CARD_DATA.nameKr,
-        organization: card.data.organization || CARD_DATA.organization,
-        organizationKr: card.data.organizationKr || CARD_DATA.organizationKr,
-        title: card.data.title || CARD_DATA.title,
-        titleKr: card.data.titleKr || CARD_DATA.titleKr,
-        phone: card.data.phone || CARD_DATA.phone,
-        email: card.data.email || CARD_DATA.email,
-        addressKr: card.data.addressKr || CARD_DATA.addressKr,
+        name: primaryName,
+        nameEn: cleanNameEn,
+        nameKr: '',
+        organization: cleanOrg,
+        organizationKr: cleanOrgKr,
+        subOrg: cleanSubOrg,
+        title: cleanTitle,
+        titleKr: cleanTitleKr,
+        phone: card.data.phone ?? '',
+        phoneRaw: card.data.phoneRaw ?? '',
+        whatsappUrl: card.data.whatsappUrl ?? '',
+        email: card.data.email ?? '',
+        addressKr: card.data.addressKr ?? '',
         address_en: cleanAddressEn,
-        addressLines: cleanAddressEn ? [cleanAddressEn] : (card.data.addressLines || []),
-        website: card.data.website || CARD_DATA.website,
-        websiteDisplay: card.data.websiteDisplay || CARD_DATA.websiteDisplay,
+        addressLines: cleanAddressEn ? [cleanAddressEn] : [],
+        website: card.data.website || `https://${APP_BASE_DOMAIN}/${card.slug || 'master'}`,
+        websiteDisplay: card.data.websiteDisplay || `${APP_BASE_DOMAIN}/${card.slug || 'master'}`,
+        googleMapsUrl: card.data.googleMapsUrl ?? '',
+        naverMapsUrl: card.data.naverMapsUrl ?? '',
         details: {
           ...card.details,
+          en_name: cleanNameEn,
+          sub_org: cleanSubOrg,
+          address: card.data.addressKr ?? '',
+          address_en: cleanAddressEn,
+          slogan: card.data.backTagline ?? '',
           show_address: card.card_features?.show_address ?? true,
-          show_en_name: card.card_features?.show_en_name ?? true,
-          address_en: cleanAddressEn
+          show_en_name: card.card_features?.show_en_name ?? true
         }
       };
       setFormData(initialData);
@@ -186,13 +253,23 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
       setBackImageUrl(card.back_image_url || card.scannedImageBack);
       setPreviewFace('front');
     }
-  }, [card, isOpen, isMyCardMode]);
+  }, [card, isOpen, isMyCardMode, isCreating]);
 
   if (!isOpen) return null;
 
   const handleFormFieldChange = (field: keyof CardData, value: string) => {
     setFormData(prev => {
-      const updated = { ...prev, [field]: value };
+      const updated: CardData = { ...prev, [field]: value };
+      if (field === 'nameEn') {
+        updated.nameEn = value;
+        updated.nameKr = '';
+        updated.details = {
+          ...updated.details,
+          en_name: value,
+          show_address: features.show_address ?? true,
+          show_en_name: features.show_en_name ?? true
+        };
+      }
       if (field === 'address_en') {
         updated.address_en = value;
         updated.details = {
@@ -225,26 +302,107 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
   const effectiveDisplayUrl = cleanCustomDomain || `${APP_BASE_DOMAIN}/${cleanSlug}`;
 
   const handleResetSample = () => {
-    setFormData({ ...CARD_DATA });
-    setSlug('master');
+    if (isCreating) {
+      setFormData({
+        organization: '',
+        organizationKr: '',
+        subOrg: '',
+        name: '',
+        nameEn: '',
+        nameKr: '',
+        title: '',
+        titleKr: '',
+        phone: '',
+        phoneRaw: '',
+        whatsappUrl: '',
+        email: '',
+        website: effectiveUrl,
+        websiteDisplay: effectiveDisplayUrl,
+        addressLines: [],
+        addressKr: '',
+        address_en: '',
+        details: {
+          en_name: '',
+          sub_org: '',
+          address: '',
+          address_en: '',
+          slogan: '',
+          show_address: true,
+          show_en_name: true
+        },
+        googleMapsUrl: '',
+        naverMapsUrl: ''
+      });
+    } else {
+      setFormData({
+        ...CARD_DATA,
+        nameEn: CARD_DATA.nameKr,
+        nameKr: ''
+      });
+      setSlug('master');
+    }
     setTheme('pure_white');
     setLayoutType('editorial_minimal');
     setCreationMode('template');
   };
 
   const handleSave = () => {
-    const finalAddressEn = formData.address_en ?? formData.details?.address_en ?? '';
+    const cleanPrimaryName = (formData.name || formData.nameKr || '').trim() || '이름 미입력';
+    const rawSubName = (formData.nameEn ?? '').trim();
+    const cleanNameEn =
+      rawSubName && rawSubName.toLowerCase() !== cleanPrimaryName.toLowerCase()
+        ? rawSubName
+        : '';
+
+    const cleanOrgKr = (formData.organizationKr ?? '').trim();
+    const rawOrgEn = (formData.organization ?? '').trim();
+    const cleanOrgEn =
+      rawOrgEn && rawOrgEn.toLowerCase() !== cleanOrgKr.toLowerCase()
+        ? rawOrgEn
+        : '';
+
+    const rawSubOrg = (formData.subOrg ?? '').trim();
+    const cleanSubOrg =
+      rawSubOrg &&
+      rawSubOrg.toLowerCase() !== cleanOrgKr.toLowerCase() &&
+      rawSubOrg.toLowerCase() !== cleanOrgEn.toLowerCase()
+        ? rawSubOrg
+        : '';
+
+    const cleanTitleKr = (formData.titleKr ?? '').trim();
+    const rawTitleEn = (formData.title ?? '').trim();
+    const cleanTitleEn =
+      rawTitleEn && rawTitleEn.toLowerCase() !== cleanTitleKr.toLowerCase()
+        ? rawTitleEn
+        : '';
+
+    const cleanAddressKr = (formData.addressKr ?? '').trim();
+    const rawAddressEn = (formData.address_en ?? formData.details?.address_en ?? '').trim();
+    const finalAddressEn =
+      rawAddressEn && rawAddressEn.toLowerCase() !== cleanAddressKr.toLowerCase()
+        ? rawAddressEn
+        : '';
+
     const finalData: CardData = {
       ...formData,
+      name: cleanPrimaryName,
+      nameEn: cleanNameEn,
+      nameKr: '',
+      organization: cleanOrgEn,
+      organizationKr: cleanOrgKr,
+      subOrg: cleanSubOrg,
+      title: cleanTitleEn,
+      titleKr: cleanTitleKr,
+      addressKr: cleanAddressKr,
       address_en: finalAddressEn,
-      addressLines: finalAddressEn ? [finalAddressEn] : (formData.addressLines || []),
+      addressLines: finalAddressEn ? [finalAddressEn] : [],
       website: effectiveUrl,
       websiteDisplay: effectiveDisplayUrl,
       details: {
         ...formData.details,
-        en_name: formData.nameKr,
-        sub_org: formData.subOrg,
-        address: formData.addressKr,
+        en_name: cleanNameEn,
+        sub_org: cleanSubOrg,
+        address: cleanAddressKr,
         address_en: finalAddressEn,
         slogan: formData.backTagline,
         show_address: features.show_address ?? true,
@@ -271,9 +429,9 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
       owner_key: card.owner_key || `key_${Date.now()}`,
       created_at: card.created_at || new Date().toISOString(),
       details: {
-        en_name: formData.nameKr,
-        sub_org: formData.subOrg,
-        address: formData.addressKr,
+        en_name: cleanNameEn,
+        sub_org: cleanSubOrg,
+        address: cleanAddressKr,
         address_en: finalAddressEn,
         slogan: formData.backTagline,
         show_address: features.show_address ?? true,
@@ -285,7 +443,7 @@ export const CardEditorModal: React.FC<CardEditorModalProps> = ({
       back_image_url: isPhotoMode ? backImageUrl : undefined,
       scannedImage: isPhotoMode ? frontImageUrl : undefined,
       scannedImageBack: isPhotoMode ? backImageUrl : undefined,
-      isPhotoCard: isPhotoMode
+      isPhotoCard: isPhotoMode && Boolean(frontImageUrl)
     };
 
     onSave(updated);

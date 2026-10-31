@@ -37,12 +37,43 @@ export const EditorPreviewPanel: React.FC<EditorPreviewPanelProps> = ({
   previewFace,
   onFlipPreviewFace,
 }) => {
-  const cardDataForPreview: CardData = {
-    ...formData,
-    address_en: formData.address_en ?? formData.details?.address_en,
-    website: effectiveUrl,
-    websiteDisplay: effectiveDisplayUrl,
-  };
+  const isCompletelyEmpty =
+    !formData.name.trim() &&
+    !(formData.nameEn || '').trim() &&
+    !formData.nameKr.trim() &&
+    !formData.organization.trim() &&
+    !formData.organizationKr.trim() &&
+    !formData.title.trim() &&
+    !formData.titleKr.trim() &&
+    !formData.phone.trim() &&
+    !formData.email.trim();
+
+  const cardDataForPreview: CardData = isCompletelyEmpty
+    ? {
+        ...formData,
+        name: '박기홍',
+        nameEn: '',
+        nameKr: '',
+        organization: '',
+        organizationKr: '고구마 지식 관리실',
+        subOrg: '',
+        title: '',
+        titleKr: '대표 마스터',
+        phone: '+82 10-1234-5678',
+        phoneRaw: '+821012345678',
+        email: 'master@goguma.app',
+        addressKr: '서울특별시 강남구 테헤란로 152',
+        address_en: '',
+        addressLines: [],
+        website: effectiveUrl,
+        websiteDisplay: effectiveDisplayUrl,
+      }
+    : {
+        ...formData,
+        address_en: formData.address_en ?? formData.details?.address_en,
+        website: effectiveUrl,
+        websiteDisplay: effectiveDisplayUrl,
+      };
 
   const isVerticalCard = isVerticalLayout(layoutType) && creationMode === 'template';
   const sanitizedFront = useMemo(() => sanitizeHtml(htmlFront), [htmlFront]);

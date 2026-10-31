@@ -161,6 +161,7 @@ export const VaultView: React.FC<VaultViewProps> = ({
       const d = c.data;
       return (
         d.name.toLowerCase().includes(q) ||
+        Boolean(d.nameEn && d.nameEn.toLowerCase().includes(q)) ||
         d.nameKr.toLowerCase().includes(q) ||
         d.organization.toLowerCase().includes(q) ||
         d.organizationKr.toLowerCase().includes(q) ||

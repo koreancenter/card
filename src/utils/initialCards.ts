@@ -114,7 +114,8 @@ export const INITIAL_CARDS: StoredCard[] = [
       organization: 'Korea Cultural Exchange Foundation',
       organizationKr: '한국문화교류진흥재단',
       name: '정서윤',
-      nameKr: '정서윤',
+      nameEn: '',
+      nameKr: '',
       title: 'Executive Vice President',
       titleKr: '부사장',
       phone: '+82 10-3882-9011',
@@ -186,9 +187,42 @@ const LEGACY_STORAGE_KEY = 'koreancenter_stored_cards_v2';
 let memoryDecryptedCards: StoredCard[] | null = null;
 
 function enrichCard(c: StoredCard): StoredCard {
-  const enriched = {
+  const rawData = c.data;
+  const primaryName = (rawData?.name || rawData?.nameKr || '').trim();
+  const rawNameKr = (rawData?.nameKr || '').trim();
+  const rawNameEn = (rawData?.nameEn || '').trim();
+  const cleanNameKr =
+    rawNameKr && rawNameKr.toLowerCase() !== primaryName.toLowerCase() ? rawData.nameKr : '';
+  const cleanNameEn =
+    rawNameEn && rawNameEn.toLowerCase() !== primaryName.toLowerCase() ? rawData.nameEn : '';
+
+  const rawOrg = (rawData?.organization || '').trim();
+  const rawOrgKr = (rawData?.organizationKr || '').trim();
+  const cleanOrg =
+    rawOrg && rawOrgKr && rawOrg.toLowerCase() === rawOrgKr.toLowerCase()
+      ? ''
+      : (rawData?.organization || '');
+
+  const rawTitle = (rawData?.title || '').trim();
+  const rawTitleKr = (rawData?.titleKr || '').trim();
+  const cleanTitle =
+    rawTitle && rawTitleKr && rawTitle.toLowerCase() === rawTitleKr.toLowerCase()
+      ? ''
+      : (rawData?.title || '');
+
+  const enriched: StoredCard = {
     ...c,
-    owner_key: c.owner_key || (c.isMyCard ? `key_${c.id}` : undefined)
+    owner_key: c.owner_key || (c.isMyCard ? `key_${c.id}` : undefined),
+    data: rawData
+      ? {
+          ...rawData,
+          name: primaryName || rawData.name || '',
+          nameEn: cleanNameEn,
+          nameKr: cleanNameKr,
+          organization: cleanOrg,
+          title: cleanTitle,
+        }
+      : c.data,
   };
   const isLegacyMasterSample =
     c.id === 'sample-card-alexander-vance' ||

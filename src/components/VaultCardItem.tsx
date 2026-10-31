@@ -134,11 +134,19 @@ const VaultCardItemComponent: React.FC<VaultCardItemProps> = ({
 
       {/* Card Contact & Meta Info */}
       <div className="px-4 pb-2 space-y-1 text-xs">
-        <div className="flex items-baseline justify-between">
-          <h4 className="font-bold text-white text-sm tracking-tight">{card.data.name}</h4>
-          <span className="text-[11px] text-zinc-400">{card.data.titleKr || card.data.title}</span>
+        <div className="flex items-baseline justify-between gap-2">
+          <h4 className="font-bold text-white text-sm tracking-tight truncate">
+            {card.data.name || card.data.nameKr}
+          </h4>
+          <span className="text-[11px] text-zinc-400 shrink-0">
+            {card.data.titleKr || card.data.title}
+          </span>
         </div>
-        <p className="text-[11px] text-zinc-400 truncate">{card.data.organization}</p>
+        {(card.data.organizationKr || card.data.organization) && (
+          <p className="text-[11px] text-zinc-400 truncate">
+            {card.data.organizationKr || card.data.organization}
+          </p>
+        )}
         {card.notes && (
           <p className="text-[10px] text-zinc-400 line-clamp-1 italic pt-0.5">"{card.notes}"</p>
         )}
@@ -264,15 +272,17 @@ const VaultCardListRowComponent: React.FC<VaultCardListRowProps> = ({
       <td className="py-3.5 px-4">
         <div className="flex items-center gap-2">
           <span className="font-bold text-white group-hover:underline underline-offset-2">
-            {card.data.name}
+            {card.data.name || card.data.nameKr}
           </span>
           {card.isMyCard && (
             <span className="text-[10px] text-zinc-400 font-medium">· 내 명함</span>
           )}
         </div>
       </td>
-      <td className="py-3.5 px-4 text-zinc-400">{card.data.titleKr || card.data.title}</td>
-      <td className="py-3.5 px-4 text-zinc-300">{card.data.organization}</td>
+      <td className="py-3.5 px-4 text-zinc-400">{card.data.titleKr || card.data.title || '-'}</td>
+      <td className="py-3.5 px-4 text-zinc-300">
+        {card.data.organizationKr || card.data.organization || '-'}
+      </td>
       <td className="py-3.5 px-4 text-zinc-400 text-[11px]">{card.category}</td>
       <td className="py-3.5 px-4">
         {card.scannedImage ? (

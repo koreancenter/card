@@ -289,6 +289,8 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
     if (isProcessing || processingRef.current) return;
     if (!name.trim() || !phone.trim() || !onSaveCard) return;
 
+    const cleanName = name.trim();
+    const cleanOrg = companyAndNote.trim();
     const rawPhone = phone.replace(/[^0-9+]/g, '');
     const id = `photo-card-${Date.now()}`;
     const now = new Date().toISOString().split('T')[0];
@@ -296,21 +298,41 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
     const newCard: StoredCard = {
       id,
       isMyCard: false,
-      isPhotoCard: true,
+      isPhotoCard: Boolean(frontPhoto),
+      creation_mode: 'photo',
       category,
       theme: 'sumi_ink',
       layout_type: 'editorial_minimal',
+      card_features: {
+        show_en_name: false,
+        show_sub_org: Boolean(cleanOrg),
+        show_address: false,
+        monogram_text: '',
+      },
       createdAt: now,
-      notes: companyAndNote.trim() || '실물 명함 보관',
+      notes: cleanOrg || '실물 명함 보관',
       scannedImage: frontPhoto || undefined,
       scannedImageBack: backPhoto || undefined,
+      front_image_url: frontPhoto || undefined,
+      back_image_url: backPhoto || undefined,
+      details: {
+        en_name: '',
+        sub_org: '',
+        address: '',
+        address_en: '',
+        slogan: '',
+        show_address: false,
+        show_en_name: false,
+      },
       data: {
-        name: name.trim(),
-        nameKr: name.trim(),
+        name: cleanName,
+        nameEn: '',
+        nameKr: '',
         title: '',
         titleKr: '',
-        organization: companyAndNote.trim() || '비즈니스 파트너',
-        organizationKr: companyAndNote.trim() || '비즈니스 파트너',
+        organization: '',
+        organizationKr: cleanOrg,
+        subOrg: '',
         phone: phone.trim(),
         phoneRaw: rawPhone,
         whatsappUrl: rawPhone ? `https://wa.me/${rawPhone.replace(/^\+/, '')}` : '',
@@ -319,6 +341,16 @@ export const PhotoArchiveModal: React.FC<PhotoArchiveModalProps> = ({
         websiteDisplay: '',
         addressLines: [],
         addressKr: '',
+        address_en: '',
+        details: {
+          en_name: '',
+          sub_org: '',
+          address: '',
+          address_en: '',
+          slogan: '',
+          show_address: false,
+          show_en_name: false,
+        },
         googleMapsUrl: '',
         naverMapsUrl: '',
       },

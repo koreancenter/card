@@ -99,6 +99,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
   const mainTitle =
     (!isLegacyBackTitle && rawBackTitle) ||
     data.organization ||
+    data.organizationKr ||
     'GOGUMA KNOWLEDGE OFFICE';
 
   const rawBackSubtitle = (data.backSubtitle || '').trim();
@@ -108,12 +109,14 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
   const isLegacyTag =
     rawBackTagline === 'AI EXPERT GROUP' || rawBackTagline === 'GOGUMA AI STUDIO';
 
-  const subHeading =
-    (!isLegacySub && rawBackSubtitle && rawBackSubtitle !== mainTitle
+  const rawSubHeading =
+    !isLegacySub && rawBackSubtitle && rawBackSubtitle.toLowerCase() !== mainTitle.trim().toLowerCase()
       ? rawBackSubtitle
-      : !isLegacyTag && rawBackTagline && rawBackTagline !== mainTitle
+      : !isLegacyTag && rawBackTagline && rawBackTagline.toLowerCase() !== mainTitle.trim().toLowerCase()
         ? rawBackTagline
-        : 'KOREAN CENTER GLOBAL NETWORK');
+        : 'KOREAN CENTER GLOBAL NETWORK';
+  const subHeading =
+    rawSubHeading.trim().toLowerCase() !== mainTitle.trim().toLowerCase() ? rawSubHeading : '';
 
   const rawAddressEn = (
     data.address_en ||
@@ -152,7 +155,7 @@ export const BusinessCardBack: React.FC<BusinessCardBackProps> = ({
         <h2 className={`${isPortrait ? 'text-xs sm:text-sm' : 'text-sm sm:text-base md:text-[17px]'} font-semibold tracking-[0.16em] uppercase leading-snug ${themeStyles.textPrimary} break-keep`}>
           {mainTitle}
         </h2>
-        {subHeading && (
+        {subHeading && subHeading !== mainTitle && (
           <p className={`text-[9px] sm:text-[10px] font-normal uppercase tracking-[0.24em] leading-relaxed ${themeStyles.textSecondary} break-keep`}>
             {subHeading}
           </p>

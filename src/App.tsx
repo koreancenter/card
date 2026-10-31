@@ -32,7 +32,6 @@ import { APP_BASE_DOMAIN, resolveCardFromLocation, getCardShareUrl, getRouteSlug
 import { pullWalletFromEdge, pushWalletToEdge } from './utils/syncWallet';
 import { useAutoLock } from './hooks/useAutoLock';
 import { useModalState } from './hooks/useModalState';
-import { CARD_DATA } from './utils/vcard';
 import { verifyBiometric } from './utils/biometrics';
 import { 
   Check, 
@@ -270,11 +269,12 @@ export default function App() {
   // Create New My Card (Protected by PIN if locked)
   const handleOpenCreateModal = () => {
     requireUnlock(() => {
+      const defaultSlug = `card-${String(Date.now()).slice(-4)}`;
       const newCardTemplate: StoredCard = {
         id: `my-card-${Date.now()}`,
         isMyCard: true,
         isDefault: cards.length === 0,
-        slug: 'master',
+        slug: defaultSlug,
         owner_key: `key_${Date.now()}`,
         theme: activeCard?.theme || 'pure_white',
         layout_type: 'editorial_minimal',
@@ -287,10 +287,49 @@ export default function App() {
         category: '글로벌 네트워크',
         createdAt: new Date().toISOString().split('T')[0],
         notes: '내 디지털 명함',
+        details: {
+          en_name: '',
+          sub_org: '',
+          address: '',
+          address_en: '',
+          slogan: '',
+          show_address: true,
+          show_en_name: true
+        },
         data: {
-          ...CARD_DATA,
-          website: `https://${APP_BASE_DOMAIN}/master`,
-          websiteDisplay: `${APP_BASE_DOMAIN}/master`
+          organization: '',
+          organizationKr: '',
+          subOrg: '',
+          name: '',
+          nameEn: '',
+          nameKr: '',
+          title: '',
+          titleKr: '',
+          phone: '',
+          phoneRaw: '',
+          whatsappUrl: '',
+          email: '',
+          website: `https://${APP_BASE_DOMAIN}/${defaultSlug}`,
+          websiteDisplay: `${APP_BASE_DOMAIN}/${defaultSlug}`,
+          addressLines: [],
+          addressKr: '',
+          address_en: '',
+          addressEn: '',
+          details: {
+            en_name: '',
+            sub_org: '',
+            address: '',
+            address_en: '',
+            slogan: '',
+            show_address: true,
+            show_en_name: true
+          },
+          googleMapsUrl: '',
+          naverMapsUrl: '',
+          backTitle: '',
+          backSubtitle: '',
+          backTagline: '',
+          backHqAddress: ''
         }
       };
       modals.openEditor(newCardTemplate, true);
@@ -327,9 +366,12 @@ export default function App() {
     if (!activeCard) return;
     const targetUrl = getCardShareUrl(activeCard);
     const displayUrl = activeCard.data.websiteDisplay || targetUrl;
+    const displayName = activeCard.data.name || activeCard.data.nameKr;
+    const displayOrg = activeCard.data.organizationKr || activeCard.data.organization;
+    const displayTitle = activeCard.data.titleKr || activeCard.data.title;
     const shareData = {
-      title: `${activeCard.data.name} — ${activeCard.data.organization}`,
-      text: `${activeCard.data.organization} ${activeCard.data.title} ${activeCard.data.name} 디지털 명함`,
+      title: displayOrg ? `${displayName} — ${displayOrg}` : displayName,
+      text: [displayOrg, displayTitle, displayName, '디지털 명함'].filter(Boolean).join(' '),
       url: targetUrl,
     };
 

@@ -83,6 +83,7 @@ export interface CardData {
   organizationKr: string;
   subOrg?: string;
   name: string;
+  nameEn?: string;
   nameKr: string;
   title: string;
   titleKr: string;

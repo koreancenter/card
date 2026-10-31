@@ -176,6 +176,21 @@ export class CardSerializer {
    * RFC-6350 / RFC-2426 Compliant vCard 3.0 String Generator
    */
   static toVCard(data: CardData = CARD_DATA, options: VCardOptions = { includeRevision: true }): string {
+    const primaryName = (data.name || data.nameKr || '').trim();
+    const rawSubName = (data.nameEn || data.details?.en_name || (data.name ? data.nameKr : '') || '').trim();
+    const subName =
+      rawSubName && rawSubName.toLowerCase() !== primaryName.toLowerCase() ? rawSubName : '';
+
+    const primaryOrg = (data.organization || data.organizationKr || '').trim();
+    const rawSubOrg = (data.organization && data.organizationKr ? data.organizationKr : '').trim();
+    const subOrg =
+      rawSubOrg && rawSubOrg.toLowerCase() !== primaryOrg.toLowerCase() ? rawSubOrg : '';
+
+    const primaryTitle = (data.title || data.titleKr || '').trim();
+    const rawSubTitle = (data.title && data.titleKr ? data.titleKr : '').trim();
+    const subTitle =
+      rawSubTitle && rawSubTitle.toLowerCase() !== primaryTitle.toLowerCase() ? rawSubTitle : '';
+
     const addressJoined = data.address_en || (data.addressLines && data.addressLines.length > 0 
       ? data.addressLines.join(', ') 
       : (data.addressKr || ''));
@@ -183,15 +198,15 @@ export class CardSerializer {
     const lines: string[] = [
       'BEGIN:VCARD',
       'VERSION:3.0',
-      `N:${(data.name || '').split(' ').reverse().join(';')};;;`,
-      `FN:${data.nameKr ? `${data.name} (${data.nameKr})` : data.name}`,
-      `ORG:${data.organization || ''}${data.organizationKr ? ` (${data.organizationKr})` : ''}`,
-      `TITLE:${data.title || ''}${data.titleKr ? ` (${data.titleKr})` : ''}`,
+      `N:${primaryName.split(' ').reverse().join(';')};;;`,
+      `FN:${subName ? `${primaryName} (${subName})` : primaryName}`,
+      `ORG:${primaryOrg}${subOrg ? ` (${subOrg})` : ''}`,
+      `TITLE:${primaryTitle}${subTitle ? ` (${subTitle})` : ''}`,
       `TEL;TYPE=CELL,VOICE,PREF:${data.phoneRaw || (data.phone ? data.phone.replace(/[^0-9+]/g, '') : '')}`,
       `EMAIL;TYPE=INTERNET,WORK,PREF:${data.email || ''}`,
       `URL;TYPE=WORK:${data.website || ''}`,
       `ADR;TYPE=WORK:;;${addressJoined};;;;`,
-      `NOTE:${data.organization || ''} - ${data.title || ''}`
+      `NOTE:${[primaryOrg, primaryTitle].filter(Boolean).join(' - ')}`
     ];
 
     if (options.includeRevision) {
@@ -259,10 +274,34 @@ export class CardSerializer {
    * Standalone Offline HTML Single-File Bundle
    */
   static toStandaloneHtml(data: CardData, theme: CardTheme = 'pure_white', options: HtmlExportOptions = {}): string {
+    const primaryName = (data.name || data.nameKr || '').trim();
+    const rawSubName = (data.nameEn || data.details?.en_name || (data.name ? data.nameKr : '') || '').trim();
+    const subName =
+      rawSubName && rawSubName.toLowerCase() !== primaryName.toLowerCase() ? rawSubName : '';
+
+    const primaryOrg = (data.organization || data.organizationKr || '').trim();
+    const rawSubOrg = (data.organization && data.organizationKr ? data.organizationKr : '').trim();
+    const subOrgLabel =
+      rawSubOrg && rawSubOrg.toLowerCase() !== primaryOrg.toLowerCase() ? rawSubOrg : '';
+
+    const primaryTitle = (data.title || data.titleKr || '').trim();
+    const rawSubTitle = (data.title && data.titleKr ? data.titleKr : '').trim();
+    const subTitle =
+      rawSubTitle && rawSubTitle.toLowerCase() !== primaryTitle.toLowerCase() ? rawSubTitle : '';
+
     const vcardString = this.toVCard(data);
     const vcardEncoded = encodeURIComponent(vcardString);
-    const pageTitle = `${escapeHtmlText(data.name || '')} (${escapeHtmlText(data.nameKr || '')}) — ${escapeHtmlText(data.organization || '')}`;
-    const pageDesc = `${escapeHtmlText(data.organizationKr || '')} ${escapeHtmlText(data.titleKr || '')} ${escapeHtmlText(data.name || '')}의 디지털 명함입니다.`;
+    const nameTitlePart = subName
+      ? `${escapeHtmlText(primaryName)} (${escapeHtmlText(subName)})`
+      : escapeHtmlText(primaryName);
+    const pageTitle = primaryOrg
+      ? `${nameTitlePart} — ${escapeHtmlText(primaryOrg)}`
+      : nameTitlePart;
+    const pageDesc = `${escapeHtmlText(
+      [data.organizationKr || primaryOrg, data.titleKr || primaryTitle, primaryName]
+        .filter(Boolean)
+        .join(' ')
+    )}의 디지털 명함입니다.`;
     const rawUrl = (data.website || 'https://card.goguma.app/master').trim();
     const officialUrl = /^https?:\/\//i.test(rawUrl) ? escapeHtmlText(rawUrl) : 'https://card.goguma.app/master';
     const safePhoneHref = escapeHtmlText((data.phoneRaw || '').replace(/[^0-9+]/g, ''));
@@ -337,7 +376,7 @@ export class CardSerializer {
         韓
       </div>
       <a href="${officialUrl}" class="font-serif tracking-widest text-xs uppercase text-zinc-300 hover:text-white transition-colors">
-        ${escapeHtmlText(data.organization || '')}
+        ${escapeHtmlText(primaryOrg)}
       </a>
     </div>
   </header>
@@ -360,15 +399,15 @@ export class CardSerializer {
         <!-- CARD FRONT -->
         <div class="absolute inset-0 w-full h-full p-6 sm:p-7 flex flex-col justify-between backface-hidden rounded-2xl overflow-hidden" style="background-color: ${selectedTheme.bg}; color: ${selectedTheme.text};">
           <div>
-            <p class="text-[10px] tracking-tight font-medium" style="color: ${selectedTheme.textSec};">${escapeHtmlText(data.organizationKr || '')}</p>
-            <h2 class="text-sm font-semibold tracking-tight">${escapeHtmlText(data.organization || '')}</h2>
-            ${data.subOrg ? `<p class="text-[9px] font-semibold tracking-[0.2em] uppercase mt-0.5" style="color: ${selectedTheme.textSec};">${escapeHtmlText(data.subOrg)}</p>` : ''}
+            ${subOrgLabel && subOrgLabel !== primaryOrg ? `<p class="text-[10px] tracking-tight font-medium" style="color: ${selectedTheme.textSec};">${escapeHtmlText(subOrgLabel)}</p>` : ''}
+            ${primaryOrg ? `<h2 class="text-sm font-semibold tracking-tight">${escapeHtmlText(primaryOrg)}</h2>` : ''}
+            ${data.subOrg && data.subOrg.trim() !== primaryOrg && data.subOrg.trim() !== subOrgLabel ? `<p class="text-[9px] font-semibold tracking-[0.2em] uppercase mt-0.5" style="color: ${selectedTheme.textSec};">${escapeHtmlText(data.subOrg)}</p>` : ''}
           </div>
 
           <div class="my-auto py-4 space-y-1">
-            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">${escapeHtmlText(data.name || '')}</h1>
-            <p class="text-xs font-mono tracking-wider" style="color: ${selectedTheme.textSec};">${escapeHtmlText(data.nameKr || '')}</p>
-            <p class="text-xs pt-1 font-medium">${escapeHtmlText(data.title || '')} <span style="color: ${selectedTheme.textSec};">(${escapeHtmlText(data.titleKr || '')})</span></p>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">${escapeHtmlText(primaryName)}</h1>
+            ${subName && subName !== primaryName ? `<p class="text-xs font-mono tracking-wider" style="color: ${selectedTheme.textSec};">${escapeHtmlText(subName)}</p>` : ''}
+            ${primaryTitle ? `<p class="text-xs pt-1 font-medium">${escapeHtmlText(primaryTitle)}${subTitle && subTitle !== primaryTitle ? ` <span style="color: ${selectedTheme.textSec};">(${escapeHtmlText(subTitle)})</span>` : ''}</p>` : ''}
           </div>
 
           <div class="space-y-2 pt-4 text-xs" style="border-top: 1px solid ${selectedTheme.border};">
@@ -390,7 +429,7 @@ export class CardSerializer {
         <!-- CARD BACK -->
         <div class="absolute inset-0 w-full h-full p-6 sm:p-7 flex flex-col justify-between backface-hidden rotate-y-180 rounded-2xl overflow-hidden" style="background-color: ${selectedTheme.bg}; color: ${selectedTheme.text};">
           <div class="my-auto text-center space-y-2">
-            <h2 class="text-lg sm:text-xl font-semibold tracking-[0.14em] uppercase">${escapeHtmlText(data.backTitle || data.organization || 'GOGUMA KNOWLEDGE OFFICE')}</h2>
+            <h2 class="text-lg sm:text-xl font-semibold tracking-[0.14em] uppercase">${escapeHtmlText(data.backTitle || primaryOrg || 'GOGUMA KNOWLEDGE OFFICE')}</h2>
             <p class="text-[10px] font-medium uppercase tracking-[0.24em]" style="color: ${selectedTheme.textSec};">${escapeHtmlText(data.backSubtitle || data.backTagline || 'KOREAN CENTER GLOBAL NETWORK')}</p>
           </div>
 
